@@ -315,10 +315,12 @@ U+256x	╠	╡	╢	╣	╤	╥	╦	╧	╨	╩	╪	╫	╬	╭	╮	╯
 ♦♣║♥ ║
 QJ║10║
 ╚╚╚══╝
-╔══╗
-║░░║
-║░░║
-╚══╝
+╔══╗╔══╗╔══╗╔══╗╔══╗
+║░░║║▛▜║║▗▜║║▚▞║║╠╣║
+║░░║║▙▟║║▙▘║║▞▚║║╠╣║
+╚══╝╚══╝╚══╝╚══╝╚══╝
+u2591u2591 u259bu259c u2597u259c u259au259e
+u2591u2591 u2599u259f u2599u2598 u259eu259a
 ┌  ┐
  
  
@@ -326,7 +328,8 @@ QJ║10║
 */
 void pt_card_simple(int x, int y, Card *card) {
     int cflags = card->flags;
-    int fg = (card_red(cflags) ? RED : BRIGHT_BLACK);
+    int fg = (card_red(cflags) ? g_settings->redcolor : g_settings->blackcolor);
+    int bg = g_settings->bgcolor;
     char *fstr = malloc(8 * sizeof(char));
     char *rankstr = malloc(4 * sizeof(char));
     int rank = get_rank(cflags);
@@ -348,7 +351,7 @@ void pt_card_simple(int x, int y, Card *card) {
         case 's': snprintf(fstr, 8, "\u2660%s", rankstr); break;
         default: break;
     }
-    scr_pt_clr(x,y,fg,WHITE,"%s",fstr);
+    scr_pt_clr(x,y,fg,bg,"%s",fstr);
     scr_reset();
     free(fstr);
     free(rankstr);
@@ -356,7 +359,8 @@ void pt_card_simple(int x, int y, Card *card) {
 
 void pt_card(int x, int y, Card *card) {
     int cflags = card->flags;
-    int fg = (card_red(cflags) ? RED : BRIGHT_BLACK);
+    int fg = (card_red(cflags) ? g_settings->redcolor : g_settings->blackcolor);
+    int bg = g_settings->bgcolor;
     char *sstr = malloc(8 * sizeof(char));
     char *rankstr = malloc(4 * sizeof(char));
     int rank = get_rank(cflags);
@@ -379,14 +383,14 @@ void pt_card(int x, int y, Card *card) {
         default: break;
     }
 
-    scr_pt_clr(x,y,fg,WHITE,"\u2554\u2550\u2550\u2557");
-    scr_pt_clr(x,y+1,fg,WHITE,"\u2551%s \u2551",sstr);
+    scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
+    scr_pt_clr(x,y+1,fg,bg,"\u2551%s \u2551",sstr);
     if(10 == rank) {
-        scr_pt_clr(x,y+2,fg,WHITE,"\u2551%s\u2551",rankstr);
+        scr_pt_clr(x,y+2,fg,bg,"\u2551%s\u2551",rankstr);
     } else {
-        scr_pt_clr(x,y+2,fg,WHITE,"\u2551 %s\u2551",rankstr);
+        scr_pt_clr(x,y+2,fg,bg,"\u2551 %s\u2551",rankstr);
     }
-    scr_pt_clr(x,y+3,fg,WHITE,"\u255A\u2550\u2550\u255D");
+    scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
     free(sstr);
     free(rankstr);
 }
@@ -403,38 +407,41 @@ void pt_card_top(int x, int y, Card *card) {
     ╚══╝
     */
     int rank = get_rank(card->flags);
-    int fg = (card_red(card->flags) ? RED : BRIGHT_BLACK);
-    scr_pt_clr(x,y,fg, WHITE, "\u2554");
+    int fg = (card_red(card->flags) ? g_settings->redcolor : g_settings->blackcolor);
+    int bg = g_settings->bgcolor;
+    scr_pt_clr(x,y,fg, bg, "\u2554");
     pt_card_simple(x+1,y,card);
     if(10 != rank) {
-        scr_pt_clr(x+3,y,fg,WHITE, "\u2557");
+        scr_pt_clr(x+3,y,fg,bg, "\u2557");
     }
 }
 
 void pt_card_suite(int x, int y, Card *card) {
-    int fg = (card_red(card->flags) ? RED : BRIGHT_BLACK);
+    int fg = (card_red(card->flags) ? g_settings->redcolor : g_settings->blackcolor);
+    int bg = g_settings->bgcolor;
     switch(get_suite(card->flags)) {
-        case 'h': scr_pt_clr(x,y,fg,WHITE,"\u2665"); break;
-        case 'd': scr_pt_clr(x,y,fg,WHITE,"\u2666"); break;
-        case 'c': scr_pt_clr(x,y,fg,WHITE,"\u2663"); break;
-        case 's': scr_pt_clr(x,y,fg,WHITE,"\u2660"); break;
+        case 'h': scr_pt_clr(x,y,fg,bg,"\u2665"); break;
+        case 'd': scr_pt_clr(x,y,fg,bg,"\u2666"); break;
+        case 'c': scr_pt_clr(x,y,fg,bg,"\u2663"); break;
+        case 's': scr_pt_clr(x,y,fg,bg,"\u2660"); break;
         default: break;
     }
 }
 
 void pt_card_rank(int x, int y, Card *card) {
     int rank = get_rank(card->flags);
-    int fg = (card_red(card->flags) ? RED : BRIGHT_BLACK);
+    int fg = (card_red(card->flags) ? g_settings->redcolor : g_settings->blackcolor);
+    int bg = g_settings->bgcolor;
     if(13 == rank) {
-        scr_pt_clr(x,y,fg,WHITE,"K");
+        scr_pt_clr(x,y,fg,bg,"K");
     } else if (12 == rank) {
-        scr_pt_clr(x,y,fg,WHITE,"Q");
+        scr_pt_clr(x,y,fg,bg,"Q");
     } else if (11 == rank) {
-        scr_pt_clr(x,y,fg,WHITE,"J");
+        scr_pt_clr(x,y,fg,bg,"J");
     } else if (1 == rank) {
-        scr_pt_clr(x,y,fg,WHITE,"A");
+        scr_pt_clr(x,y,fg,bg,"A");
     } else {
-        scr_pt_clr(x,y,fg,WHITE,"%d",rank);
+        scr_pt_clr(x,y,fg,bg,"%d",rank);
     }
 }
 
@@ -447,15 +454,16 @@ void pt_card_left(int x, int y, Card *card) {
     0╚╚╚══╝
     */
     int rank = get_rank(card->flags);
-    int fg = (card_red(card->flags) ? RED : BRIGHT_BLACK);
-    scr_pt_clr(x,y,fg, WHITE, "\u2554");
+    int fg = (card_red(card->flags) ? g_settings->redcolor : g_settings->blackcolor);
+    int bg = g_settings->bgcolor;
+    scr_pt_clr(x,y,fg, bg, "\u2554");
     pt_card_suite(x,y+1,card);
     if(10 != rank) {
         pt_card_rank(x,y+2,card);
-        scr_pt_clr(x,y+3,fg,WHITE,"\u255A");
+        scr_pt_clr(x,y+3,fg,bg,"\u255A");
     } else {
-        scr_pt_clr(x,y+2,fg,WHITE,"1");
-        scr_pt_clr(x,y+3,fg,WHITE,"0");
+        scr_pt_clr(x,y+2,fg,bg,"1");
+        scr_pt_clr(x,y+3,fg,bg,"0");
     }
 }
 
@@ -463,16 +471,18 @@ void pt_card_back(int x, int y) {
     /*
      * Prints the card back like this - might change this to later have
      * different backs or designs or something.
-    ╔══╗
-    ║░░║
-    ║░░║
-    ╚══╝
+    ╔══╗╔══╗╔══╗╔══╗╔══╗
+    ║░░║║▛▜║║▗▜║║▚▞║║  ║
+    ║░░║║▙▟║║▙▘║║▞▚║║  ║
+    ╚══╝╚══╝╚══╝╚══╝╚══╝
+    u2591u2591 u259bu259c u2597u259c u259au259e
+    u2591u2591 u2599u259f u2599u2598 u259eu259a
     */
-    int fg = CYAN;
-    int bg = BRIGHT_BLACK;
+    int fg = g_settings->deckcolor;
+    int bg = g_settings->bgcolor;
     scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
-    scr_pt_clr(x,y+1,fg,bg,"\u2551\u2591\u2591\u2551");
-    scr_pt_clr(x,y+2,fg,bg,"\u2551\u2591\u2591\u2551");
+    scr_pt_clr(x,y+1,fg,bg,"\u2551\u2597\u259c\u2551");
+    scr_pt_clr(x,y+2,fg,bg,"\u2551\u2599\u2598\u2551");
     scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
 }
 
@@ -490,6 +500,22 @@ u2514 u2518
     scr_pt_clr(x,y+3,BRIGHT_BLACK,BLACK,"\u2514  \u2518");
 }
 
+void pt_card_space_suite(int x, int y, int cflags) {
+    /* 
+     * As above, but with a hollow suite symbol in the space
+     */
+    pt_card_space(x,y);
+    if(card_hearts(cflags)) {
+        scr_pt_clr(x+1,y+1,BRIGHT_BLACK,BLACK,"\u2661");
+    } else if(card_diamonds(cflags)) {
+        scr_pt_clr(x+1,y+1,BRIGHT_BLACK,BLACK,"\u2662");
+    } else if(card_spades(cflags)) {
+        scr_pt_clr(x+1,y+1,BRIGHT_BLACK,BLACK,"\u2664");
+    } else if(card_clubs(cflags)) {
+        scr_pt_clr(x+1,y+1,BRIGHT_BLACK,BLACK,"\u2667");
+    }
+}
+
 void pt_card_special_rank(int x, int y, int cflags, char ch) {
 /*
  * ♠ u2660, ♤ u2664
@@ -498,8 +524,8 @@ void pt_card_special_rank(int x, int y, int cflags, char ch) {
  * ♣ u2663, ♧ u2667
  */
     char *suite = malloc(6 * sizeof(char));
-    int fg = (card_red(cflags) ? RED : BRIGHT_BLACK);
-    int bg = WHITE;
+    int fg = (card_red(cflags) ? g_settings->redcolor : g_settings->blackcolor);
+    int bg = g_settings->bgcolor;
     if(card_hearts(cflags)) {
         strcpy(suite,"\u2665");
     } else if (card_diamonds(cflags)) {
@@ -528,5 +554,7 @@ void pt_card_title(int x, int y, char *str) {
         }
         pt_card_special_rank(x + (i * 4), y, cflags, str[i]);
     }
+    pt_card_back(x-4,y);
+    pt_card_back(x + (i *4),y);
 }
 

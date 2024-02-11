@@ -17,28 +17,27 @@
 * You should have received a copy of the GNU General Public License
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CARDS_H
-#define CARDS_H
 
-#include <term_engine.h>
-#include <mt19937.h>
+#ifndef BUTTON_H
+#define BUTTON_H
 
-#include <flags.h>
-#include <deck.h>
-#include <button.h>
+typedef struct Button Button;
 
-#include <klondike.h>
-
-typedef struct Settings Settings;
-
-struct Settings {
-    uint8_t redcolor;
-    uint8_t blackcolor;
-    uint8_t deckcolor;
-    uint8_t bgcolor;
-    uint8_t btncolor;
-    uint8_t btnselectcolor;
+struct Button {
+    char ch;
+    bool active;
+    bool selected;
+    int x;
+    int y;
+    int id;
 };
 
-extern Settings *g_settings;
-#endif //CARDS_H
+Button* create_button(int x, int y, int id, char ch);
+void destroy_button(Button *btn);
+
+void pt_button(Button *btn);
+void mv_button(Button *btn, int x, int y);
+void pt_button_at(Button *btn, int x, int y);
+void toggle_button(Button *btn);
+
+#endif //BUTTON_H

@@ -17,28 +17,42 @@
 * You should have received a copy of the GNU General Public License
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CARDS_H
-#define CARDS_H
+#ifndef KLONDIKE_H
+#define KLONDIKE_H
 
-#include <term_engine.h>
-#include <mt19937.h>
+typedef enum {
+    WASTE       =   0,
+    TAB_B,
+    TAB_C,
+    TAB_D,
+    TAB_E,
+    TAB_F,
+    TAB_G,
+    TAB_H,
+    FND_H,
+    FND_D,
+    FND_C,
+    FND_S,
+    STOCK,
+    NUM_DECKS
+} KlondikeDecks;
 
-#include <flags.h>
-#include <deck.h>
-#include <button.h>
+typedef struct {
+    Deck **decks; 
+    Deck *fromref; 
+    Deck *toref; 
+    Button **btns;
+    char *msg;
+} Klondike;
 
-#include <klondike.h>
+extern Klondike* g_klondike;
 
-typedef struct Settings Settings;
+void klondike_init(void);
+void klondike_cleanup(void);
+void klondike_deal(void);
+void klondike_loop(void);
+bool klondike_events(void);
+void klondike_update(void);
+void klondike_draw(void);
 
-struct Settings {
-    uint8_t redcolor;
-    uint8_t blackcolor;
-    uint8_t deckcolor;
-    uint8_t bgcolor;
-    uint8_t btncolor;
-    uint8_t btnselectcolor;
-};
-
-extern Settings *g_settings;
-#endif //CARDS_H
+#endif //KLONDIKE_H

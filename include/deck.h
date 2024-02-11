@@ -109,6 +109,7 @@ void pt_card_rank(int x, int y, Card *card);
 void pt_card_left(int x, int y, Card *card);
 void pt_card_back(int x, int y);
 void pt_card_space(int x, int y);
+void pt_card_space_suite(int x, int y, int cflags);
 void pt_card_special_rank(int x, int y, int cflags, char ch);
 void pt_card_title(int x, int y, char *str);
 

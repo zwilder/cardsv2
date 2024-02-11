@@ -19,15 +19,25 @@
 */
 #include <cards.h>
 
+Settings *g_settings;
 int main(int argc, char **argv) {
     term_init(); // Initialize the terminal
     init_genrand(time(NULL)); // Seed the pnrg
+    g_settings = malloc(sizeof(Settings));
+    g_settings->redcolor = BRIGHT_RED;
+    g_settings->blackcolor = WHITE;
+    g_settings->deckcolor = BRIGHT_BLACK;
+    g_settings->bgcolor = BLACK;
+    g_settings->btnselectcolor = CYAN;
+    g_settings->btncolor = WHITE;
     
     scr_clear();
-    pt_card_title((g_screenW / 2) - 12, 0,
+    pt_card_title((g_screenW / 2) - 12, 
+            (g_screenH / 2) - 2,
             "Cards!");
     scr_reset();
     kb_get_bl_char();
+    klondike_init();
 
     /*
     Deck *testdeck = create_deck();
@@ -36,47 +46,23 @@ int main(int argc, char **argv) {
     int i = 0;
     fill_deck(testdeck);
     shuffle_deck(testdeck);
-    while(testdeck->count) {
-        scr_clear();
-        pt_card_title((g_screenW / 2) - 12,
-                0, "Cards!");
-        scr_pt_clr((g_screenW / 2) - 7,
-                g_screenH / 2, BLACK, WHITE, 
-                "Deck size: %d", testdeck->count);
-        scr_pt_clr((g_screenW / 2) - 7,
-                (g_screenH / 2)+1, BLACK, WHITE, 
-                "Hand size: %d", hand->count);
-        draw_card(testdeck,hand);
-        //card = remove_card_from_deck(testdeck, testdeck->cards);
-        //add_card_to_deck(hand,card);
-        card = hand->cards;
-        while(card->next) {
-            card = card->next;
-        }
-        pt_card_back(1,1);
-        pt_card(1,2,card);
-        scr_reset();
-        kb_get_bl_char();
-    }
-    
     scr_clear();
-    add_deck(hand,testdeck);
-    shuffle_deck(testdeck);
     draw_cards(testdeck, hand, 5);
     card = hand->cards;
     while(card->next) {
-        pt_card_left(1+i, 1, card);
+        pt_card_top(1, 1+i, card);
         card = card->next;
         i++;
     }
-    pt_card(1+i,1,card);
+    pt_card(1,1+i,card);
     scr_reset();
     kb_get_bl_char();
 
     destroy_deck(hand);
     destroy_deck(testdeck);
-
     */
+
+    free(g_settings);
     term_close(); // Reset the terminal
     return 0;
 }
