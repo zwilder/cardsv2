@@ -390,3 +390,143 @@ void pt_card(int x, int y, Card *card) {
     free(sstr);
     free(rankstr);
 }
+
+void pt_card_top(int x, int y, Card *card) {
+    /*
+     * Prints the top of the card for vertical stacking like:
+    ╔♣10
+    ╔♦Q╗
+    ╔♣J╗
+    ╔══╗
+    ║♥ ║
+    ║10║
+    ╚══╝
+    */
+    int rank = get_rank(card->flags);
+    int fg = (card_red(card->flags) ? RED : BRIGHT_BLACK);
+    scr_pt_clr(x,y,fg, WHITE, "\u2554");
+    pt_card_simple(x+1,y,card);
+    if(10 != rank) {
+        scr_pt_clr(x+3,y,fg,WHITE, "\u2557");
+    }
+}
+
+void pt_card_suite(int x, int y, Card *card) {
+    int fg = (card_red(card->flags) ? RED : BRIGHT_BLACK);
+    switch(get_suite(card->flags)) {
+        case 'h': scr_pt_clr(x,y,fg,WHITE,"\u2665"); break;
+        case 'd': scr_pt_clr(x,y,fg,WHITE,"\u2666"); break;
+        case 'c': scr_pt_clr(x,y,fg,WHITE,"\u2663"); break;
+        case 's': scr_pt_clr(x,y,fg,WHITE,"\u2660"); break;
+        default: break;
+    }
+}
+
+void pt_card_rank(int x, int y, Card *card) {
+    int rank = get_rank(card->flags);
+    int fg = (card_red(card->flags) ? RED : BRIGHT_BLACK);
+    if(13 == rank) {
+        scr_pt_clr(x,y,fg,WHITE,"K");
+    } else if (12 == rank) {
+        scr_pt_clr(x,y,fg,WHITE,"Q");
+    } else if (11 == rank) {
+        scr_pt_clr(x,y,fg,WHITE,"J");
+    } else if (1 == rank) {
+        scr_pt_clr(x,y,fg,WHITE,"A");
+    } else {
+        scr_pt_clr(x,y,fg,WHITE,"%d",rank);
+    }
+}
+
+void pt_card_left(int x, int y, Card *card) {
+    /*
+     * Prints the left side of the card so the cards can be stacked liked so:
+    ╔╔╔╔══╗
+    ♦♦♣║♥ ║
+    1QJ║10║
+    0╚╚╚══╝
+    */
+    int rank = get_rank(card->flags);
+    int fg = (card_red(card->flags) ? RED : BRIGHT_BLACK);
+    scr_pt_clr(x,y,fg, WHITE, "\u2554");
+    pt_card_suite(x,y+1,card);
+    if(10 != rank) {
+        pt_card_rank(x,y+2,card);
+        scr_pt_clr(x,y+3,fg,WHITE,"\u255A");
+    } else {
+        scr_pt_clr(x,y+2,fg,WHITE,"1");
+        scr_pt_clr(x,y+3,fg,WHITE,"0");
+    }
+}
+
+void pt_card_back(int x, int y) {
+    /*
+     * Prints the card back like this - might change this to later have
+     * different backs or designs or something.
+    ╔══╗
+    ║░░║
+    ║░░║
+    ╚══╝
+    */
+    int fg = CYAN;
+    int bg = BRIGHT_BLACK;
+    scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
+    scr_pt_clr(x,y+1,fg,bg,"\u2551\u2591\u2591\u2551");
+    scr_pt_clr(x,y+2,fg,bg,"\u2551\u2591\u2591\u2551");
+    scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
+}
+
+void pt_card_space(int x, int y) {
+    /*
+     * Prints a blank space for a card
+u250c u2510
+u2514 u2518
+    ┌  ┐
+     
+     
+    └  ┘
+    */
+    scr_pt_clr(x,y,BRIGHT_BLACK,BLACK,"\u250C  \u2510");
+    scr_pt_clr(x,y+3,BRIGHT_BLACK,BLACK,"\u2514  \u2518");
+}
+
+void pt_card_special_rank(int x, int y, int cflags, char ch) {
+/*
+ * ♠ u2660, ♤ u2664
+ * ♥ u2665, ♡ u2661
+ * ♦ u2666, ♢ u2662
+ * ♣ u2663, ♧ u2667
+ */
+    char *suite = malloc(6 * sizeof(char));
+    int fg = (card_red(cflags) ? RED : BRIGHT_BLACK);
+    int bg = WHITE;
+    if(card_hearts(cflags)) {
+        strcpy(suite,"\u2665");
+    } else if (card_diamonds(cflags)) {
+        strcpy(suite,"\u2666");
+    } else if (card_clubs(cflags)) {
+        strcpy(suite,"\u2663");
+    } else if (card_spades(cflags)) {
+        strcpy(suite,"\u2660");
+    }
+    scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
+    scr_pt_clr(x,y+1,fg,bg,"\u2551%s \u2551",suite);
+    scr_pt_clr(x,y+2,fg,bg,"\u2551 %c\u2551",ch);
+    scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
+
+    free(suite);
+}
+
+void pt_card_title(int x, int y, char *str) {
+    int i = 0;
+    int cflags = 0;
+    for(i = 0; str[i] != '\0'; i++) {
+        if(mt_bool()) {
+            cflags = (i % 2 == 0 ? CD_H : CD_S);
+        } else {
+            cflags = (i % 2 == 0 ? CD_D : CD_C);
+        }
+        pt_card_special_rank(x + (i * 4), y, cflags, str[i]);
+    }
+}
+

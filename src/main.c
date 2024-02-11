@@ -22,7 +22,14 @@
 int main(int argc, char **argv) {
     term_init(); // Initialize the terminal
     init_genrand(time(NULL)); // Seed the pnrg
+    
+    scr_clear();
+    pt_card_title((g_screenW / 2) - 12, 0,
+            "Cards!");
+    scr_reset();
+    kb_get_bl_char();
 
+    /*
     Deck *testdeck = create_deck();
     Deck *hand = create_deck();
     Card *card = NULL;
@@ -31,6 +38,8 @@ int main(int argc, char **argv) {
     shuffle_deck(testdeck);
     while(testdeck->count) {
         scr_clear();
+        pt_card_title((g_screenW / 2) - 12,
+                0, "Cards!");
         scr_pt_clr((g_screenW / 2) - 7,
                 g_screenH / 2, BLACK, WHITE, 
                 "Deck size: %d", testdeck->count);
@@ -44,7 +53,8 @@ int main(int argc, char **argv) {
         while(card->next) {
             card = card->next;
         }
-        pt_card(1,1,card);
+        pt_card_back(1,1);
+        pt_card(1,2,card);
         scr_reset();
         kb_get_bl_char();
     }
@@ -54,17 +64,19 @@ int main(int argc, char **argv) {
     shuffle_deck(testdeck);
     draw_cards(testdeck, hand, 5);
     card = hand->cards;
-    while(card) {
-        pt_card(4 * i, 1, card);
+    while(card->next) {
+        pt_card_left(1+i, 1, card);
         card = card->next;
         i++;
     }
+    pt_card(1+i,1,card);
     scr_reset();
     kb_get_bl_char();
 
     destroy_deck(hand);
     destroy_deck(testdeck);
 
+    */
     term_close(); // Reset the terminal
     return 0;
 }

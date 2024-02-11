@@ -62,7 +62,7 @@ struct Deck {
 };
 
 /*****
- * Card (LL) functions
+ * Card (Linked List) functions
  *****/
 Card* create_card(int cflags);
 void destroy_card(Card *card);
@@ -103,5 +103,13 @@ void shuffle_deck(Deck *deck);
  *****/
 void pt_card_simple(int x, int y, Card *card);
 void pt_card(int x, int y, Card *card);
+void pt_card_top(int x, int y, Card *card);
+void pt_card_suite(int x, int y, Card *card);
+void pt_card_rank(int x, int y, Card *card);
+void pt_card_left(int x, int y, Card *card);
+void pt_card_back(int x, int y);
+void pt_card_space(int x, int y);
+void pt_card_special_rank(int x, int y, int cflags, char ch);
+void pt_card_title(int x, int y, char *str);
 
 #endif //DECK_H
