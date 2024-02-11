@@ -121,6 +121,7 @@ void scr_set_style(int style);
  *******************/
 void kb_init(void);
 void kb_restore(void);
+char kb_get_bl_char(void);
 char kb_get_char(void);
 char* kb_get_str(int maxsz);
 char* kb_get_str_at(int x, int y, int maxsz);

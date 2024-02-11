@@ -185,6 +185,15 @@ char kb_get_char(void) {
     return c;
 }
 
+char kb_get_bl_char(void) {
+    /* As above, but this blocks until input is recieved */
+    char c = '\0';
+    while('\0' == c) {
+        read(STDIN_FILENO,&c,1);
+    }
+    return c;
+}
+
 char* kb_get_str(int maxsz) {
     /*
      * 1	Blinking block
