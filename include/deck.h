@@ -80,6 +80,10 @@ Card* remove_card_from_deck(Deck *deck, Card *card);
 void draw_card(Deck *from, Deck *to);
 void draw_cards(Deck *from, Deck *to, int n);
 void add_deck(Deck *from, Deck *to);
+void move_top_card_to_deck(Deck *from, Deck *to);
+void move_last_card_to_deck(Deck *from, Deck *to);
+Card* get_last_card(Deck *deck);
+Card* get_card_at(Deck *deck, int n);
 
 /*****
  * Deck interaction

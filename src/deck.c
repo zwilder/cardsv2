@@ -135,6 +135,47 @@ Card* search_deck(Deck *deck, int cflags) {
     return result;
 }
 
+void move_top_card_to_deck(Deck *from, Deck *to) {
+    if(!from || !to) return;
+    if(!from->cards) return;
+    Card *card = remove_card_from_deck(from, from->cards);
+    add_card_to_deck(to, card);
+}
+
+void move_last_card_to_deck(Deck *from, Deck *to) {
+    if(!from || !to) return;
+    if(!from->cards) return;
+    //Card *card = remove_card_from_deck(from, from->cards);
+    Card *card = from->cards;
+    while(card->next) {
+        card = card->next;
+    }
+    remove_card_from_deck(from, card);
+    add_card_to_deck(to, card);
+}
+
+Card* get_last_card(Deck *deck) {
+    if(!deck) return NULL;
+    if(!deck->cards) return NULL;
+    Card *card = deck->cards;
+    while(card->next) {
+        card = card->next;
+    }
+    return card;
+}
+
+Card* get_card_at(Deck *deck, int n) {
+    if(!deck) return NULL;
+    if(!deck->cards) return NULL;
+    int i = 0;
+    Card *result = deck->cards;
+    while((i < n) && result) {
+        result = result->next;
+        i++;
+    }
+    return result;
+}
+
 /*****
  * Deck interaction
  *****/
