@@ -20,6 +20,7 @@
 #ifndef KLONDIKE_H
 #define KLONDIKE_H
 
+// These should all be updated to be preceded with "KL_" at some point
 typedef enum {
     WASTE       =   0,
     TAB_B,
