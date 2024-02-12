@@ -67,10 +67,10 @@ void klondike_update(void) {
         }
 
         //Check move here
-        if(g_klondike->toref->count) {
+        if(g_klondike->toref->count && g_klondike->toref->cards) {
             cflags_a = get_last_card(g_klondike->toref)->flags;
         }
-        if(g_klondike->fromref->count) {
+        if(g_klondike->fromref->count && g_klondike->fromref->cards) {
             cflags_b = get_last_card(g_klondike->fromref)->flags;
         }
         if(g_klondike->toref->id == WASTE) {
@@ -118,7 +118,7 @@ void klondike_update(void) {
             } else {
                 klondike_check_sequence();
             }
-            if (!g_klondike->toref->count && (13 == get_rank(cflags_b))) {
+            if (!g_klondike->toref->cards && (13 == get_rank(cflags_b))) {
                 move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
                 klondike_msg(NULL);
             }
@@ -177,6 +177,10 @@ void klondike_check_sequence(void) {
             }
             prev->next = NULL; //Sever that chain!
             g_klondike->fromref->count = count_cards(g_klondike->fromref->cards);
+        } else {
+            //prev == card
+            //card is the only one in "from" deck
+            g_klondike->fromref->cards = NULL;
         }
         if(tocard) {
             // Reattach that chain!

@@ -18,6 +18,7 @@
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <sys/time.h>
 #include <cards.h>
 
 /* Basic screen layout (80x24 standard)
@@ -173,12 +174,34 @@ void klondike_msg(char *msg,...) {
     va_end(args);
 }
 
+long current_ms(void) {
+    // Helper function to return the current time in ms
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    return ((tp.tv_sec * 1000) + (tp.tv_usec / 1000));
+}
+
 void klondike_loop(void) {
+    /* Overdesigned main loop? Probably. This is your standard,
+     * events-update-render loop with a nice check to keep it at a steady
+     * 30fps (otherwise it will render as fast as it can draw, and since this
+     * isn't a very processor intensive program at all - it can look blinky) */
     bool running = true;
+    long prev = current_ms();
+    long lag = 0, current = 0, elapsed = 0;
+    long msperframe = 33; // 16ms = ~60fps, 33ms = ~30fps
     while(running) {
+        current = current_ms();
+        elapsed = current - prev;
+        prev = current;
+        lag += elapsed;
+
         running = klondike_events();
         klondike_update();
         klondike_draw();
+        while(lag >= msperframe) {
+            lag -= msperframe;
+        }
     }
 }
 
