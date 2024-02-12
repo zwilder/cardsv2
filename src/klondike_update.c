@@ -109,12 +109,16 @@ void klondike_update(void) {
             }
         } else {
             // Attempting to move card to a foundation
-            if(card_alt_color(cflags_b,cflags_a) && 
-                    card_in_asc_sequence(cflags_a,cflags_b)) {
-                // Add check here for moving multiple cards
-                move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
-                klondike_msg(NULL);
-            } else if (!g_klondike->toref->count && (13 == get_rank(cflags_b))) {
+            if(g_klondike->fromref->id == WASTE) {
+                if(card_alt_color(cflags_b,cflags_a) && 
+                        card_in_asc_sequence(cflags_a,cflags_b)) {
+                    move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
+                    klondike_msg(NULL);
+                } 
+            } else {
+                klondike_check_sequence();
+            }
+            if (!g_klondike->toref->count && (13 == get_rank(cflags_b))) {
                 move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
                 klondike_msg(NULL);
             }
@@ -126,4 +130,60 @@ void klondike_update(void) {
         g_klondike->toref = NULL;
     }
 
+}
+
+void klondike_check_sequence(void) {
+    Card *card = NULL, *tocard = NULL, *prev = NULL;
+    bool valid_move = false;
+
+    // The first visible card in a tableau is the highest in sequence
+    card = g_klondike->fromref->cards;
+    while(card) {
+        if(check_flag(card->flags, CD_UP)) break;
+        card = card->next;
+    }
+    if(!card) {
+        // If for some reason it didn't find ANY face up card, grab the last
+        card = get_last_card(g_klondike->fromref);
+    }
+
+    // See how many cards are in the sequence
+    // Prompt the user to see how many they want to move
+    // Set card to the first card the user wants to move
+    
+    // Check last card of "to", to see if this move is valid
+    if(!g_klondike->toref->cards) {
+        //Can only move a king to an empty spot
+        if(check_flag(card->flags, CD_K)) {
+            // Valid, do it
+            valid_move = true;
+        }
+    } else {
+        tocard = get_last_card(g_klondike->toref);
+        if(card_in_asc_sequence(tocard->flags, card->flags) &&
+                card_alt_color(tocard->flags, card->flags)) {
+            // Valid, do it
+            valid_move = true;
+        }
+    }
+
+    // Find card BEFORE card in "from" deck
+    if(valid_move) {
+        prev = g_klondike->fromref->cards;
+        if(prev != card) {
+            // card isn't the only one in "from" deck
+            while(prev->next != card) {
+                prev = prev->next;
+            }
+            prev->next = NULL; //Sever that chain!
+            g_klondike->fromref->count = count_cards(g_klondike->fromref->cards);
+        }
+        if(tocard) {
+            // Reattach that chain!
+            tocard->next = card;
+        } else {
+            g_klondike->toref->cards = card;
+        }
+        g_klondike->toref->count = count_cards(g_klondike->toref->cards);
+    }
 }

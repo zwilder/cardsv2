@@ -55,6 +55,7 @@ void klondike_msg(char *msg,...);
 void klondike_loop(void);
 bool klondike_events(void);
 void klondike_update(void);
+void klondike_check_sequence(void);
 void klondike_draw(void);
 
 #endif //KLONDIKE_H
