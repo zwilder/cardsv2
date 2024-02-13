@@ -104,23 +104,25 @@ void klondike_update(void) {
             }
             if(valid_move) {
                 //Move card
+                g_klondike->score += 10; // Moving a card to a foundation is 10pts
                 move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
                 klondike_msg(NULL);
             }
         } else {
-            // Attempting to move card to a foundation
+            // Attempting to move card to a tableau
             if(g_klondike->fromref->id == WASTE) {
                 if(card_alt_color(cflags_b,cflags_a) && 
                         card_in_asc_sequence(cflags_a,cflags_b)) {
                     move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
                     klondike_msg(NULL);
-                } 
+                    g_klondike->score += 5;
+                }else if (!g_klondike->toref->cards && 
+                        (check_flag(cflags_b, CD_K))) {
+                    move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
+                    klondike_msg(NULL);
+                }
             } else {
                 klondike_check_sequence();
-            }
-            if (!g_klondike->toref->cards && (13 == get_rank(cflags_b))) {
-                move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
-                klondike_msg(NULL);
             }
         }
 

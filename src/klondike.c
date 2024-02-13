@@ -30,11 +30,11 @@
  4   ║  ║ ║║║  ║        ║  ║ ║  ║ ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗ 
  5   ╚══╝ ╚╚╚══╝        ╚══╝ ║  ║ ║  ║ ╔══╗ ╔══╗ ╔══╗ ╔══╗     └  ┘ └  ┘ └  ┘ └  ┘
  6                           ╚══╝ ║  ║ ║  ║ ╔══╗ ╔══╗ ╔══╗                
- 7                                ╚══╝ ║  ║ ║  ║ ╔══╗ ╔══╗ 
+ 7                                ╚══╝ ║  ║ ║  ║ ╔══╗ ╔══╗      
  8                                     ╚══╝ ║  ║ ║  ║ ╔══╗             
  9                                          ╚══╝ ║  ║ ║  ║
 10                                               ╚══╝ ║  ║   
- 1                                                    ╚══╝
+ 1                                                    ╚══╝  
  2
  3
  4
@@ -46,7 +46,7 @@
 20
  1
  2 Messages        
- 3
+ 3 Score: 150
  4 Stock: 21. Waste 3. Press q to exit.
            1         2         3         4         5         6         7         8
   12345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -88,6 +88,7 @@ void klondike_init(void) {
 
     // Allocate memory for decks/buttons
     g_klondike = malloc(sizeof(Klondike));
+    g_klondike->score = 0;
     g_klondike->decks = malloc(NUM_DECKS * sizeof(Deck));
     g_klondike->btns = malloc(NUM_DECKS * sizeof(Button));
     for(i = 0; i < NUM_DECKS; i++) {
@@ -203,6 +204,7 @@ void klondike_loop(void) {
             lag -= msperframe;
         }
     }
+    // Score check here... If score is new high score, save it
 }
 
 bool klondike_events(void) {

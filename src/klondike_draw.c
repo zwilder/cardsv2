@@ -86,7 +86,10 @@ void klondike_draw(void) {
                 cards = cards->next;
             }
             // Print the last card (which is always face up)
-            engage_flag(&(cards->flags),CD_UP);
+            if(!check_flag(cards->flags, CD_UP)) {
+                engage_flag(&(cards->flags),CD_UP);
+                g_klondike->score += 5; // Flipping over a tab card is 5pts
+            }
             pt_card(22+(5*i)+xo,1+j+yo,cards);
         }
     }
@@ -123,8 +126,12 @@ void klondike_draw(void) {
                 g_klondike->msg);
     }
 
+    // Draw score
+    scr_pt_clr(xo, 22+yo, BRIGHT_WHITE, BLACK, "Score: %d",
+            g_klondike->score);
+
     // Draw status
-    scr_pt_clr(xo,23+yo,WHITE,BLACK,
+    scr_pt_clr(xo,23+yo,BRIGHT_BLACK,BLACK,
             "Stock: %d. Waste: %d. Press q to quit.",
             g_klondike->decks[STOCK]->count,
             g_klondike->decks[WASTE]->count);
