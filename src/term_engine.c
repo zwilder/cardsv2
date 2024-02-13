@@ -79,6 +79,12 @@ void scr_reset(void) {
 
 void scr_clear(void) {
     printf("\x1b[H\x1b[J"); //?
+    int x = 0, y = 0;
+    for(x = 0; x < g_screenW; x++) {
+        for(y = 0; y < g_screenH; y++) {
+            scr_pt_clr_char(x,y,BLACK,BLACK,' ');
+        }
+    }
     fflush(stdout);
 }
 
