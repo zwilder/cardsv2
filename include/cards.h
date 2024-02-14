@@ -20,15 +20,27 @@
 #ifndef CARDS_H
 #define CARDS_H
 
-#include <term_engine.h>
+/*****
+ * Toolbox
+ *****/
 #include <mt19937.h>
+#include <term_engine.h>
 
+/*****
+ * Cards - Project
+ *****/
 #include <flags.h>
 #include <deck.h>
 #include <button.h>
 
+/*****
+ * Cards - Games
+ *****/
 #include <klondike.h>
 
+/*****
+ * Global settings structure
+ *****/
 typedef struct Settings Settings;
 
 struct Settings {

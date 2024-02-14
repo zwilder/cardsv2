@@ -138,4 +138,5 @@ void klondike_draw(void) {
 
     // Reset drawing functions
     scr_reset();
+    g_klondike->redraw = false;
 }

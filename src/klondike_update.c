@@ -28,6 +28,7 @@ void klondike_update(void) {
     // Activate/deactivate waste button
     if(g_klondike->decks[WASTE]->count) {
         g_klondike->btns[WASTE]->active = true;
+        g_klondike->redraw = true;
     } else {
         g_klondike->btns[WASTE]->active = false;
     }
@@ -55,6 +56,7 @@ void klondike_update(void) {
             } else {
                 add_deck(g_klondike->decks[WASTE],g_klondike->decks[STOCK]);
             }
+            g_klondike->redraw = true;
         } else {
             g_klondike->fromref = g_klondike->decks[id_a]; 
         }
@@ -75,10 +77,13 @@ void klondike_update(void) {
         }
         if(g_klondike->toref->id == WASTE) {
             klondike_msg("Sorry, can't move cards to the waste!");
+            g_klondike->redraw = true;
         } else if (g_klondike->fromref->id >= FND_H) {
             klondike_msg("Sorry, can't move cards from the foundation.");
+            g_klondike->redraw = true;
         } else if (g_klondike->toref->id == STOCK) {
             klondike_msg("Sorry, can't move cards to the stock.");
+            g_klondike->redraw = true;
         } else if (g_klondike->toref->id >= FND_H) {
             // Attempting to move a card to the foundation
             if(g_klondike->toref->id == FND_H) {
@@ -107,6 +112,7 @@ void klondike_update(void) {
                 g_klondike->score += 10; // Moving a card to a foundation is 10pts
                 move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
                 klondike_msg(NULL);
+                g_klondike->redraw = true;
             }
         } else {
             // Attempting to move card to a tableau
@@ -116,10 +122,12 @@ void klondike_update(void) {
                     move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
                     klondike_msg(NULL);
                     g_klondike->score += 5;
+                    g_klondike->redraw = true;
                 }else if (!g_klondike->toref->cards && 
                         (check_flag(cflags_b, CD_K))) {
                     move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
                     klondike_msg(NULL);
+                    g_klondike->redraw = true;
                 }
             } else {
                 klondike_check_sequence();
@@ -191,5 +199,6 @@ void klondike_check_sequence(void) {
             g_klondike->toref->cards = card;
         }
         g_klondike->toref->count = count_cards(g_klondike->toref->cards);
+        g_klondike->redraw = true;
     }
 }

@@ -44,6 +44,7 @@ typedef struct {
     Deck *toref; 
     Button **btns;
     char *msg;
+    bool redraw;
     int score;
 } Klondike;
 
