@@ -17,33 +17,10 @@
 * You should have received a copy of the GNU General Public License
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CARDS_H
-#define CARDS_H
 
-/*****
- * Toolbox
- *****/
-#include <mt19937.h>
-#include <term_engine.h>
+#include <cards.h>
 
-/*****
- * Cards - Project
- *****/
-#include <flags.h>
-#include <deck.h>
-#include <button.h>
-#include <save.h>
-
-/*****
- * Cards - Games
- *****/
-#include <klondike.h>
-
-/*****
- * Global settings structure
- *****/
-typedef struct Settings Settings;
-
+/*
 struct Settings {
     uint8_t redcolor;
     uint8_t blackcolor;
@@ -53,6 +30,30 @@ struct Settings {
     uint8_t btnselectcolor;
     int klondike_hs;
 };
+*/
 
-extern Settings *g_settings;
-#endif //CARDS_H
+void save_game(void) {
+    FILE *f = fopen(".cards.bin","wb+");
+
+    if(f) {
+        fwrite(&(g_settings->klondike_hs),sizeof(int),1,f);
+    }
+
+    fclose(f);
+}
+
+bool load_game(void) {
+    bool success = false;
+    FILE *f = fopen(".cards.bin","rb+");
+    int bytesread = 0;
+
+    if(f) {
+        bytesread += fread(&(g_settings->klondike_hs), sizeof(int),1,f);
+        success = true;
+        fclose(f);
+    } else {
+        g_settings->klondike_hs = 0;
+    }
+
+    return success;
+}

@@ -40,7 +40,8 @@ int main(int argc, char **argv) {
     g_settings->bgcolor = BLACK;
     g_settings->btnselectcolor = CYAN;
     g_settings->btncolor = WHITE;
-    
+    load_game();
+
     scr_clear();
     pt_card_title((g_screenW / 2) - 12, 
             (g_screenH / 2) - 2,

@@ -207,6 +207,10 @@ void klondike_loop(void) {
             lag -= msperframe;
         }
     }
+    if(g_klondike->score > g_settings->klondike_hs) {
+        g_settings->klondike_hs = g_klondike->score;
+        save_game();
+    }
     // Score check here... If score is new high score, save it
 }
 
