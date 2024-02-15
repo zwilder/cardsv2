@@ -32,7 +32,6 @@ int main(int argc, char **argv) {
     g_settings->bgcolor = BLACK;
     g_settings->btnselectcolor = CYAN;
     g_settings->btncolor = WHITE;
-    */
     //Vapor
     g_settings->redcolor = BRIGHT_MAGENTA;
     g_settings->blackcolor = BRIGHT_CYAN;
@@ -40,6 +39,7 @@ int main(int argc, char **argv) {
     g_settings->bgcolor = BLACK;
     g_settings->btnselectcolor = CYAN;
     g_settings->btncolor = WHITE;
+    */
     load_game();
 
     scr_clear();
@@ -53,7 +53,8 @@ int main(int argc, char **argv) {
     scr_reset();
     kb_get_bl_char();
     klondike_init();
-
+    
+    save_game();
     free(g_settings);
     term_close(); // Reset the terminal
     return 0;

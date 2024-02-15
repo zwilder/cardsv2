@@ -37,6 +37,12 @@ void save_game(void) {
 
     if(f) {
         fwrite(&(g_settings->klondike_hs),sizeof(int),1,f);
+        fwrite(&(g_settings->redcolor),sizeof(uint8_t),1,f);
+        fwrite(&(g_settings->blackcolor),sizeof(uint8_t),1,f);
+        fwrite(&(g_settings->deckcolor),sizeof(uint8_t),1,f);
+        fwrite(&(g_settings->bgcolor),sizeof(uint8_t),1,f);
+        fwrite(&(g_settings->btncolor),sizeof(uint8_t),1,f);
+        fwrite(&(g_settings->btnselectcolor),sizeof(uint8_t),1,f);
     }
 
     fclose(f);
@@ -49,10 +55,22 @@ bool load_game(void) {
 
     if(f) {
         bytesread += fread(&(g_settings->klondike_hs), sizeof(int),1,f);
+        bytesread += fread(&(g_settings->redcolor), sizeof(uint8_t),1,f);
+        bytesread += fread(&(g_settings->blackcolor), sizeof(uint8_t),1,f);
+        bytesread += fread(&(g_settings->deckcolor), sizeof(uint8_t),1,f);
+        bytesread += fread(&(g_settings->bgcolor), sizeof(uint8_t),1,f);
+        bytesread += fread(&(g_settings->btncolor), sizeof(uint8_t),1,f);
+        bytesread += fread(&(g_settings->btnselectcolor), sizeof(uint8_t),1,f);
         success = true;
         fclose(f);
     } else {
         g_settings->klondike_hs = 0;
+        g_settings->redcolor = BRIGHT_MAGENTA;
+        g_settings->blackcolor = BRIGHT_CYAN;
+        g_settings->deckcolor = BRIGHT_BLACK;
+        g_settings->bgcolor = BLACK;
+        g_settings->btnselectcolor = CYAN;
+        g_settings->btncolor = WHITE;
     }
 
     return success;
