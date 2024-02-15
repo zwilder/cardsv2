@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     scr_pt_clr((g_screenW / 2) - 40,
             (g_screenH / 2) + 12,
             BRIGHT_BLACK, BLACK,
-            "(c) Zach Wilder, 2024");
+            "\u00A9 2024 - Zach Wilder");
     scr_reset();
     kb_get_bl_char();
     klondike_init();

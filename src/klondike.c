@@ -89,6 +89,7 @@ void klondike_init(void) {
     // Allocate memory for decks/buttons
     g_klondike = malloc(sizeof(Klondike));
     g_klondike->redraw = true;
+    g_klondike->restart = false;
     g_klondike->score = 0;
     g_klondike->decks = malloc(NUM_DECKS * sizeof(Deck));
     g_klondike->btns = malloc(NUM_DECKS * sizeof(Button));
@@ -128,6 +129,7 @@ void klondike_init(void) {
 
     // Cleanup
     klondike_cleanup();
+
 }
 
 void klondike_cleanup(void) {
@@ -143,6 +145,7 @@ void klondike_cleanup(void) {
         free(g_klondike->msg);
     }
     free(g_klondike);
+    g_klondike = NULL;
 }
 
 void klondike_deal(void) {
@@ -187,7 +190,11 @@ void klondike_loop(void) {
     /* Overdesigned main loop? Probably. This is your standard,
      * events-update-render loop with a nice check to keep it at a steady
      * 30fps (otherwise it will render as fast as it can draw, and since this
-     * isn't a very processor intensive program at all - it can look blinky) */
+     * isn't a very processor intensive program at all - it can look blinky) 
+     * Update: this doesn't stop it looking blinky. Fairly certain the way I'm
+     * using escape codes to clear/refresh the screen is causing the blinky.
+     * Current fix is only drawing the screen when the game does something that
+     * would make the display change.*/
     bool running = true;
     long prev = current_ms();
     long lag = 0, current = 0, elapsed = 0;
@@ -203,15 +210,22 @@ void klondike_loop(void) {
         if(g_klondike->redraw) {
             klondike_draw();
         }
+        if(g_klondike->restart) {
+            running = false;
+        }
         while(lag >= msperframe) {
             lag -= msperframe;
         }
     }
+    // Score check here... If score is new high score, save it
     if(g_klondike->score > g_settings->klondike_hs) {
         g_settings->klondike_hs = g_klondike->score;
         save_game();
     }
-    // Score check here... If score is new high score, save it
+    // If the game is going to be restarted, do it here
+    if(g_klondike->restart) {
+        klondike_init();
+    }
 }
 
 bool klondike_events(void) {
@@ -272,6 +286,8 @@ bool klondike_events(void) {
                   break;
         case 'Q':
         case 'q': running = false; break;
+        case 'R':
+        case 'r': g_klondike->restart = true; break;
         default: break;
     }
     if(redraw) {

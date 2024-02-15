@@ -39,13 +39,14 @@ typedef enum {
 } KlondikeDecks;
 
 typedef struct {
-    Deck **decks; 
-    Deck *fromref; 
-    Deck *toref; 
-    Button **btns;
-    char *msg;
-    bool redraw;
-    int score;
+    Deck **decks; // The "decks" (card spots) above
+    Deck *fromref; // A reference to where a move originates
+    Deck *toref; // A reference to where the move is going
+    Button **btns; // Buttons for each deck above
+    char *msg; // String pointer for messages
+    bool redraw; // Flag to let the main loop know to redraw the screen
+    bool restart; // Flag to restart the game
+    int score; // Current game score
 } Klondike;
 
 extern Klondike* g_klondike;
