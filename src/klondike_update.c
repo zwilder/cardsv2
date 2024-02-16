@@ -25,14 +25,6 @@ void klondike_update(void) {
     int id_a = 0, id_b = 0;
     int cflags_a = 0, cflags_b = 0;
     bool valid_move = false;
-    // Activate/deactivate waste button
-    if(g_klondike->decks[WASTE]->count) {
-        g_klondike->btns[WASTE]->active = true;
-        g_klondike->redraw = true;
-    } else {
-        g_klondike->btns[WASTE]->active = false;
-    }
-
     // Count the selected buttons
     for(i = 0; i < NUM_DECKS; i++) {
         if(g_klondike->btns[i]->selected) {
@@ -138,6 +130,13 @@ void klondike_update(void) {
         g_klondike->btns[id_b]->selected = false;
         g_klondike->fromref = NULL;
         g_klondike->toref = NULL;
+    }
+
+    // Activate/deactivate waste button
+    if(g_klondike->decks[WASTE]->count) {
+        g_klondike->btns[WASTE]->active = true;
+    } else {
+        g_klondike->btns[WASTE]->active = false;
     }
 
 }

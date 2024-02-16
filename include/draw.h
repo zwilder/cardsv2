@@ -17,45 +17,17 @@
 * You should have received a copy of the GNU General Public License
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CARDS_H
-#define CARDS_H
 
-/*****
- * Toolbox
- *****/
-#include <mt19937.h>
-#include <vec2i.h>
-#include <glyph.h>
-#include <term_engine.h>
+#ifndef DRAW_H
+#define DRAW_H
 
-/*****
- * Cards - Project
- *****/
-#include <flags.h>
-#include <deck.h>
-#include <button.h>
-#include <save.h>
-#include <draw.h>
+extern const int SCREEN_WIDTH; /* glyph.c */
+extern const int SCREEN_HEIGHT; /* glyph.c */
+extern Glyph *g_screenbuf; /* draw.c */
 
-/*****
- * Cards - Games
- *****/
-#include <klondike.h>
+void init_screenbuf(void);
+void close_screenbuf(void);
+void draw_glyph(int x, int y, Glyph g);
+void draw_screen(Glyph *screen);
 
-/*****
- * Global settings structure
- *****/
-typedef struct Settings Settings;
-
-struct Settings {
-    uint8_t redcolor;
-    uint8_t blackcolor;
-    uint8_t deckcolor;
-    uint8_t bgcolor;
-    uint8_t btncolor;
-    uint8_t btnselectcolor;
-    int klondike_hs;
-};
-
-extern Settings *g_settings;
-#endif //CARDS_H
+#endif //DRAW_H

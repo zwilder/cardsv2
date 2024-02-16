@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <termios.h>
 #include <sys/ioctl.h>
+#include <signal.h>
 #include <unistd.h> 
 #include <stdarg.h>
 #include <stdint.h>
@@ -100,6 +101,7 @@ typedef enum {
  ******************/
 void term_init(void);
 void term_close(void);
+void term_resize(int i);
 
 /******************
  * Draw functions

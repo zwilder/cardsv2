@@ -42,6 +42,15 @@ int g_screenH = 0;
  * System functions
  ******************/
 void term_init(void) {
+    //signal(SIGWINCH, term_resize); //Works but depreciated?
+    // This replaces the signal call above
+    struct sigaction resize_action;
+    resize_action.sa_handler = term_resize;
+    sigemptyset(&resize_action.sa_mask);
+    resize_action.sa_flags = 0;
+    sigaction(SIGWINCH, &resize_action, NULL);
+
+    // Init the screen and keyboard
     scr_init();
     kb_init();
 }
@@ -49,6 +58,14 @@ void term_init(void) {
 void term_close(void) {
     scr_restore();
     kb_restore();
+}
+
+void term_resize(int i) {
+    // Argument needed to match what signal(3) expects
+    struct winsize ws;
+    ioctl(0,TIOCGWINSZ,&ws);
+    g_screenW = ws.ws_col;
+    g_screenH = ws.ws_row;
 }
 
 /******************

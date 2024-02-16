@@ -26,11 +26,12 @@ void klondike_draw(void) {
     int x = 0;
     Deck *deck = NULL;
     Card *cards = NULL, *cda = NULL, *cdb = NULL, *cdc = NULL;
-    xo = (g_screenW / 2) - 40; // Standard screen size is 80x24
-    yo = (g_screenH / 2) - 12;
+    xo = (g_screenW / 2) - (SCREEN_WIDTH / 2); // Standard screen size is 80x24, defined in glyph.c
+    yo = (g_screenH / 2) - (SCREEN_HEIGHT / 2);
 
-    // Clear screen
-    scr_clear();
+    // Clear and draw the screen buffer - this just blacks out the screen
+    clear_screen(g_screenbuf);
+    draw_screen(g_screenbuf);
 
     // Draw Buttons
     for(i = 0; i < NUM_DECKS; i++) {
@@ -52,9 +53,14 @@ void klondike_draw(void) {
         // This is kinda ugly, but it works so... its ok?
         x = 8;
         deck = g_klondike->decks[WASTE];
+        /*
         cda = get_card_at(deck, deck->count - 3); //Third to last
         cdb = get_card_at(deck, deck->count - 2); //Second to last
         cdc = get_card_at(deck, deck->count - 1); //Last
+        */
+        cdc = get_last_card(deck); // Last
+        if(cdc->prev) cdb = cdc->prev; // Second to last
+        if(cdb->prev) cda = cdb->prev; // Third to last
         if((cda == cdb) || (cda == cdc)) cda = NULL; //In case it loops around?
         if((cdb == cdc)) cdb = NULL; // Same
         if(cda && cdb && cdc) {
@@ -129,13 +135,6 @@ void klondike_draw(void) {
     // Draw score
     scr_pt_clr(xo, 22+yo, BRIGHT_WHITE, BLACK, "Score: %d",
             g_klondike->score);
-
-    // Draw Debug thing
-    cards = get_last_card(g_klondike->decks[TAB_G]);
-    if(cards->prev) {
-        scr_pt_clr(59+xo,21+yo,WHITE,BLACK,"Last->prev TAB_G:");
-        pt_card_simple(76+xo, 21+yo, cards->prev);
-    }
 
     // Draw status
     scr_pt_clr(xo,23+yo,BRIGHT_BLACK,BLACK,
