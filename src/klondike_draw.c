@@ -130,6 +130,13 @@ void klondike_draw(void) {
     scr_pt_clr(xo, 22+yo, BRIGHT_WHITE, BLACK, "Score: %d",
             g_klondike->score);
 
+    // Draw Debug thing
+    cards = get_last_card(g_klondike->decks[TAB_G]);
+    if(cards->prev) {
+        scr_pt_clr(59+xo,21+yo,WHITE,BLACK,"Last->prev TAB_G:");
+        pt_card_simple(76+xo, 21+yo, cards->prev);
+    }
+
     // Draw status
     scr_pt_clr(xo,23+yo,BRIGHT_BLACK,BLACK,
             "High score: %d. Stock: %d. Waste: %d. Press [q] to quit, [r] to restart.",

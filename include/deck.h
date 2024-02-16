@@ -48,6 +48,7 @@ typedef enum {
 struct Card {
     int flags;
     Card *next;
+    Card *prev;
 };
 
 struct Deck {

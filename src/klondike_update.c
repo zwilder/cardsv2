@@ -177,7 +177,7 @@ void klondike_check_sequence(void) {
         }
     }
 
-    // Find card BEFORE card in "from" deck
+    // Find card BEFORE card in "from" deck (next to last card)
     if(valid_move) {
         prev = g_klondike->fromref->cards;
         if(prev != card) {
@@ -185,6 +185,7 @@ void klondike_check_sequence(void) {
             while(prev->next != card) {
                 prev = prev->next;
             }
+            // prev is next to last card in fromref
             prev->next = NULL; //Sever that chain!
             g_klondike->fromref->count = count_cards(g_klondike->fromref->cards);
         } else {
@@ -195,6 +196,7 @@ void klondike_check_sequence(void) {
         if(tocard) {
             // Reattach that chain!
             tocard->next = card;
+            card->prev = tocard; // Think this fixes the double llist issue
         } else {
             g_klondike->toref->cards = card;
         }

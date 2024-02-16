@@ -23,6 +23,7 @@ Card* create_card(int cflags) {
     Card *card = malloc(sizeof(Card));
     card->flags = cflags;
     card->next = NULL;
+    card->prev = NULL;
     return card;
 }
 
@@ -65,6 +66,7 @@ void add_card_to_deck(Deck *deck, Card *card) {
         while(tmp->next) {
             tmp = tmp->next;
         }
+        card->prev = tmp;
         tmp->next = card;
     }
     deck->count += 1;
@@ -85,7 +87,11 @@ Card* remove_card_from_deck(Deck *deck, Card *card) {
         }
         if(result) {
             prev->next = result->next;
+            if(result->next) {
+                result->next->prev = prev;
+            }
             result->next = NULL;
+            result->prev = NULL;
         }
     }
     deck->count -= 1;
