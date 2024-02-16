@@ -29,5 +29,24 @@ void init_screenbuf(void);
 void close_screenbuf(void);
 void draw_glyph(int x, int y, Glyph g);
 void draw_screen(Glyph *screen);
+void draw_str(int x, int y, char *str);
+void draw_str_vec(Vec2i a, char *str);
+void draw_colorstr(int x, int y, char *str, uint8_t fg, uint8_t bg);
+void draw_colorstr_vec(Vec2i a, char *str, uint8_t fg, uint8_t bg);
+void draw_hline(int x, int y, int w, uint8_t color);
+void draw_hline_vec(Vec2i a, int w, uint8_t color);
+void draw_vline(int x, int y, int h, uint8_t color);
+void draw_vline_vec(Vec2i a, int h, uint8_t color);
+void draw_solid_box(int x, int y, int w, int h, uint8_t color);
+void draw_solid_box_vec(Vec2i a, Vec2i d, uint8_t color);
+void draw_solid_box_rect(Rect a, uint8_t color);
+void draw_box(int x, int y, int w, int h, uint8_t fg, uint8_t bg);
+void draw_box_vec(Vec2i a, Vec2i d, uint8_t fg, uint8_t bg);
+void draw_box_rect(Rect a, uint8_t fg, uint8_t bg);
+void draw_msg_box(char *msg, uint8_t fg, uint8_t bg);
+char draw_cmenu(SList *menu, uint8_t fg, uint8_t bg, uint8_t boxcolor);
+char draw_menu_basic(SList *menu);
+char draw_menu(SList *menu, uint8_t fg, uint8_t bg);
+char draw_menu_nobox(SList *menu, uint8_t fg, uint8_t bg);
 
 #endif //DRAW_H
