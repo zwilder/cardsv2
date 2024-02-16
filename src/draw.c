@@ -308,7 +308,7 @@ char draw_cmenu(SList *menu, uint8_t fg, uint8_t bg, uint8_t boxcolor) {
 
     // Wait for input
     while(true) {
-        result = get_input();
+        result = kb_get_char();
         if(result != '\0') break;
     }
 

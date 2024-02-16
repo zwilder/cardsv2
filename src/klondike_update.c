@@ -109,8 +109,7 @@ void klondike_update(void) {
         } else {
             // Attempting to move card to a tableau
             if(g_klondike->fromref->id == WASTE) {
-                if(card_alt_color(cflags_b,cflags_a) && 
-                        card_in_asc_sequence(cflags_a,cflags_b)) {
+                if(klondike_valid_move(cflags_a,cflags_b)) {
                     move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
                     klondike_msg(NULL);
                     g_klondike->score += 5;
@@ -169,10 +168,20 @@ void klondike_check_sequence(void) {
         }
     } else {
         tocard = get_last_card(g_klondike->toref);
-        if(card_in_asc_sequence(tocard->flags, card->flags) &&
-                card_alt_color(tocard->flags, card->flags)) {
+        // If this fails, we need to check card->next until card->next is NULL
+        // to see if there is a valid move
+        if(klondike_valid_move(tocard->flags, card->flags)) {
             // Valid, do it
             valid_move = true;
+        } else {
+            // Check the next cards
+            while(card->next) {
+                card = card->next;
+                if(klondike_valid_move(tocard->flags,card->flags)) {
+                    valid_move = true;
+                    break;
+                }
+            }
         }
     }
 
@@ -202,4 +211,8 @@ void klondike_check_sequence(void) {
         g_klondike->toref->count = count_cards(g_klondike->toref->cards);
         g_klondike->redraw = true;
     }
+}
+
+bool klondike_valid_move(int a, int b) {
+    return (card_in_asc_sequence(a,b) && card_alt_color(a,b));
 }
