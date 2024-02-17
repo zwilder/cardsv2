@@ -27,23 +27,6 @@ void klondike_update(void) {
     bool valid_move = false;
 
     // Check win condition
-    if(!g_klondike->win) {
-        for(i = FND_H; i <= FND_S; i++) {
-            count += count_cards(g_klondike->decks[i]->cards); 
-        }
-        if(count == 52) {
-            // all 52 cards are on the foundations
-            g_klondike->win = true;
-            // Turn off all the buttons
-            for(i = 0; i < NUM_DECKS; i++) {
-                g_klondike->btns[i]->selected = false;
-                g_klondike->btns[i]->active = false;
-            }
-            g_klondike->fromref = NULL;
-            g_klondike->toref = NULL;
-        }
-    }
-
     if(g_klondike->win) {
         // None of the rest of update needs to run
         return;
@@ -162,7 +145,24 @@ void klondike_update(void) {
     } else {
         g_klondike->btns[WASTE]->active = false;
     }
-
+    // Check win condition
+    if(!g_klondike->win) {
+        count = 0;
+        for(i = FND_H; i <= FND_S; i++) {
+            count += count_cards(g_klondike->decks[i]->cards); 
+        }
+        if(count == 52) {
+            // all 52 cards are on the foundations
+            g_klondike->win = true;
+            // Turn off all the buttons
+            for(i = 0; i < NUM_DECKS; i++) {
+                g_klondike->btns[i]->selected = false;
+                g_klondike->btns[i]->active = false;
+            }
+            g_klondike->fromref = NULL;
+            g_klondike->toref = NULL;
+        }
+    }
 }
 
 void klondike_check_sequence(void) {
