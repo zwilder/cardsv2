@@ -89,6 +89,7 @@ void klondike_init(void) {
     // Allocate memory for decks/buttons
     g_klondike = malloc(sizeof(Klondike));
     g_klondike->redraw = true;
+    g_klondike->win = false;
     g_klondike->restart = false;
     g_klondike->score = 0;
     g_klondike->decks = malloc(NUM_DECKS * sizeof(Deck));

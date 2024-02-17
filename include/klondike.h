@@ -46,6 +46,7 @@ typedef struct {
     char *msg; // String pointer for messages
     bool redraw; // Flag to let the main loop know to redraw the screen
     bool restart; // Flag to restart the game
+    bool win; // Flag for win condition
     int score; // Current game score
 } Klondike;
 

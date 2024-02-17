@@ -32,6 +32,12 @@ void klondike_draw(void) {
     // Clear and draw the screen buffer - this just blacks out the screen
     clear_screen(g_screenbuf);
     draw_screen(g_screenbuf);
+    if(g_klondike->win) {
+        //YOU WIN!
+        pt_card_title((g_screenW / 2) - 16, 
+                (g_screenH / 2) - 2,
+                "YOU WIN!");
+    }
 
     // Draw Buttons
     for(i = 0; i < NUM_DECKS; i++) {
@@ -144,6 +150,6 @@ void klondike_draw(void) {
             g_klondike->decks[WASTE]->count);
 
     // Reset drawing functions
-    scr_reset();
+    //scr_reset();
     g_klondike->redraw = false;
 }

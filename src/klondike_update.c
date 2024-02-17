@@ -25,7 +25,32 @@ void klondike_update(void) {
     int id_a = 0, id_b = 0;
     int cflags_a = 0, cflags_b = 0;
     bool valid_move = false;
+
+    // Check win condition
+    if(!g_klondike->win) {
+        for(i = FND_H; i <= FND_S; i++) {
+            count += count_cards(g_klondike->decks[i]->cards); 
+        }
+        if(count == 52) {
+            // all 52 cards are on the foundations
+            g_klondike->win = true;
+            // Turn off all the buttons
+            for(i = 0; i < NUM_DECKS; i++) {
+                g_klondike->btns[i]->selected = false;
+                g_klondike->btns[i]->active = false;
+            }
+            g_klondike->fromref = NULL;
+            g_klondike->toref = NULL;
+        }
+    }
+
+    if(g_klondike->win) {
+        // None of the rest of update needs to run
+        return;
+    }
+
     // Count the selected buttons
+    count = 0;
     for(i = 0; i < NUM_DECKS; i++) {
         if(g_klondike->btns[i]->selected) {
             count++;
