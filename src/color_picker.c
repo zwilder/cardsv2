@@ -35,7 +35,7 @@ uint8_t color_picker_menu(const uint8_t initcolor, char *prompt) {
     //int yo = (g_screenH / 2) - (SCREEN_HEIGHT / 2);
     int x = 0, y = 0;
     uint8_t selcolor = initcolor;
-    int i = 0, j = 0;
+    int i = 0, j = 0, k = 0;
     char ch = '\0';
 
     // String buffer
@@ -54,6 +54,18 @@ uint8_t color_picker_menu(const uint8_t initcolor, char *prompt) {
         x = 0;
         for(i = 1; i < 256; i ++) {
             j = get_screen_index(x,y);
+            k = get_screen_index(x,y+1);
+            g_screenbuf[k].ch = ' ';
+            g_screenbuf[k].fg = i;
+            g_screenbuf[k].bg = i;
+            k = get_screen_index(x+1,y);
+            g_screenbuf[k].ch = ' ';
+            g_screenbuf[k].fg = i;
+            g_screenbuf[k].bg = i;
+            k = get_screen_index(x+1,y+1);
+            g_screenbuf[k].ch = ' ';
+            g_screenbuf[k].fg = i;
+            g_screenbuf[k].bg = i;
             if(i == selcolor) {
                 g_screenbuf[j].ch = 'X';
                 g_screenbuf[j].fg = i;
@@ -67,6 +79,7 @@ uint8_t color_picker_menu(const uint8_t initcolor, char *prompt) {
                 g_screenbuf[j].bg = i;
                 g_screenbuf[j].fg = i;
             }
+            
             x+=2;
             if((i % 32 == 0) && (i != 0)) { 
                 y+=2;

@@ -59,14 +59,14 @@ void klondike_draw(void) {
         // This is kinda ugly, but it works so... its ok?
         x = 8;
         deck = g_klondike->decks[WASTE];
-        /*
         cda = get_card_at(deck, deck->count - 3); //Third to last
         cdb = get_card_at(deck, deck->count - 2); //Second to last
         cdc = get_card_at(deck, deck->count - 1); //Last
-        */
+        /*
         cdc = get_last_card(deck); // Last
         if(cdc->prev) cdb = cdc->prev; // Second to last
         if(cdb->prev) cda = cdb->prev; // Third to last
+        */
         if((cda == cdb) || (cda == cdc)) cda = NULL; //In case it loops around?
         if((cdb == cdc)) cdb = NULL; // Same
         if(cda && cdb && cdc) {
