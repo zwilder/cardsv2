@@ -21,65 +21,6 @@
 #include <sys/time.h>
 #include <cards.h>
 
-/* Basic screen layout (80x24 standard)
- *         1         2         3         4         5         6         7         8
-  12345678901234567890123456789012345678901234567890123456789012345678901234567890
- 1   [m]    [a]         [b]  [c]  [d]  [e]  [f]  [g]  [h]      [i]  [j]  [k]  [l]
- 2   ╔══╗ ╔╔╔══╗        ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗     ┌  ┐ ┌  ┐ ┌  ┐ ┌  ┐
- 3   ║  ║ ║║║  ║        ║  ║ ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗      ♡    ♢    ♧    ♤
- 4   ║  ║ ║║║  ║        ║  ║ ║  ║ ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗ 
- 5   ╚══╝ ╚╚╚══╝        ╚══╝ ║  ║ ║  ║ ╔══╗ ╔══╗ ╔══╗ ╔══╗     └  ┘ └  ┘ └  ┘ └  ┘
- 6                           ╚══╝ ║  ║ ║  ║ ╔══╗ ╔══╗ ╔══╗                
- 7                                ╚══╝ ║  ║ ║  ║ ╔══╗ ╔══╗      
- 8                                     ╚══╝ ║  ║ ║  ║ ╔══╗             
- 9                                          ╚══╝ ║  ║ ║  ║
-10                                               ╚══╝ ║  ║   
- 1                                                    ╚══╝  
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-20
- 1
- 2 Messages        
- 3 Score: 150
- 4 Stock: 21. Waste 3. Press q to exit.
-           1         2         3         4         5         6         7         8
-  12345678901234567890123456789012345678901234567890123456789012345678901234567890
-
-  Stock 3,1
-  Waste 8,1
-  TabB  22,1
-  TabC  27,1
-  TabD  32,1
-  TabE  37,1
-  TabF  42,1
-  TabG  47,1
-  TabH  52,1
-  FndH  61,1
-  FndD  66,1
-  FndC  71,1
-  FndS  76,1
-  Msgs  0,21
-  Stat  0,23
-
- * Drawing reference
- * ♠ u2660, ♤ u2664
- * ♥ u2665, ♡ u2661
- * ♦ u2666, ♢ u2662
- * ♣ u2663, ♧ u2667
-    ┌  ┐ u250c u2510
-     
-     
-    └  ┘ u2514 u2518
-     	0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F
-U+255x	═	║	╒	╓	╔	╕	╖	╗	╘	╙	╚	╛	╜	╝	╞	╟
- */
-
 Klondike *g_klondike = NULL;
 
 void klondike_init(void) {
@@ -196,23 +137,24 @@ void klondike_loop(void) {
      * using escape codes to clear/refresh the screen is causing the blinky.
      * Current fix is only drawing the screen when the game does something that
      * would make the display change.*/
-    bool running = true;
+    //bool running = true;
     long prev = current_ms();
     long lag = 0, current = 0, elapsed = 0;
     long msperframe = 33; // 16ms = ~60fps, 33ms = ~30fps
-    while(running) {
+    g_klondike->running = true;
+    while(g_klondike->running) {
         current = current_ms();
         elapsed = current - prev;
         prev = current;
         lag += elapsed;
-
-        running = klondike_events();
+        
+        klondike_events();
         klondike_update();
         if(g_klondike->redraw) {
             klondike_draw();
         }
         if(g_klondike->restart) {
-            running = false;
+            g_klondike->running = false;
         }
         while(lag >= msperframe) {
             lag -= msperframe;
@@ -221,7 +163,7 @@ void klondike_loop(void) {
     // Score check here... If score is new high score, save it
     if(g_klondike->score > g_settings->klondike_hs) {
         g_settings->klondike_hs = g_klondike->score;
-        save_game();
+        save_settings();
     }
     // If the game is going to be restarted, do it here
     if(g_klondike->restart) {
@@ -229,8 +171,8 @@ void klondike_loop(void) {
     }
 }
 
-bool klondike_events(void) {
-    bool running = true, redraw = false;
+void klondike_events(void) {
+    bool redraw = false;
     char ch = kb_get_char();
     switch(ch) {
         case 'A':
@@ -286,17 +228,59 @@ bool klondike_events(void) {
                   redraw = true;
                   break;
         case 27: 
-                  settings_menu(); 
+                  klondike_pause(); 
                   redraw = true; 
                   break;
-        case 'Q':
-        case 'q': running = false; break;
-        case 'R':
-        case 'r': g_klondike->restart = true; break;
         default: break;
     }
     if(redraw) {
         g_klondike->redraw = redraw;
     }
-    return running;
+}
+
+void klondike_pause(void) {
+    int xo = (g_screenW / 2) - (SCREEN_WIDTH / 2);
+    int yo = (g_screenH / 2) - (SCREEN_HEIGHT / 2);
+    char ch = '\0';
+
+    // Create the slist for the menu
+    SList *menu = create_slist("-Game Paused-");
+    slist_push(&menu, "Press any other key to resume");
+    slist_push(&menu, "cslnq");
+    slist_push(&menu, "Change card color settings");
+    slist_push(&menu, "Save game and quit");
+    slist_push(&menu, "Load saved game");
+    slist_push(&menu, "Start new game");
+    slist_push(&menu, "Quit game");
+
+    // Show the menu
+    scr_clear(); // Clear everything off the terminal screen
+    pt_card_title((SCREEN_WIDTH / 2)-14+xo, yo, "Pause");
+    fill_screen_blank(g_screenbuf); // Fill the screenbuf with blank characters (transparent)
+    ch = draw_menu_nobox(menu, WHITE, BLACK);
+
+    // Process the input
+    switch(ch) {
+        case 'c':
+            settings_menu();
+            break;
+        case 's':
+            //save_klondike();
+            g_klondike->running = false;
+            break;
+        case 'l':
+            //load_klondike();
+            break;
+        case 'n':
+            g_klondike->restart = true;
+            break;
+        case 'q':
+            g_klondike->running = false;
+            break;
+        default: break;
+    }
+
+    // Cleanup
+    clear_screen(g_screenbuf);
+    destroy_slist(&menu);
 }

@@ -32,7 +32,7 @@ struct Settings {
 };
 */
 
-void save_game(void) {
+void save_settings(void) {
     FILE *f = fopen(".cards.bin","wb+");
 
     if(f) {
@@ -48,7 +48,7 @@ void save_game(void) {
     fclose(f);
 }
 
-bool load_game(void) {
+bool load_settings(void) {
     bool success = false;
     FILE *f = fopen(".cards.bin","rb+");
     int bytesread = 0;

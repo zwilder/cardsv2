@@ -20,6 +20,65 @@
 
 #include <cards.h>
 
+/* Basic screen layout (80x24 standard)
+ *         1         2         3         4         5         6         7         8
+  12345678901234567890123456789012345678901234567890123456789012345678901234567890
+ 1   [m]    [a]         [b]  [c]  [d]  [e]  [f]  [g]  [h]      [i]  [j]  [k]  [l]
+ 2   ╔══╗ ╔╔╔══╗        ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗     ┌  ┐ ┌  ┐ ┌  ┐ ┌  ┐
+ 3   ║  ║ ║║║  ║        ║  ║ ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗      ♡    ♢    ♧    ♤
+ 4   ║  ║ ║║║  ║        ║  ║ ║  ║ ╔══╗ ╔══╗ ╔══╗ ╔══╗ ╔══╗ 
+ 5   ╚══╝ ╚╚╚══╝        ╚══╝ ║  ║ ║  ║ ╔══╗ ╔══╗ ╔══╗ ╔══╗     └  ┘ └  ┘ └  ┘ └  ┘
+ 6                           ╚══╝ ║  ║ ║  ║ ╔══╗ ╔══╗ ╔══╗                
+ 7                                ╚══╝ ║  ║ ║  ║ ╔══╗ ╔══╗      
+ 8                                     ╚══╝ ║  ║ ║  ║ ╔══╗             
+ 9                                          ╚══╝ ║  ║ ║  ║
+10                                               ╚══╝ ║  ║   
+ 1                                                    ╚══╝  
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+20
+ 1
+ 2 Messages        
+ 3 Score: 150
+ 4 Stock: 21. Waste 3. Press q to exit.
+           1         2         3         4         5         6         7         8
+  12345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+  Stock 3,1
+  Waste 8,1
+  TabB  22,1
+  TabC  27,1
+  TabD  32,1
+  TabE  37,1
+  TabF  42,1
+  TabG  47,1
+  TabH  52,1
+  FndH  61,1
+  FndD  66,1
+  FndC  71,1
+  FndS  76,1
+  Msgs  0,21
+  Stat  0,23
+
+ * Drawing reference
+ * ♠ u2660, ♤ u2664
+ * ♥ u2665, ♡ u2661
+ * ♦ u2666, ♢ u2662
+ * ♣ u2663, ♧ u2667
+    ┌  ┐ u250c u2510
+     
+     
+    └  ┘ u2514 u2518
+     	0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F
+U+255x	═	║	╒	╓	╔	╕	╖	╗	╘	╙	╚	╛	╜	╝	╞	╟
+ */
+
 void klondike_draw(void) {
     int i = 0,j = 0;
     int xo = 0, yo = 0; 
@@ -144,7 +203,7 @@ void klondike_draw(void) {
 
     // Draw status
     scr_pt_clr(xo,23+yo,BRIGHT_BLACK,BLACK,
-            "High score: %d. Stock: %d. Waste: %d. Press [q] to quit, [r] to restart.",
+            "High score: %d. Stock: %d. Waste: %d. Press [esc] to open menu.",
             g_settings->klondike_hs,
             g_klondike->decks[STOCK]->count,
             g_klondike->decks[WASTE]->count);

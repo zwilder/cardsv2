@@ -43,10 +43,12 @@ uint8_t color_picker_menu(const uint8_t initcolor, char *prompt) {
 
     while(ch != 'q') {
         clear_screen(g_screenbuf); // Clear the screen buffer
-        draw_hline(0,0,SCREEN_WIDTH,WHITE);
-        draw_colorstr((SCREEN_WIDTH/2)-(strlen(prompt)/2),y,
-                prompt,BLACK,WHITE);
-        y++;
+        //draw_hline(0,0,SCREEN_WIDTH,WHITE);
+        if(prompt) {
+            draw_colorstr((SCREEN_WIDTH/2)-(strlen(prompt)/2),y,
+                    prompt,WHITE,BLACK);
+            y++;
+        }
         snprintf(strbuf, 79, "Current color: %d. Selected color: %d.",
                 initcolor,selcolor);
         draw_str(x,y,strbuf);

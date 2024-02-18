@@ -47,6 +47,7 @@ typedef struct {
     bool redraw; // Flag to let the main loop know to redraw the screen
     bool restart; // Flag to restart the game
     bool win; // Flag for win condition
+    bool running; // Flag for main loop
     int score; // Current game score
 } Klondike;
 
@@ -57,7 +58,8 @@ void klondike_cleanup(void);
 void klondike_deal(void);
 void klondike_msg(char *msg,...);
 void klondike_loop(void);
-bool klondike_events(void);
+void klondike_events(void);
+void klondike_pause(void);
 void klondike_update(void);
 void klondike_check_sequence(void);
 bool klondike_valid_move(int a, int b);

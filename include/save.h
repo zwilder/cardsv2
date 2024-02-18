@@ -20,7 +20,7 @@
 #ifndef SAVE_H
 #define SAVE_H
 
-void save_game(void);
-bool load_game(void);
+void save_settings(void);
+bool load_settings(void);
 
 #endif //SAVE_H

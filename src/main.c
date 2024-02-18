@@ -19,30 +19,66 @@
 */
 #include <cards.h>
 
+void main_menu(void);
+
 int main(int argc, char **argv) {
+    init_genrand(time(NULL)); // Seed the pnrg
     term_init(); // Initialize the terminal
     init_screenbuf(); // Initialize the global screen buffer
-    init_genrand(time(NULL)); // Seed the pnrg
-    init_settings(); // Create global settings
-    load_game(); // Load settings/high scores
-
     clear_screen(g_screenbuf); // Clear the screenbuf
-    draw_screen(g_screenbuf); // Draw the screen buf
-    scr_clear();
-    pt_card_title((g_screenW / 2) - 12, 
-            (g_screenH / 2) - 2,
-            "Cards!");
-    scr_pt_clr((g_screenW / 2) - 40,
-            (g_screenH / 2) + 11,
-            BRIGHT_BLACK, BLACK,
-            "\u00A9 2024 - Zach Wilder");
-    scr_reset();
-    kb_get_bl_char();
-    klondike_init();
-    
-    save_game(); // Save settings/high scores
+    draw_screen(g_screenbuf); // Draw the screenbuf
+    init_settings(); // Create global settings
+    load_settings(); // Load settings/high scores
+
+    main_menu(); // Open the main menu
+
+    save_settings(); // Save settings/high scores
     close_settings(); // Free global settings
     close_screenbuf(); // Close the global screen buffer
     term_close(); // Reset the terminal
     return 0;
 }
+
+void main_menu(void) {
+    int xo = (g_screenW / 2) - (SCREEN_WIDTH / 2);
+    int yo = (g_screenH / 2) - (SCREEN_HEIGHT / 2);
+    char ch = '\0';
+    SList *menu = create_slist("-Cards-");
+    slist_push(&menu, " ");
+    slist_push(&menu, "khoq");
+    slist_push(&menu, "New game of Klondike");
+    slist_push(&menu, "High scores");
+    slist_push(&menu, "Card color settings");
+    slist_push(&menu, "Quit");
+
+    while(ch != 'q') {
+        scr_clear(); // Clear everything off the terminal screen
+        pt_card_title((SCREEN_WIDTH / 2)-16+xo, yo, "Cards!");
+        scr_pt_clr((SCREEN_WIDTH / 2)-9+xo,(SCREEN_HEIGHT - 1)+yo,
+                BRIGHT_BLACK,BLACK, "\u00A9 Zach Wilder 2024");
+        fill_screen_blank(g_screenbuf); // Fill the screenbuf with blank characters (transparent)
+        ch = draw_menu_nobox(menu, WHITE, BLACK);
+        switch(ch) {
+            case 'k':
+                klondike_init();
+                // For now, quit when leaving klondike.
+                // I may, in the future, have init return a bool or something -
+                // like if I add a "return to main menu" screen in the Klondike
+                // menu
+                ch = 'q';
+                break;
+            case 'h':
+                //high_scores();
+                break;
+            case 'o':
+                settings_menu();
+                break;
+            case 'q':
+                break;
+            default: break;
+        }
+    }
+    clear_screen(g_screenbuf);
+    destroy_slist(&menu);
+}
+
