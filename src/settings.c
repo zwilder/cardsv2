@@ -64,7 +64,7 @@ void settings_menu(void) {
     slist_push(&menu, "Return settings to default");
     while(ch != 'q') {
         scr_clear(); // Clear everything off the terminal screen
-        pt_card_title((SCREEN_WIDTH / 2)-20+xo, yo, "Settings");
+        pt_card_title((SCREEN_WIDTH / 2)-16+xo, yo+1, "Settings");
         fill_screen_blank(g_screenbuf); // Fill the screenbuf with blank characters (transparent)
         ch = draw_menu_nobox(menu, WHITE, BLACK);
         switch(ch) {

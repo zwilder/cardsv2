@@ -43,7 +43,7 @@ void main_menu(void) {
     int xo = (g_screenW / 2) - (SCREEN_WIDTH / 2);
     int yo = (g_screenH / 2) - (SCREEN_HEIGHT / 2);
     char ch = '\0';
-    SList *menu = create_slist("-Cards-");
+    SList *menu = create_slist(" ");
     slist_push(&menu, " ");
     slist_push(&menu, "khoq");
     slist_push(&menu, "New game of Klondike");
@@ -53,7 +53,7 @@ void main_menu(void) {
 
     while(ch != 'q') {
         scr_clear(); // Clear everything off the terminal screen
-        pt_card_title((SCREEN_WIDTH / 2)-16+xo, yo, "Cards!");
+        pt_card_title((SCREEN_WIDTH / 2)-12+xo, yo+2, "Cards!");
         scr_pt_clr((SCREEN_WIDTH / 2)-9+xo,(SCREEN_HEIGHT - 1)+yo,
                 BRIGHT_BLACK,BLACK, "\u00A9 Zach Wilder 2024");
         fill_screen_blank(g_screenbuf); // Fill the screenbuf with blank characters (transparent)

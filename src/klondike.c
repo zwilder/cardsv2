@@ -246,16 +246,16 @@ void klondike_pause(void) {
     // Create the slist for the menu
     SList *menu = create_slist("-Game Paused-");
     slist_push(&menu, "Press any other key to resume");
-    slist_push(&menu, "cslnq");
+    slist_push(&menu, "cnq");
     slist_push(&menu, "Change card color settings");
-    slist_push(&menu, "Save game and quit");
-    slist_push(&menu, "Load saved game");
+    //slist_push(&menu, "Save game and quit");
+    //slist_push(&menu, "Load saved game");
     slist_push(&menu, "Start new game");
     slist_push(&menu, "Quit game");
 
     // Show the menu
     scr_clear(); // Clear everything off the terminal screen
-    pt_card_title((SCREEN_WIDTH / 2)-14+xo, yo, "Pause");
+    pt_card_title((SCREEN_WIDTH / 2)-10+xo, yo+1, "Pause");
     fill_screen_blank(g_screenbuf); // Fill the screenbuf with blank characters (transparent)
     ch = draw_menu_nobox(menu, WHITE, BLACK);
 
