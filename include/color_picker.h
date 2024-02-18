@@ -17,33 +17,10 @@
 * You should have received a copy of the GNU General Public License
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CARDS_H
-#define CARDS_H
 
-/*****
- * Toolbox
- *****/
-#include <mt19937.h>
-#include <vec2i.h>
-#include <rect.h>
-#include <slist.h>
-#include <glyph.h>
-#include <term_engine.h>
+#ifndef COLOR_PICKER_H
+#define COLOR_PICKER
 
-/*****
- * Cards - Project
- *****/
-#include <flags.h>
-#include <deck.h>
-#include <button.h>
-#include <settings.h>
-#include <save.h>
-#include <draw.h>
-#include <color_picker.h>
+uint8_t color_picker_menu(const uint8_t initcolor, char *prompt);
 
-/*****
- * Cards - Games
- *****/
-#include <klondike.h>
-
-#endif //CARDS_H
+#endif //COLOR_PICKER

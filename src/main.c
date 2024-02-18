@@ -19,32 +19,16 @@
 */
 #include <cards.h>
 
-Settings *g_settings;
 int main(int argc, char **argv) {
     term_init(); // Initialize the terminal
     init_screenbuf(); // Initialize the global screen buffer
     init_genrand(time(NULL)); // Seed the pnrg
-    g_settings = malloc(sizeof(Settings));
-    /*
-    //Regular
-    g_settings->redcolor = BRIGHT_RED;
-    g_settings->blackcolor = WHITE;
-    g_settings->deckcolor = BRIGHT_BLACK;
-    g_settings->bgcolor = BLACK;
-    g_settings->btnselectcolor = CYAN;
-    g_settings->btncolor = WHITE;
-    //Vapor
-    g_settings->redcolor = BRIGHT_MAGENTA;
-    g_settings->blackcolor = BRIGHT_CYAN;
-    g_settings->deckcolor = BRIGHT_BLACK;
-    g_settings->bgcolor = BLACK;
-    g_settings->btnselectcolor = CYAN;
-    g_settings->btncolor = WHITE;
-    */
-    load_game(); // Load the settings and high scores
+    init_settings(); // Create global settings
+    load_game(); // Load settings/high scores
 
     clear_screen(g_screenbuf); // Clear the screenbuf
     draw_screen(g_screenbuf); // Draw the screen buf
+    scr_clear();
     pt_card_title((g_screenW / 2) - 12, 
             (g_screenH / 2) - 2,
             "Cards!");
@@ -56,8 +40,8 @@ int main(int argc, char **argv) {
     kb_get_bl_char();
     klondike_init();
     
-    save_game(); // Save the settings and high scores
-    free(g_settings);
+    save_game(); // Save settings/high scores
+    close_settings(); // Free global settings
     close_screenbuf(); // Close the global screen buffer
     term_close(); // Reset the terminal
     return 0;

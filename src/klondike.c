@@ -285,6 +285,10 @@ bool klondike_events(void) {
         case 'm': toggle_button(g_klondike->btns[STOCK]);
                   redraw = true;
                   break;
+        case 27: 
+                  settings_menu(); 
+                  redraw = true; 
+                  break;
         case 'Q':
         case 'q': running = false; break;
         case 'R':

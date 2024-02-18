@@ -95,7 +95,8 @@ void scr_reset(void) {
 }
 
 void scr_clear(void) {
-    printf("\x1b[H\x1b[J"); //?
+    // Move the cursor to home [H, and clear the screen [J
+    printf("\x1b[H\x1b[J");
     fflush(stdout);
 }
 

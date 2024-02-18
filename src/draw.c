@@ -70,7 +70,9 @@ void draw_screen(Glyph *screen) {
             if(i > (SCREEN_WIDTH * SCREEN_HEIGHT - 1)) {
                 break;
             }
-            draw_glyph(x,y,screen[i]);
+            if(screen[i].ch) {
+                draw_glyph(x,y,screen[i]);
+            }
         }
     }
 }
@@ -311,10 +313,6 @@ char draw_cmenu(SList *menu, uint8_t fg, uint8_t bg, uint8_t boxcolor) {
         result = kb_get_char();
         if(result != '\0') break;
     }
-
-    // Returns screen to whatever it was before drawing the menu
-    // (makes the screen flicker during new player creation, so disabling)
-    //engine_draw();
 
     // Return input
     return result;

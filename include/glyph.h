@@ -38,6 +38,8 @@ void set_screen_str_at(Glyph *screen, Vec2i pos, char *str, int fg, int bg);
 void set_xy_screen_str(Glyph *screen, int x, int y, char *str, int fg, int bg);
 void destroy_screen(Glyph *screen);
 void clear_screen(Glyph *screen);
+void fill_screen(Glyph *screen, int fg, int bg, char ch);
+void fill_screen_blank(Glyph *screen);
 int get_screen_index(int x, int y);
 
 #endif

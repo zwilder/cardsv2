@@ -115,6 +115,22 @@ void clear_screen(Glyph *screen) {
     }
 }
 
+void fill_screen(Glyph *screen, int fg, int bg, char ch) {
+    int x, y, index;
+    for (x = 0; x < SCREEN_WIDTH; x++) {
+        for(y = 0; y < SCREEN_HEIGHT; y++) {
+            index = get_screen_index(x,y);
+            screen[index].ch = ch;
+            screen[index].fg = fg;
+            screen[index].bg = bg;
+        }
+    }
+}
+
+void fill_screen_blank(Glyph *screen) {
+    fill_screen(screen, 0, 0, '\0');
+}
+
 void destroy_screen(Glyph *screen) {
     /* If an array of glyphs exists, free the memory. */
     if(NULL != screen) {

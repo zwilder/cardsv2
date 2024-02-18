@@ -17,33 +17,32 @@
 * You should have received a copy of the GNU General Public License
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CARDS_H
-#define CARDS_H
+
+#ifndef SETTINGS_H
+#define SETTINGS_H
 
 /*****
- * Toolbox
+ * Global settings structure
  *****/
-#include <mt19937.h>
-#include <vec2i.h>
-#include <rect.h>
-#include <slist.h>
-#include <glyph.h>
-#include <term_engine.h>
+typedef struct Settings Settings;
+
+struct Settings {
+    uint8_t redcolor;
+    uint8_t blackcolor;
+    uint8_t deckcolor;
+    uint8_t bgcolor;
+    uint8_t btncolor;
+    uint8_t btnselectcolor;
+    int klondike_hs;
+};
+
+extern Settings *g_settings;
 
 /*****
- * Cards - Project
+ * Settings functions
  *****/
-#include <flags.h>
-#include <deck.h>
-#include <button.h>
-#include <settings.h>
-#include <save.h>
-#include <draw.h>
-#include <color_picker.h>
+void init_settings(void);
+void close_settings(void);
+void settings_menu(void);
 
-/*****
- * Cards - Games
- *****/
-#include <klondike.h>
-
-#endif //CARDS_H
+#endif //SETTINGS_H
