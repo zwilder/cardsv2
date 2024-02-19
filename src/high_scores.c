@@ -47,7 +47,7 @@ void high_scores(void) {
     draw_colorstr(4,11,strbuf, WHITE, BLACK);
 
     // Prompt
-    draw_colorstr((SCREEN_WIDTH / 2)-13+xo,SCREEN_HEIGHT-1,
+    draw_colorstr((SCREEN_WIDTH / 2)-13,SCREEN_HEIGHT-1,
             "- Press any key to return -",
             BRIGHT_BLACK,BLACK);
 
