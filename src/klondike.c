@@ -228,6 +228,7 @@ void klondike_events(void) {
                   redraw = true;
                   break;
         case 27: 
+        case 'q':
                   klondike_pause(); 
                   redraw = true; 
                   break;

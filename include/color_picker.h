@@ -18,6 +18,11 @@
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*****
+ * This is a silly include file, but it's here because this function is generic
+ * enough that I could pull this out and make it a "Toolbox" file pretty
+ * easily... and I might work on that soon.
+ *****/
 #ifndef COLOR_PICKER_H
 #define COLOR_PICKER
 

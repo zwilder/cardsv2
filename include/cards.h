@@ -46,4 +46,10 @@
  *****/
 #include <klondike.h>
 
+/*****
+ * Utility and Helper functions
+ *****/
+void main_menu(void);
+void high_scores(void);
+
 #endif //CARDS_H
