@@ -99,25 +99,25 @@ void klondike_draw(void) {
     }
 
     // Draw Buttons
-    for(i = 0; i < NUM_DECKS; i++) {
+    for(i = 0; i < KL_NUM_DECKS; i++) {
         pt_button_at(g_klondike->btns[i], 
                 g_klondike->btns[i]->x + xo,
                 g_klondike->btns[i]->y + yo);
     }
 
     // Draw Stock
-    if(g_klondike->decks[STOCK]->cards) {
+    if(g_klondike->decks[KL_STOCK]->cards) {
         pt_card_back(3+xo,1+yo);
     } else {
         pt_card_space(3+xo,1+yo);
     }
 
     // Draw waste
-    if(g_klondike->decks[WASTE]->cards) {
+    if(g_klondike->decks[KL_WASTE]->cards) {
         // Draw the last three cards on the waste pile
         // This is kinda ugly, but it works so... its ok?
         x = 8;
-        deck = g_klondike->decks[WASTE];
+        deck = g_klondike->decks[KL_WASTE];
         cda = get_card_at(deck, deck->count - 3); //Third to last
         cdb = get_card_at(deck, deck->count - 2); //Second to last
         cdc = get_card_at(deck, deck->count - 1); //Last
@@ -142,7 +142,7 @@ void klondike_draw(void) {
 
     // Draw Tableaus
     for(i = 0; i < 7; i++) {
-        deck = g_klondike->decks[TAB_B + i];
+        deck = g_klondike->decks[KL_TAB_B + i];
         if(deck->cards) {
             cards = deck->cards;
             j = 0;
@@ -166,27 +166,27 @@ void klondike_draw(void) {
     }
 
     // Draw Foundations
-    if(g_klondike->decks[FND_H]->count) {
+    if(g_klondike->decks[KL_FND_H]->count) {
         pt_card(61+xo,1+yo,
-                get_last_card(g_klondike->decks[FND_H]));
+                get_last_card(g_klondike->decks[KL_FND_H]));
     } else {
         pt_card_space_suite(61+xo,1+yo, CD_H);
     }
-    if(g_klondike->decks[FND_D]->count) {
+    if(g_klondike->decks[KL_FND_D]->count) {
         pt_card(66+xo,1+yo,
-                get_last_card(g_klondike->decks[FND_D]));
+                get_last_card(g_klondike->decks[KL_FND_D]));
     } else {
         pt_card_space_suite(66+xo,1+yo, CD_D);
     }
-    if(g_klondike->decks[FND_C]->count) {
+    if(g_klondike->decks[KL_FND_C]->count) {
         pt_card(71+xo,1+yo,
-                get_last_card(g_klondike->decks[FND_C]));
+                get_last_card(g_klondike->decks[KL_FND_C]));
     } else {
         pt_card_space_suite(71+xo,1+yo, CD_C);
     }
-    if(g_klondike->decks[FND_S]->count) {
+    if(g_klondike->decks[KL_FND_S]->count) {
         pt_card(76+xo,1+yo,
-                get_last_card(g_klondike->decks[FND_S]));
+                get_last_card(g_klondike->decks[KL_FND_S]));
     } else {
         pt_card_space_suite(76+xo,1+yo, CD_S);
     }
@@ -205,8 +205,8 @@ void klondike_draw(void) {
     scr_pt_clr(xo,23+yo,BRIGHT_BLACK,BLACK,
             "High score: %d. Stock: %d. Waste: %d. Press [q] to open menu.",
             g_settings->klondike_hs,
-            g_klondike->decks[STOCK]->count,
-            g_klondike->decks[WASTE]->count);
+            g_klondike->decks[KL_STOCK]->count,
+            g_klondike->decks[KL_WASTE]->count);
 
     // Reset drawing functions
     //scr_reset();

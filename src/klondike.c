@@ -33,32 +33,32 @@ void klondike_init(void) {
     g_klondike->win = false;
     g_klondike->restart = false;
     g_klondike->score = 0;
-    g_klondike->decks = malloc(NUM_DECKS * sizeof(Deck));
-    g_klondike->btns = malloc(NUM_DECKS * sizeof(Button));
-    for(i = 0; i < NUM_DECKS; i++) {
+    g_klondike->decks = malloc(KL_NUM_DECKS * sizeof(Deck));
+    g_klondike->btns = malloc(KL_NUM_DECKS * sizeof(Button));
+    for(i = 0; i < KL_NUM_DECKS; i++) {
         g_klondike->decks[i] = create_deck();
         g_klondike->decks[i]->id = i;
         g_klondike->btns[i] = create_button(0,0,i,'a'+i);
     }
 
     // Put the buttons in the right spot
-    g_klondike->btns[STOCK]->x = 3;
-    g_klondike->btns[STOCK]->active = true;
-    g_klondike->btns[WASTE]->x = 8;
+    g_klondike->btns[KL_STOCK]->x = 3;
+    g_klondike->btns[KL_STOCK]->active = true;
+    g_klondike->btns[KL_WASTE]->x = 8;
     
     for(i = 0; i < 7; i++) {
-        g_klondike->btns[TAB_B + i]->x = 22 + (5*i);
-        g_klondike->btns[TAB_B + i]->active = true;
+        g_klondike->btns[KL_TAB_B + i]->x = 22 + (5*i);
+        g_klondike->btns[KL_TAB_B + i]->active = true;
     }
     
     for(i = 0; i < 4; i++) {
-        g_klondike->btns[FND_H + i]->x = 61 + (5*i);
-        g_klondike->btns[FND_H + i]->active = true;
+        g_klondike->btns[KL_FND_H + i]->x = 61 + (5*i);
+        g_klondike->btns[KL_FND_H + i]->active = true;
     }
 
     // Put 52 cards in the stock, and shuffle it
-    fill_deck(g_klondike->decks[STOCK]);
-    shuffle_deck(g_klondike->decks[STOCK]);
+    fill_deck(g_klondike->decks[KL_STOCK]);
+    shuffle_deck(g_klondike->decks[KL_STOCK]);
 
     // Global message is null
     g_klondike->msg = NULL;
@@ -77,7 +77,7 @@ void klondike_init(void) {
 void klondike_cleanup(void) {
     if(!g_klondike) return;
     int i = 0;
-    for(i = 0; i < NUM_DECKS; i++) {
+    for(i = 0; i < KL_NUM_DECKS; i++) {
         destroy_deck(g_klondike->decks[i]);
         destroy_button(g_klondike->btns[i]);
     }
@@ -96,10 +96,10 @@ void klondike_deal(void) {
     for(i = 0; i < 7; i++) {
         j = i + 1;
         // Draw cards from the deck to put on the tableau
-        draw_cards(g_klondike->decks[STOCK],g_klondike->decks[TAB_B + i], j);
+        draw_cards(g_klondike->decks[KL_STOCK],g_klondike->decks[KL_TAB_B + i], j);
 
         // Turn the top card (last card) faceup
-        tmp = g_klondike->decks[TAB_B + i]->cards;
+        tmp = g_klondike->decks[KL_TAB_B + i]->cards;
         while(tmp->next) {
             tmp = tmp->next;
         }
@@ -176,55 +176,55 @@ void klondike_events(void) {
     char ch = kb_get_char();
     switch(ch) {
         case 'A':
-        case 'a': toggle_button(g_klondike->btns[WASTE]); 
+        case 'a': toggle_button(g_klondike->btns[KL_WASTE]); 
                   redraw = true; 
                   break;
         case 'B':
-        case 'b': toggle_button(g_klondike->btns[TAB_B]);
+        case 'b': toggle_button(g_klondike->btns[KL_TAB_B]);
                   redraw = true;
                   break;
         case 'C':
-        case 'c': toggle_button(g_klondike->btns[TAB_C]);
+        case 'c': toggle_button(g_klondike->btns[KL_TAB_C]);
                   redraw = true;
                   break;
         case 'D':
-        case 'd': toggle_button(g_klondike->btns[TAB_D]);
+        case 'd': toggle_button(g_klondike->btns[KL_TAB_D]);
                   redraw = true;
                   break;
         case 'E':
-        case 'e': toggle_button(g_klondike->btns[TAB_E]);
+        case 'e': toggle_button(g_klondike->btns[KL_TAB_E]);
                   redraw = true;
                   break;
         case 'F':
-        case 'f': toggle_button(g_klondike->btns[TAB_F]);
+        case 'f': toggle_button(g_klondike->btns[KL_TAB_F]);
                   redraw = true;
                   break;
         case 'G':
-        case 'g': toggle_button(g_klondike->btns[TAB_G]);
+        case 'g': toggle_button(g_klondike->btns[KL_TAB_G]);
                   redraw = true;
                   break;
         case 'H':
-        case 'h': toggle_button(g_klondike->btns[TAB_H]);
+        case 'h': toggle_button(g_klondike->btns[KL_TAB_H]);
                   redraw = true;
                   break;
         case 'I':
-        case 'i': toggle_button(g_klondike->btns[FND_H]);
+        case 'i': toggle_button(g_klondike->btns[KL_FND_H]);
                   redraw = true;
                   break;
         case 'J':
-        case 'j': toggle_button(g_klondike->btns[FND_D]);
+        case 'j': toggle_button(g_klondike->btns[KL_FND_D]);
                   redraw = true;
                   break;
         case 'K':
-        case 'k': toggle_button(g_klondike->btns[FND_C]);
+        case 'k': toggle_button(g_klondike->btns[KL_FND_C]);
                   redraw = true;
                   break;
         case 'L':
-        case 'l': toggle_button(g_klondike->btns[FND_S]);
+        case 'l': toggle_button(g_klondike->btns[KL_FND_S]);
                   redraw = true;
                   break;
         case 'M':
-        case 'm': toggle_button(g_klondike->btns[STOCK]);
+        case 'm': toggle_button(g_klondike->btns[KL_STOCK]);
                   redraw = true;
                   break;
         case 27: 

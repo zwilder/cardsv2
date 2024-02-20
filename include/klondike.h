@@ -22,20 +22,20 @@
 
 // These should all be updated to be preceded with "KL_" at some point
 typedef enum {
-    WASTE       =   0,
+    KL_WASTE       =   0,
     KL_TAB_B,
-    TAB_C,
-    TAB_D,
-    TAB_E,
-    TAB_F,
-    TAB_G,
-    TAB_H,
-    FND_H,
-    FND_D,
-    FND_C,
-    FND_S,
-    STOCK,
-    NUM_DECKS
+    KL_TAB_C,
+    KL_TAB_D,
+    KL_TAB_E,
+    KL_TAB_F,
+    KL_TAB_G,
+    KL_TAB_H,
+    KL_FND_H,
+    KL_FND_D,
+    KL_FND_C,
+    KL_FND_S,
+    KL_STOCK,
+    KL_NUM_DECKS
 } KlondikeDecks;
 
 typedef struct {
