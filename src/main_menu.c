@@ -36,19 +36,22 @@ void main_menu(void) {
     while(ch != 'q') {
         scr_clear(); // Clear everything off the terminal screen
         fill_screen_blank(g_screenbuf); // Fill the screenbuf with blank characters (transparent)
+        /*
         pt_card_title((SCREEN_WIDTH / 2)-12+xo, 
                 (SCREEN_HEIGHT / 2)-6+yo, 
                 "Cards!");
+        */
+        pt_card_title((SCREEN_WIDTH/2)-12+xo,1+yo,"Cards!");
         scr_pt_clr((SCREEN_WIDTH / 2)-9+xo,(SCREEN_HEIGHT - 1)+yo,
                 BRIGHT_BLACK,BLACK, "\u00A9 Zach Wilder 2024");
         // 40-20+66 = 86
-        draw_str((SCREEN_WIDTH/2)-20,(SCREEN_HEIGHT/2)+2,
+        draw_str((SCREEN_WIDTH/2)-20,8,
                 "[k] - Klondike        [p] - Penguin");
-        draw_str((SCREEN_WIDTH/2)-20,(SCREEN_HEIGHT/2)+3,
+        draw_str((SCREEN_WIDTH/2)-20,9,
                 "[f] - Freecell        [c] - Cribbage");
-        draw_str((SCREEN_WIDTH/2)-20,(SCREEN_HEIGHT/2)+4,
+        draw_str((SCREEN_WIDTH/2)-20,10,
                 "[h] - High Scores     [o] - Card Settings");
-        draw_str((SCREEN_WIDTH/2)-20,(SCREEN_HEIGHT/2)+5,
+        draw_str((SCREEN_WIDTH/2)-20,11,
                 "[q] - Quit");
         //ch = draw_menu_nobox(menu, WHITE, BLACK);
         draw_screen(g_screenbuf);

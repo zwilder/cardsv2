@@ -23,7 +23,7 @@
 void klondike_update(void) {
     int i = 0, count = 0;
     int id_a = 0, id_b = 0;
-    int cflags_a = 0, cflags_b = 0;
+    int cflags_a = 0, cflags_b = 0, cflags_c = 0;
     bool valid_move = false;
 
     // Check win condition
@@ -86,6 +86,10 @@ void klondike_update(void) {
             g_klondike->redraw = true;
         } else if (g_klondike->toref->id >= FND_H) {
             // Attempting to move a card to the foundation
+            // It would be cool if the game checcked each foundation, found
+            // which one is the "right one" (if any) and then moved it there all
+            // automagically. 
+            // Old
             if(g_klondike->toref->id == FND_H) {
                 if(card_hearts(cflags_b) && 
                         card_in_asc_sequence(cflags_b,cflags_a)) {

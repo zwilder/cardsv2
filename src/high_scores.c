@@ -30,7 +30,7 @@ void high_scores(void) {
     fill_screen_blank(g_screenbuf);
 
     // Draw the title
-    pt_card_title((SCREEN_WIDTH / 2)-22+xo, yo+2, "High Scores");
+    pt_card_title((SCREEN_WIDTH / 2)-22+xo, yo+1, "High Scores");
     
     // Draw the scores
     snprintf(strbuf,79,

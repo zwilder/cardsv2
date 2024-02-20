@@ -23,7 +23,7 @@
 // These should all be updated to be preceded with "KL_" at some point
 typedef enum {
     WASTE       =   0,
-    TAB_B,
+    KL_TAB_B,
     TAB_C,
     TAB_D,
     TAB_E,
