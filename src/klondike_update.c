@@ -27,7 +27,7 @@ void klondike_update(void) {
     bool valid_move = false;
 
     // Check win condition
-    if(g_klondike->win) {
+    if(check_flag(g_klondike->flags, GFL_WIN)) {
         // None of the rest of update needs to run
         return;
     }
@@ -56,7 +56,7 @@ void klondike_update(void) {
             } else {
                 add_deck(g_klondike->decks[KL_WASTE],g_klondike->decks[KL_STOCK]);
             }
-            g_klondike->redraw = true;
+            g_klondike->flags |= GFL_DRAW;
         } else {
             g_klondike->fromref = g_klondike->decks[id_a]; 
         }
@@ -77,13 +77,13 @@ void klondike_update(void) {
         }
         if(g_klondike->toref->id == KL_WASTE) {
             klondike_msg("Sorry, can't move cards to the waste!");
-            g_klondike->redraw = true;
+            g_klondike->flags |= GFL_DRAW;
         } else if (g_klondike->fromref->id >= KL_FND_H) {
             klondike_msg("Sorry, can't move cards from the foundation.");
-            g_klondike->redraw = true;
+            g_klondike->flags |= GFL_DRAW;
         } else if (g_klondike->toref->id == KL_STOCK) {
             klondike_msg("Sorry, can't move cards to the stock.");
-            g_klondike->redraw = true;
+            g_klondike->flags |= GFL_DRAW;
         } else if (g_klondike->toref->id >= KL_FND_H) {
             // Attempting to move a card to the foundation
             // It would be cool if the game checcked each foundation, found
@@ -116,7 +116,7 @@ void klondike_update(void) {
                 g_klondike->score += 10; // Moving a card to a foundation is 10pts
                 move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
                 klondike_msg(NULL);
-                g_klondike->redraw = true;
+                g_klondike->flags |= GFL_DRAW;
             }
         } else {
             // Attempting to move card to a tableau
@@ -125,12 +125,12 @@ void klondike_update(void) {
                     move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
                     klondike_msg(NULL);
                     g_klondike->score += 5;
-                    g_klondike->redraw = true;
+                    g_klondike->flags |= GFL_DRAW;
                 }else if (!g_klondike->toref->cards && 
                         (check_flag(cflags_b, CD_K))) {
                     move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
                     klondike_msg(NULL);
-                    g_klondike->redraw = true;
+                    g_klondike->flags |= GFL_DRAW;
                 }
             } else {
                 klondike_check_sequence();
@@ -150,14 +150,14 @@ void klondike_update(void) {
         g_klondike->btns[KL_WASTE]->active = false;
     }
     // Check win condition
-    if(!g_klondike->win) {
+    if(!check_flag(g_klondike->flags, GFL_WIN)) {
         count = 0;
         for(i = KL_FND_H; i <= KL_FND_S; i++) {
             count += count_cards(g_klondike->decks[i]->cards); 
         }
         if(count == 52) {
             // all 52 cards are on the foundations
-            g_klondike->win = true;
+            g_klondike->flags |= GFL_WIN;
             // Turn off all the buttons
             for(i = 0; i < KL_NUM_DECKS; i++) {
                 g_klondike->btns[i]->selected = false;
@@ -238,7 +238,7 @@ void klondike_check_sequence(void) {
             g_klondike->toref->cards = card;
         }
         g_klondike->toref->count = count_cards(g_klondike->toref->cards);
-        g_klondike->redraw = true;
+        g_klondike->flags |= GFL_DRAW;
     }
 }
 

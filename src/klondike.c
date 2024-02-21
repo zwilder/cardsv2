@@ -21,25 +21,14 @@
 #include <sys/time.h>
 #include <cards.h>
 
-Klondike *g_klondike = NULL;
+Solitaire *g_klondike = NULL;
 
 void klondike_init(void) {
     int i = 0;
     if(g_klondike) klondike_cleanup();
 
     // Allocate memory for decks/buttons
-    g_klondike = malloc(sizeof(Klondike));
-    g_klondike->redraw = true;
-    g_klondike->win = false;
-    g_klondike->restart = false;
-    g_klondike->score = 0;
-    g_klondike->decks = malloc(KL_NUM_DECKS * sizeof(Deck));
-    g_klondike->btns = malloc(KL_NUM_DECKS * sizeof(Button));
-    for(i = 0; i < KL_NUM_DECKS; i++) {
-        g_klondike->decks[i] = create_deck();
-        g_klondike->decks[i]->id = i;
-        g_klondike->btns[i] = create_button(0,0,i,'a'+i);
-    }
+    g_klondike = create_solitaire(KL_NUM_DECKS);
 
     // Put the buttons in the right spot
     g_klondike->btns[KL_STOCK]->x = 3;
@@ -76,17 +65,7 @@ void klondike_init(void) {
 
 void klondike_cleanup(void) {
     if(!g_klondike) return;
-    int i = 0;
-    for(i = 0; i < KL_NUM_DECKS; i++) {
-        destroy_deck(g_klondike->decks[i]);
-        destroy_button(g_klondike->btns[i]);
-    }
-    free(g_klondike->decks);
-    free(g_klondike->btns);
-    if(g_klondike->msg) {
-        free(g_klondike->msg);
-    }
-    free(g_klondike);
+    destroy_solitaire(g_klondike);
     g_klondike = NULL;
 }
 
@@ -137,12 +116,11 @@ void klondike_loop(void) {
      * using escape codes to clear/refresh the screen is causing the blinky.
      * Current fix is only drawing the screen when the game does something that
      * would make the display change.*/
-    //bool running = true;
     long prev = current_ms();
     long lag = 0, current = 0, elapsed = 0;
     long msperframe = 33; // 16ms = ~60fps, 33ms = ~30fps
-    g_klondike->running = true;
-    while(g_klondike->running) {
+    g_klondike->flags |= GFL_RUNNING;
+    while(check_flag(g_klondike->flags, GFL_RUNNING)) {
         current = current_ms();
         elapsed = current - prev;
         prev = current;
@@ -150,11 +128,11 @@ void klondike_loop(void) {
         
         klondike_events();
         klondike_update();
-        if(g_klondike->redraw) {
+        if(check_flag(g_klondike->flags,GFL_DRAW)) {
             klondike_draw();
         }
-        if(g_klondike->restart) {
-            g_klondike->running = false;
+        if(check_flag(g_klondike->flags,GFL_RESTART)) {
+            g_klondike->flags &= ~GFL_RUNNING;
         }
         while(lag >= msperframe) {
             lag -= msperframe;
@@ -166,7 +144,7 @@ void klondike_loop(void) {
         save_settings();
     }
     // If the game is going to be restarted, do it here
-    if(g_klondike->restart) {
+    if(check_flag(g_klondike->flags,GFL_RESTART)) {
         klondike_init();
     }
 }
@@ -235,7 +213,7 @@ void klondike_events(void) {
         default: break;
     }
     if(redraw) {
-        g_klondike->redraw = redraw;
+        g_klondike->flags |= GFL_DRAW;
     }
 }
 
@@ -267,16 +245,16 @@ void klondike_pause(void) {
             break;
         case 's':
             //save_klondike();
-            g_klondike->running = false;
+            g_klondike->flags &= ~GFL_RUNNING;
             break;
         case 'l':
             //load_klondike();
             break;
         case 'n':
-            g_klondike->restart = true;
+            g_klondike->flags |= GFL_RESTART;
             break;
         case 'q':
-            g_klondike->running = false;
+            g_klondike->flags &= ~GFL_RUNNING;
             break;
         default: break;
     }

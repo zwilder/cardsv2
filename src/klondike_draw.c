@@ -91,7 +91,7 @@ void klondike_draw(void) {
     // Clear and draw the screen buffer - this just blacks out the screen
     clear_screen(g_screenbuf);
     draw_screen(g_screenbuf);
-    if(g_klondike->win) {
+    if(check_flag(g_klondike->flags, GFL_WIN)) {
         //YOU WIN!
         pt_card_title((g_screenW / 2) - 16, 
                 (g_screenH / 2) - 2,
@@ -210,5 +210,5 @@ void klondike_draw(void) {
 
     // Reset drawing functions
     //scr_reset();
-    g_klondike->redraw = false;
+    g_klondike->flags &= ~GFL_DRAW;
 }
