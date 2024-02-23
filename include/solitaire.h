@@ -25,10 +25,14 @@ typedef enum {
     GFL_DRAW        = 1 << 1,
     GFL_RESTART     = 1 << 2,
     GFL_WIN         = 1 << 3,
-    GFL_RUNNING     = 1 << 4
+    GFL_RUNNING     = 1 << 4,
+    GFL_QTOMAIN     = 1 << 5
 } GameFlags;
 
 typedef struct {
+    void (*events)(void);
+    void (*update)(void);
+    void (*draw)(void);
     uint8_t num_decks; // The number of decks (hands, tableaus etc)
     Deck **decks; // The "decks" (card spots) above
     Button **btns; // Buttons for each deck above
@@ -37,16 +41,11 @@ typedef struct {
     char *msg; // String pointer for messages
     uint8_t flags; // Bitflags
     int score; // Current game score
-
-    /* Depreciated */
-    bool redraw; // Flag to let the main loop know to redraw the screen
-    bool restart; // Flag to restart the game
-    bool win; // Flag for win condition
-    bool running; // Flag for main loop
 } Solitaire;
 
 Solitaire* create_solitaire(uint8_t num_decks); // Create an empty soliaire game
 void destroy_solitaire(Solitaire *game); // Destroy a solitaire game
 void solitaire_msg(Solitaire *g, char *msg,...);
+void solitaire_loop(Solitaire *g);
 
 #endif // SOLITAIRE_H

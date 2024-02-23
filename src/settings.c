@@ -41,6 +41,18 @@ Settings *g_settings = NULL;
 void init_settings(void) {
     if(g_settings) close_settings();
     g_settings = malloc(sizeof(Settings));
+    g_settings->redcolor = BRIGHT_MAGENTA;
+    g_settings->blackcolor = BRIGHT_CYAN;
+    g_settings->deckcolor = BRIGHT_BLACK;
+    g_settings->bgcolor = BLACK;
+    g_settings->btnselectcolor = CYAN;
+    g_settings->btncolor = WHITE;
+    g_settings->klondike_hs = 0;
+    g_settings->klondike_last = 0;
+    g_settings->klondike_wins = 0;
+    g_settings->penguin_hs = 0;
+    g_settings->penguin_last = 0;
+    g_settings->penguin_wins = 0;
 }
 
 void close_settings(void) {

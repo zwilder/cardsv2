@@ -40,7 +40,7 @@ typedef enum {
 
 extern Solitaire* g_klondike;
 
-void klondike_init(void);
+bool klondike_init(void);
 void klondike_cleanup(void);
 void klondike_deal(void);
 void klondike_loop(void);

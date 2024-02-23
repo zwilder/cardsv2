@@ -46,7 +46,7 @@ typedef enum {
 
 extern Solitaire *g_penguin;
 
-void penguin_init(void);
+bool penguin_init(void);
 void penguin_cleanup(void);
 void penguin_deal(void);
 void penguin_loop(void);

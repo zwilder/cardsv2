@@ -18,10 +18,14 @@
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <cards.h>
+#include <sys/time.h>
 
 Solitaire* create_solitaire(uint8_t num_decks) {
     uint8_t i = 0;
     Solitaire *game = malloc(sizeof(Solitaire));
+    game->events = NULL;
+    game->update = NULL;
+    game->draw = NULL;
     game->flags = GFL_NONE;
     game->score = 0;
     game->num_decks = num_decks;
@@ -77,4 +81,43 @@ void solitaire_msg(Solitaire *g, char *msg,...) {
     g->msg = malloc(sizeof(char) * i);
     vsnprintf(g->msg,i,msg,args);
     va_end(args);
+}
+
+long current_ms(void) {
+    // Helper function to return the current time in ms
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    return ((tp.tv_sec * 1000) + (tp.tv_usec / 1000));
+}
+
+void solitaire_loop(Solitaire *g) {
+    /* Overdesigned main loop? Probably. This is your standard,
+     * events-update-render loop with a nice check to keep it at a steady
+     * 30fps (otherwise it will render as fast as it can draw, and since this
+     * isn't a very processor intensive program at all - it can look blinky) 
+     * Update: this doesn't stop it looking blinky. Fairly certain the way I'm
+     * using escape codes to clear/refresh the screen is causing the blinky.
+     * Current fix is only drawing the screen when the game does something that
+     * would make the display change.*/
+    long prev = current_ms();
+    long lag = 0, current = 0, elapsed = 0;
+    long msperframe = 33; // 16ms = ~60fps, 33ms = ~30fps
+    g->flags |= GFL_RUNNING;
+    while(check_flag(g->flags, GFL_RUNNING)) {
+        current = current_ms();
+        elapsed = current - prev;
+        prev = current;
+        lag += elapsed;
+        g->events();
+        g->update();
+        if(check_flag(g->flags,GFL_DRAW)) {
+            g->draw();
+        }
+        if(check_flag(g->flags,GFL_RESTART)) {
+            g->flags &= ~GFL_RUNNING;
+        }
+        while(lag >= msperframe) {
+            lag -= msperframe;
+        }
+    }
 }

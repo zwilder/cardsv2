@@ -21,16 +21,27 @@
 
 Solitaire *g_penguin = NULL;
 
-void penguin_init(void) {
+bool penguin_init(void) {
+    /*
+     * Initialize a solitaire game of Penguin, and return a bool indicating if
+     * the user wants to return to the main menu, or quit the game entirely.
+     */
+    bool ret_to_main = false;
     int i = 0, j = 0;
+
     // Allocate memory for decks/buttons
     g_penguin = create_solitaire(PN_NUM_DECKS);
+
+    // Register events/update/draw functions
+    g_penguin->events = &penguin_events;
+    g_penguin->update = &penguin_update;
+    g_penguin->draw = &penguin_draw;
 
     // Put the buttons in the right spot
     j = 0;
     for(i = PN_TAB_A; i <= PN_TAB_G; i++) {
         g_penguin->btns[i]->active = true;
-        g_penguin->btns[i]->x = 3 + (j*6);
+        g_penguin->btns[i]->x = 1+(j*6);
         g_penguin->btns[i]->y = 0;
         j++;
     }
@@ -46,8 +57,9 @@ void penguin_init(void) {
     j = 0;
     for(i = PN_FND_H; i <= PN_FND_S; i++) {
         g_penguin->btns[i]->active = true;
-        g_penguin->btns[i]->x = 59 + (j*5);
+        g_penguin->btns[i]->x = 60 + (j*5);
         g_penguin->btns[i]->y = 11;
+        // Renaming the foundation buttons here
         g_penguin->btns[i]->ch = '1' + j;
         j++;
     }
@@ -63,7 +75,9 @@ void penguin_init(void) {
     penguin_loop();
 
     // Cleanup
+    ret_to_main = check_flag(g_penguin->flags, GFL_QTOMAIN);
     penguin_cleanup();
+    return ret_to_main;
 }
 
 void penguin_cleanup(void) {
@@ -128,12 +142,27 @@ void penguin_deal(void) {
 }
 
 void penguin_loop(void) {
+    // Main loop
+    solitaire_loop(g_penguin);
 
-    kb_get_bl_char(); // Temporary, just to pause here
+    // Score check here... If score is new high score, save it
+    if(g_penguin->score > g_settings->penguin_hs) {
+        g_settings->penguin_hs = g_penguin->score;
+    }
+    if(g_penguin->score) {
+        g_settings->penguin_last = g_penguin->score;
+    }
+    save_settings();
+    // If the game is going to be restarted, do it here
+    if(check_flag(g_penguin->flags,GFL_RESTART)) {
+        penguin_init();
+    }
 }
 
 void penguin_events(void) {
 
+    kb_get_bl_char();
+    g_penguin->flags &= ~GFL_RUNNING;
 }
 
 void penguin_update(void) {

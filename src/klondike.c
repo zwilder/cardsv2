@@ -23,12 +23,22 @@
 
 Solitaire *g_klondike = NULL;
 
-void klondike_init(void) {
+bool klondike_init(void) {
+    /*
+     * Initialize a solitaire game of Klondike, and return a bool indicating if
+     * the user wants to return to the main menu, or quit the game entirely.
+     */
     int i = 0;
+    bool ret_to_main = false;
     if(g_klondike) klondike_cleanup();
 
     // Allocate memory for decks/buttons
     g_klondike = create_solitaire(KL_NUM_DECKS);
+
+    // Register events/update/draw
+    g_klondike->events = &klondike_events;
+    g_klondike->update = &klondike_update;
+    g_klondike->draw = &klondike_draw;
 
     // Put the buttons in the right spot
     g_klondike->btns[KL_STOCK]->x = 3;
@@ -56,7 +66,9 @@ void klondike_init(void) {
     klondike_loop();
 
     // Cleanup
+    ret_to_main = check_flag(g_klondike->flags, GFL_QTOMAIN);
     klondike_cleanup();
+    return ret_to_main;
 }
 
 void klondike_cleanup(void) {
@@ -82,49 +94,17 @@ void klondike_deal(void) {
     }
 }
 
-long current_ms(void) {
-    // Helper function to return the current time in ms
-    struct timeval tp;
-    gettimeofday(&tp, NULL);
-    return ((tp.tv_sec * 1000) + (tp.tv_usec / 1000));
-}
-
 void klondike_loop(void) {
-    /* Overdesigned main loop? Probably. This is your standard,
-     * events-update-render loop with a nice check to keep it at a steady
-     * 30fps (otherwise it will render as fast as it can draw, and since this
-     * isn't a very processor intensive program at all - it can look blinky) 
-     * Update: this doesn't stop it looking blinky. Fairly certain the way I'm
-     * using escape codes to clear/refresh the screen is causing the blinky.
-     * Current fix is only drawing the screen when the game does something that
-     * would make the display change.*/
-    long prev = current_ms();
-    long lag = 0, current = 0, elapsed = 0;
-    long msperframe = 33; // 16ms = ~60fps, 33ms = ~30fps
-    g_klondike->flags |= GFL_RUNNING;
-    while(check_flag(g_klondike->flags, GFL_RUNNING)) {
-        current = current_ms();
-        elapsed = current - prev;
-        prev = current;
-        lag += elapsed;
-        
-        klondike_events();
-        klondike_update();
-        if(check_flag(g_klondike->flags,GFL_DRAW)) {
-            klondike_draw();
-        }
-        if(check_flag(g_klondike->flags,GFL_RESTART)) {
-            g_klondike->flags &= ~GFL_RUNNING;
-        }
-        while(lag >= msperframe) {
-            lag -= msperframe;
-        }
-    }
+    // Main loop
+    solitaire_loop(g_klondike);
     // Score check here... If score is new high score, save it
     if(g_klondike->score > g_settings->klondike_hs) {
         g_settings->klondike_hs = g_klondike->score;
-        save_settings();
     }
+    if(g_klondike->score) {
+        g_settings->klondike_last = g_klondike->score;
+    }
+    save_settings();
     // If the game is going to be restarted, do it here
     if(check_flag(g_klondike->flags,GFL_RESTART)) {
         klondike_init();
@@ -207,11 +187,12 @@ void klondike_pause(void) {
     // Create the slist for the menu
     SList *menu = create_slist("-Game Paused-");
     slist_push(&menu, "Press any other key to resume");
-    slist_push(&menu, "cnq");
+    slist_push(&menu, "cnmq");
     slist_push(&menu, "Change card color settings");
     //slist_push(&menu, "Save game and quit");
     //slist_push(&menu, "Load saved game");
     slist_push(&menu, "Start new game");
+    slist_push(&menu, "Quit to main menu");
     slist_push(&menu, "Quit game");
 
     // Show the menu
@@ -234,6 +215,10 @@ void klondike_pause(void) {
             break;
         case 'n':
             g_klondike->flags |= GFL_RESTART;
+            break;
+        case 'm':
+            g_klondike->flags |= GFL_QTOMAIN;
+            g_klondike->flags &= ~GFL_RUNNING;
             break;
         case 'q':
             g_klondike->flags &= ~GFL_RUNNING;

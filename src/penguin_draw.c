@@ -49,9 +49,13 @@
            1         2         3         4         5         6         7         8
   12345678901234567890123456789012345678901234567890123456789012345678901234567890
 
-  Buttons at 3,0 then x+6
+  Buttons might look better/more natural underneath the tableaus/cells -
+  obviously the y position of the button would have to be adjusted when a card
+  is moved to/from that tableau.
+
+  Buttons at 1,0 then x+6
   Foundation buttons at 59,11 then x+ 5
-  Tableaus at 2,1 then x+6
+  Tableaus at 0,1 then x+6
   Cells at 44,1 then x+5
   Foundations at 59,7 then x+5
  * Drawing reference
@@ -80,7 +84,15 @@ void penguin_draw(void) {
     draw_screen(g_screenbuf);
 
     // Draw Buttons
-    for(i = PN_TAB_A; i < PN_STOCK; i++) {
+    // Buttons should go underneath the tableaus, so I need to add the number of
+    // the cards in the tableau + 3 to y
+    for(i = PN_TAB_A; i < PN_CELL_A; i++) {
+        j = g_penguin->decks[i]->count + 3;
+        pt_button_at(g_penguin->btns[i],
+                g_penguin->btns[i]->x + xo,
+                g_penguin->btns[i]->y + j + yo);
+    }
+    for(i = PN_CELL_A; i < PN_STOCK; i++) {
         pt_button_at(g_penguin->btns[i],
                 g_penguin->btns[i]->x + xo,
                 g_penguin->btns[i]->y + yo);
@@ -88,14 +100,14 @@ void penguin_draw(void) {
 
     // Draw Tableaus
     for(i = 0; i < 7; i++) {
-        x = 2 + (6*i) + xo;
+        x = (6*i) + xo;
         // Get the current deck
         deck = g_penguin->decks[PN_TAB_A + i];
         if(deck->cards) {
             // Print the tops of all cards, except the last    
             j = 0;
             cards = deck->cards;
-            y = 1 + j + yo;
+            y = j + yo;
             while(cards->next) {
                 y = 1 + j + yo;
                 pt_card_top(x,y,cards);

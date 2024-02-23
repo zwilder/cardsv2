@@ -58,12 +58,7 @@ void main_menu(void) {
         ch = kb_get_bl_char();
         switch(ch) {
             case 'k':
-                klondike_init();
-                // For now, quit when leaving klondike.
-                // I may, in the future, have init return a bool or something -
-                // like if I add a "return to main menu" screen in the Klondike
-                // menu
-                ch = 'q';
+                if(!klondike_init()) ch = 'q';
                 break;
             case 'p':
                 penguin_init();

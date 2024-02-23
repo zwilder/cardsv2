@@ -29,6 +29,9 @@ struct Settings {
     uint8_t btncolor;
     uint8_t btnselectcolor;
     int klondike_hs;
+    int klondike_wins;
+    int penguin_hs;
+    int penguin_wins;
 };
 */
 
@@ -43,6 +46,11 @@ void save_settings(void) {
         fwrite(&(g_settings->bgcolor),sizeof(uint8_t),1,f);
         fwrite(&(g_settings->btncolor),sizeof(uint8_t),1,f);
         fwrite(&(g_settings->btnselectcolor),sizeof(uint8_t),1,f);
+        fwrite(&(g_settings->klondike_last),sizeof(int),1,f);
+        fwrite(&(g_settings->klondike_wins),sizeof(int),1,f);
+        fwrite(&(g_settings->penguin_hs),sizeof(int),1,f);
+        fwrite(&(g_settings->penguin_last),sizeof(int),1,f);
+        fwrite(&(g_settings->penguin_wins),sizeof(int),1,f);
     }
 
     fclose(f);
@@ -61,6 +69,11 @@ bool load_settings(void) {
         bytesread += fread(&(g_settings->bgcolor), sizeof(uint8_t),1,f);
         bytesread += fread(&(g_settings->btncolor), sizeof(uint8_t),1,f);
         bytesread += fread(&(g_settings->btnselectcolor), sizeof(uint8_t),1,f);
+        bytesread += fread(&(g_settings->klondike_last), sizeof(int),1,f);
+        bytesread += fread(&(g_settings->klondike_wins), sizeof(int),1,f);
+        bytesread += fread(&(g_settings->penguin_hs), sizeof(int),1,f);
+        bytesread += fread(&(g_settings->penguin_last), sizeof(int),1,f);
+        bytesread += fread(&(g_settings->penguin_wins), sizeof(int),1,f);
         success = true;
         fclose(f);
     } else {
@@ -71,6 +84,11 @@ bool load_settings(void) {
         g_settings->bgcolor = BLACK;
         g_settings->btnselectcolor = CYAN;
         g_settings->btncolor = WHITE;
+        g_settings->klondike_last = 0;
+        g_settings->klondike_wins = 0;
+        g_settings->penguin_hs = 0;
+        g_settings->penguin_last = 0;
+        g_settings->penguin_wins = 0;
     }
 
     return success;

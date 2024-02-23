@@ -203,8 +203,9 @@ void klondike_draw(void) {
 
     // Draw status
     scr_pt_clr(xo,23+yo,BRIGHT_BLACK,BLACK,
-            "High score: %d. Stock: %d. Waste: %d. Press [q] to open menu.",
+            "High score: %d. Last score: %d. Stock: %d. Waste: %d.", 
             g_settings->klondike_hs,
+            g_settings->klondike_last,
             g_klondike->decks[KL_STOCK]->count,
             g_klondike->decks[KL_WASTE]->count);
 

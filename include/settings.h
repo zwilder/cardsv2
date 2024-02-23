@@ -34,6 +34,11 @@ struct Settings {
     uint8_t btncolor;
     uint8_t btnselectcolor;
     int klondike_hs;
+    int klondike_last;
+    int klondike_wins;
+    int penguin_hs;
+    int penguin_last;
+    int penguin_wins;
 };
 
 extern Settings *g_settings;

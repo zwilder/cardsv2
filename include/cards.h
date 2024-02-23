@@ -51,7 +51,8 @@
 /*****
  * Utility and Helper functions
  *****/
-void main_menu(void);
-void high_scores(void);
+void main_menu(void); // main_menu.c
+void high_scores(void); // high_scores.c
+long current_ms(void); // solitaire.c
 
 #endif //CARDS_H

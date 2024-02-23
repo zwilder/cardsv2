@@ -159,6 +159,7 @@ void klondike_update(void) {
         if(count == 52) {
             // all 52 cards are on the foundations
             g_klondike->flags |= GFL_WIN;
+            g_settings->klondike_wins += 1;
             // Turn off all the buttons
             for(i = 0; i < KL_NUM_DECKS; i++) {
                 g_klondike->btns[i]->selected = false;
