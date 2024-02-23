@@ -49,9 +49,6 @@ void klondike_init(void) {
     fill_deck(g_klondike->decks[KL_STOCK]);
     shuffle_deck(g_klondike->decks[KL_STOCK]);
 
-    // Global message is null
-    g_klondike->msg = NULL;
-
     // Deal the cards, draw the cards, enter the loop
     klondike_deal();
     klondike_update();
@@ -60,7 +57,6 @@ void klondike_init(void) {
 
     // Cleanup
     klondike_cleanup();
-
 }
 
 void klondike_cleanup(void) {
@@ -84,20 +80,6 @@ void klondike_deal(void) {
         }
         engage_flag(&(tmp->flags), CD_UP);
     }
-}
-
-void klondike_msg(char *msg,...) {
-    if(g_klondike->msg) {
-        free(g_klondike->msg);
-        g_klondike->msg = NULL;
-    }
-    if(!msg) return;
-    va_list args;
-    va_start(args,msg);
-    int i = strlen(msg) + 1;
-    g_klondike->msg = malloc(sizeof(char) * i);
-    vsnprintf(g_klondike->msg,i,msg,args);
-    va_end(args);
 }
 
 long current_ms(void) {

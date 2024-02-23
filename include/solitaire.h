@@ -47,5 +47,6 @@ typedef struct {
 
 Solitaire* create_solitaire(uint8_t num_decks); // Create an empty soliaire game
 void destroy_solitaire(Solitaire *game); // Destroy a solitaire game
+void solitaire_msg(Solitaire *g, char *msg,...);
 
 #endif // SOLITAIRE_H

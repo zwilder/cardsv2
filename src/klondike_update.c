@@ -76,13 +76,13 @@ void klondike_update(void) {
             cflags_b = get_last_card(g_klondike->fromref)->flags;
         }
         if(g_klondike->toref->id == KL_WASTE) {
-            klondike_msg("Sorry, can't move cards to the waste!");
+            solitaire_msg(g_klondike,"Sorry, can't move cards to the waste!");
             g_klondike->flags |= GFL_DRAW;
         } else if (g_klondike->fromref->id >= KL_FND_H) {
-            klondike_msg("Sorry, can't move cards from the foundation.");
+            solitaire_msg(g_klondike,"Sorry, can't move cards from the foundation.");
             g_klondike->flags |= GFL_DRAW;
         } else if (g_klondike->toref->id == KL_STOCK) {
-            klondike_msg("Sorry, can't move cards to the stock.");
+            solitaire_msg(g_klondike,"Sorry, can't move cards to the stock.");
             g_klondike->flags |= GFL_DRAW;
         } else if (g_klondike->toref->id >= KL_FND_H) {
             // Attempting to move a card to the foundation
@@ -115,7 +115,7 @@ void klondike_update(void) {
                 //Move card
                 g_klondike->score += 10; // Moving a card to a foundation is 10pts
                 move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
-                klondike_msg(NULL);
+                solitaire_msg(g_klondike,NULL);
                 g_klondike->flags |= GFL_DRAW;
             }
         } else {
@@ -123,17 +123,18 @@ void klondike_update(void) {
             if(g_klondike->fromref->id == KL_WASTE) {
                 if(klondike_valid_move(cflags_a,cflags_b)) {
                     move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
-                    klondike_msg(NULL);
+                    solitaire_msg(g_klondike,NULL);
                     g_klondike->score += 5;
                     g_klondike->flags |= GFL_DRAW;
                 }else if (!g_klondike->toref->cards && 
                         (check_flag(cflags_b, CD_K))) {
                     move_last_card_to_deck(g_klondike->fromref, g_klondike->toref);
-                    klondike_msg(NULL);
+                    solitaire_msg(g_klondike,NULL);
                     g_klondike->flags |= GFL_DRAW;
                 }
             } else {
                 klondike_check_sequence();
+                solitaire_msg(g_klondike,NULL);
             }
         }
 

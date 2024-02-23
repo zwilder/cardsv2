@@ -40,11 +40,18 @@ typedef enum {
     PN_FND_D,
     PN_FND_C,
     PN_FND_S,
+    PN_STOCK,
     PN_NUM_DECKS
 } PenguinDecks;
 
-// Note, the Penguin structure is exactly the same as the Klondike structure...
-// why have two? the Klondike structure could be renamed... Solitaire?
-// Something. Honestly every game would have the same decks/from/to/btns/flags
-// setup.
+extern Solitaire *g_penguin;
+
+void penguin_init(void);
+void penguin_cleanup(void);
+void penguin_deal(void);
+void penguin_loop(void);
+void penguin_events(void);
+void penguin_update(void);
+void penguin_draw(void);
+
 #endif //PENGUIN_H

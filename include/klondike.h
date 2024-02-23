@@ -43,7 +43,6 @@ extern Solitaire* g_klondike;
 void klondike_init(void);
 void klondike_cleanup(void);
 void klondike_deal(void);
-void klondike_msg(char *msg,...);
 void klondike_loop(void);
 void klondike_events(void);
 void klondike_pause(void);

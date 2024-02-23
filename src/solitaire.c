@@ -64,3 +64,17 @@ void destroy_solitaire(Solitaire *game) {
     game->toref = NULL;
     free(game);
 }
+
+void solitaire_msg(Solitaire *g, char *msg,...) {
+    if(g->msg) {
+        free(g->msg);
+        g->msg = NULL;
+    }
+    if(!msg) return;
+    va_list args;
+    va_start(args,msg);
+    int i = strlen(msg) + 1;
+    g->msg = malloc(sizeof(char) * i);
+    vsnprintf(g->msg,i,msg,args);
+    va_end(args);
+}

@@ -304,6 +304,17 @@ int get_rank(int card) {
     return result;
 }
 
+int get_rank_flag(int card) {
+    // Just need to return the flag & ~(suites)
+    return (card & ~(CD_H | CD_D | CD_C | CD_S));
+}
+
+int get_suite_flag(int card) {
+    // Just need to return the flag & ~(rank)
+    return (card & 
+            ~(CD_A | CD_2 | CD_3 | CD_4 | CD_5 | CD_6 | 
+              CD_7 | CD_8 | CD_9 | CD_10 | CD_J | CD_Q | CD_K));
+}
 void shuffle_deck(Deck *deck) {
     int rounds = 500; // Seems about right for a truly random shuffle
     int i,j,n;
