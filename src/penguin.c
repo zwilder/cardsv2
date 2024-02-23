@@ -22,10 +22,35 @@
 Solitaire *g_penguin = NULL;
 
 void penguin_init(void) {
+    int i = 0, j = 0;
     // Allocate memory for decks/buttons
     g_penguin = create_solitaire(PN_NUM_DECKS);
 
     // Put the buttons in the right spot
+    j = 0;
+    for(i = PN_TAB_A; i <= PN_TAB_G; i++) {
+        g_penguin->btns[i]->active = true;
+        g_penguin->btns[i]->x = 3 + (j*6);
+        g_penguin->btns[i]->y = 0;
+        j++;
+    }
+
+    j = 0;
+    for(i = PN_CELL_A; i <= PN_CELL_G; i++) {
+        g_penguin->btns[i]->active = true;
+        g_penguin->btns[i]->x = 45 + (j*5);
+        g_penguin->btns[i]->y = 0;
+        j++;
+    }
+
+    j = 0;
+    for(i = PN_FND_H; i <= PN_FND_S; i++) {
+        g_penguin->btns[i]->active = true;
+        g_penguin->btns[i]->x = 59 + (j*5);
+        g_penguin->btns[i]->y = 11;
+        g_penguin->btns[i]->ch = '1' + j;
+        j++;
+    }
     
     // Put 52 cards in the stock, and shuffle it
     fill_deck(g_penguin->decks[PN_STOCK]);
@@ -82,27 +107,29 @@ void penguin_deal(void) {
                 deck = g_penguin->decks[PN_FND_C];
                 break;
             default:
+                solitaire_msg(g_penguin, "WTF HAPPENED?");
                 break;
         }
         add_card_to_deck(deck, card);
 
         // Get the next one
-        card = search_deck(g_penguin->decks[PN_STOCK], rflag);
+        card = search_deck(stock, rflag);
     }
 
     // Next, each tableau deck draws seven cards, except tab A which already has
     // one card in it (beak)
-    draw_cards(stock, g_klondike->decks[PN_TAB_A], 6);
-    draw_cards(stock, g_klondike->decks[PN_TAB_B], 7);
-    draw_cards(stock, g_klondike->decks[PN_TAB_C], 7);
-    draw_cards(stock, g_klondike->decks[PN_TAB_D], 7);
-    draw_cards(stock, g_klondike->decks[PN_TAB_E], 7);
-    draw_cards(stock, g_klondike->decks[PN_TAB_F], 7);
-    draw_cards(stock, g_klondike->decks[PN_TAB_G], 7);
+    draw_cards(stock, g_penguin->decks[PN_TAB_A], 6);
+    draw_cards(stock, g_penguin->decks[PN_TAB_B], 7);
+    draw_cards(stock, g_penguin->decks[PN_TAB_C], 7);
+    draw_cards(stock, g_penguin->decks[PN_TAB_D], 7);
+    draw_cards(stock, g_penguin->decks[PN_TAB_E], 7);
+    draw_cards(stock, g_penguin->decks[PN_TAB_F], 7);
+    draw_cards(stock, g_penguin->decks[PN_TAB_G], 7);
 }
 
 void penguin_loop(void) {
 
+    kb_get_bl_char(); // Temporary, just to pause here
 }
 
 void penguin_events(void) {
@@ -113,52 +140,3 @@ void penguin_update(void) {
 
 }
 
-void penguin_draw(void) {
-/* Basic screen layout (80x24 standard)
- *         1         2         3         4         5         6         7         8
-  12345678901234567890123456789012345678901234567890123456789012345678901234567890
- 1   [a]   [b]   [c]   [d]   [e]   [f]   [g]   [h]  [i]  [j]  [k]  [l]  [m]  [n]
- 2  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ┌  ┐ ┌  ┐ ┌  ┐ ┌  ┐ ┌  ┐ ┌  ┐ ┌  ┐                                   
- 3  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗
- 4  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗    P    E    N    G    U    I    N
- 5  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  └  ┘ └  ┘ └  ┘ └  ┘ └  ┘ └  ┘ └  ┘
- 6  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗    
- 7  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗
- 8  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ╔══╗  ┌  ┐ ┌  ┐ ┌  ┐ ┌  ┐ 
- 9  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║    ♡    ♢    ♧    ♤
-10  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║
- 1  ╚══╝  ╚══╝  ╚══╝  ╚══╝  ╚══╝  ╚══╝  ╚══╝  └  ┘ └  ┘ └  ┘ └  ┘
- 2                                             [1]  [2]  [3]  [4]
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-20
- 1
- 2 Messages        
- 3 Score: 150
- 4 Press [q] to open the menu.
-           1         2         3         4         5         6         7         8
-  12345678901234567890123456789012345678901234567890123456789012345678901234567890
-
-  Buttons at 3,0 then x+6
-  Tableaus at 2,1 then x+6
-  Cells at 44,1 then x+5
-  Foundations at 44,7 then x+5
- * Drawing reference
- * ♠ u2660, ♤ u2664
- * ♥ u2665, ♡ u2661
- * ♦ u2666, ♢ u2662
- * ♣ u2663, ♧ u2667
-    ┌  ┐ u250c u2510
-     
-     
-    └  ┘ u2514 u2518
-     	0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F
-U+255x	═	║	╒	╓	╔	╕	╖	╗	╘	╙	╚	╛	╜	╝	╞	╟
- */
-
-}

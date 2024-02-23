@@ -65,6 +65,9 @@ void main_menu(void) {
                 // menu
                 ch = 'q';
                 break;
+            case 'p':
+                penguin_init();
+                break;
             case 'h':
                 high_scores();
                 break;

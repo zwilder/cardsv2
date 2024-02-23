@@ -135,7 +135,12 @@ Card* search_deck(Deck *deck, int cflags) {
     if(!deck) return NULL;
     if(!deck->cards) return NULL;
     Card *result = deck->cards;
-    while(!check_flag(result->flags, cflags)) {
+    //while(!check_flag(result->flags, cflags)) {
+    while(result) {
+        if(check_flag(result->flags,cflags)) {
+            //Found what we are looking for
+            break;
+        }
         result = result->next;
     }
     return result;
@@ -572,6 +577,18 @@ void pt_card_space_suite(int x, int y, int cflags) {
     } else if(card_clubs(cflags)) {
         scr_pt_clr(x+1,y+1,BRIGHT_BLACK,BLACK,"\u2667");
     }
+}
+
+void pt_card_space_ch(int x, int y, char ch) {
+    /*
+     * Same as pt_card_space, but with a character in the rank
+    ┌  ┐ u250c u2510
+       
+       
+    └  ┘ u2514 u2518
+     */
+    pt_card_space(x,y);
+    scr_pt_char(x+2,y+2,ch);
 }
 
 void pt_card_special_rank(int x, int y, int cflags, char ch) {
