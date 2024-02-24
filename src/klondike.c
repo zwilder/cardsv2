@@ -65,8 +65,14 @@ bool klondike_init(void) {
     klondike_draw();
     klondike_loop();
 
+    // If the game is going to be restarted, do it here
+    if(check_flag(g_klondike->flags,GFL_RESTART)) {
+        ret_to_main = klondike_init();
+    } else {
+        ret_to_main = check_flag(g_klondike->flags, GFL_QTOMAIN);
+    }
+
     // Cleanup
-    ret_to_main = check_flag(g_klondike->flags, GFL_QTOMAIN);
     klondike_cleanup();
     return ret_to_main;
 }
@@ -105,10 +111,6 @@ void klondike_loop(void) {
         g_settings->klondike_last = g_klondike->score;
     }
     save_settings();
-    // If the game is going to be restarted, do it here
-    if(check_flag(g_klondike->flags,GFL_RESTART)) {
-        klondike_init();
-    }
 }
 
 void klondike_events(void) {
@@ -169,7 +171,8 @@ void klondike_events(void) {
                   break;
         case 27: 
         case 'q':
-                  klondike_pause(); 
+                  //klondike_pause(); 
+                  solitaire_pause(g_klondike);
                   redraw = true; 
                   break;
         default: break;
@@ -189,8 +192,6 @@ void klondike_pause(void) {
     slist_push(&menu, "Press any other key to resume");
     slist_push(&menu, "cnmq");
     slist_push(&menu, "Change card color settings");
-    //slist_push(&menu, "Save game and quit");
-    //slist_push(&menu, "Load saved game");
     slist_push(&menu, "Start new game");
     slist_push(&menu, "Quit to main menu");
     slist_push(&menu, "Quit game");
@@ -205,13 +206,6 @@ void klondike_pause(void) {
     switch(ch) {
         case 'c':
             settings_menu();
-            break;
-        case 's':
-            //save_klondike();
-            g_klondike->flags &= ~GFL_RUNNING;
-            break;
-        case 'l':
-            //load_klondike();
             break;
         case 'n':
             g_klondike->flags |= GFL_RESTART;

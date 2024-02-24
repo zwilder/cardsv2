@@ -121,3 +121,46 @@ void solitaire_loop(Solitaire *g) {
         }
     }
 }
+
+void solitaire_pause(Solitaire *g) {
+    int xo = (g_screenW / 2) - (SCREEN_WIDTH / 2);
+    int yo = (g_screenH / 2) - (SCREEN_HEIGHT / 2);
+    char ch = '\0';
+
+    // Create the slist for the menu
+    SList *menu = create_slist("-Game Paused-");
+    slist_push(&menu, "Press any other key to resume");
+    slist_push(&menu, "cnmq");
+    slist_push(&menu, "Change card color settings");
+    slist_push(&menu, "Start new game");
+    slist_push(&menu, "Quit to main menu");
+    slist_push(&menu, "Quit game");
+
+    // Show the menu
+    scr_clear(); // Clear everything off the terminal screen
+    pt_card_title((SCREEN_WIDTH / 2)-10+xo, yo+1, "Pause");
+    fill_screen_blank(g_screenbuf); // Fill the screenbuf with blank characters (transparent)
+    ch = draw_menu_nobox(menu, WHITE, BLACK);
+
+    // Process the input
+    switch(ch) {
+        case 'c':
+            settings_menu();
+            break;
+        case 'n':
+            g->flags |= GFL_RESTART;
+            break;
+        case 'm':
+            g->flags |= GFL_QTOMAIN;
+            g->flags &= ~GFL_RUNNING;
+            break;
+        case 'q':
+            g->flags &= ~GFL_RUNNING;
+            break;
+        default: break;
+    }
+
+    // Cleanup
+    clear_screen(g_screenbuf);
+    destroy_slist(&menu);
+}

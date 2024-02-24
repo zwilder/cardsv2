@@ -74,8 +74,13 @@ bool penguin_init(void) {
     penguin_draw();
     penguin_loop();
 
+    // If the game is going to be restarted, do it here
+    if(check_flag(g_penguin->flags,GFL_RESTART)) {
+        ret_to_main = penguin_init();
+    } else {
+        ret_to_main = check_flag(g_penguin->flags, GFL_QTOMAIN);
+    }
     // Cleanup
-    ret_to_main = check_flag(g_penguin->flags, GFL_QTOMAIN);
     penguin_cleanup();
     return ret_to_main;
 }
@@ -121,7 +126,7 @@ void penguin_deal(void) {
                 deck = g_penguin->decks[PN_FND_C];
                 break;
             default:
-                solitaire_msg(g_penguin, "WTF HAPPENED?");
+                solitaire_msg(g_penguin, "WTF HAPPENED? How did you get here?!");
                 break;
         }
         add_card_to_deck(deck, card);
@@ -153,19 +158,52 @@ void penguin_loop(void) {
         g_settings->penguin_last = g_penguin->score;
     }
     save_settings();
-    // If the game is going to be restarted, do it here
-    if(check_flag(g_penguin->flags,GFL_RESTART)) {
-        penguin_init();
-    }
 }
 
 void penguin_events(void) {
-
-    kb_get_bl_char();
-    g_penguin->flags &= ~GFL_RUNNING;
+    bool redraw = true;
+    char ch = kb_get_char();
+    int btn_id = -1; 
+    switch(ch) {
+        case 'A':
+        case 'a': btn_id = PN_TAB_A; break;
+        case 'B':
+        case 'b': btn_id = PN_TAB_B; break;
+        case 'C':
+        case 'c': btn_id = PN_TAB_C; break;
+        case 'D':
+        case 'd': btn_id = PN_TAB_D; break;
+        case 'E':
+        case 'e': btn_id = PN_TAB_E; break;
+        case 'F':
+        case 'f': btn_id = PN_TAB_F; break;
+        case 'G':
+        case 'g': btn_id = PN_TAB_G; break;
+        case 'H':
+        case 'h': btn_id = PN_CELL_A; break;
+        case 'I':
+        case 'i': btn_id = PN_CELL_B; break;
+        case 'J':
+        case 'j': btn_id = PN_CELL_C; break;
+        case 'K':
+        case 'k': btn_id = PN_CELL_D; break;
+        case 'L':
+        case 'l': btn_id = PN_CELL_E; break;
+        case 'M':
+        case 'm': btn_id = PN_CELL_F; break;
+        case 'N':
+        case 'n': btn_id = PN_CELL_G; break;
+        case '1': btn_id = PN_FND_H; break;
+        case '2': btn_id = PN_FND_D; break;
+        case '3': btn_id = PN_FND_C; break;
+        case '4': btn_id = PN_FND_S; break;
+        case 'q': solitaire_pause(g_penguin); break;
+        default: redraw = false; break;
+    }
+    if(btn_id != -1) {
+        toggle_button(g_penguin->btns[btn_id]);
+    }
+    if(redraw) {
+        g_penguin->flags |= GFL_DRAW;
+    }
 }
-
-void penguin_update(void) {
-
-}
-

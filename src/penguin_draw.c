@@ -87,7 +87,7 @@ void penguin_draw(void) {
     // Buttons should go underneath the tableaus, so I need to add the number of
     // the cards in the tableau + 3 to y
     for(i = PN_TAB_A; i < PN_CELL_A; i++) {
-        j = g_penguin->decks[i]->count + 3;
+        j = g_penguin->decks[i]->count + 2;
         pt_button_at(g_penguin->btns[i],
                 g_penguin->btns[i]->x + xo,
                 g_penguin->btns[i]->y + j + yo);
@@ -109,7 +109,7 @@ void penguin_draw(void) {
             cards = deck->cards;
             y = j + yo;
             while(cards->next) {
-                y = 1 + j + yo;
+                y = j + yo;
                 pt_card_top(x,y,cards);
                 j++;
                 cards = cards->next;
@@ -168,10 +168,12 @@ void penguin_draw(void) {
     // Draw status
     if(base == 1) {
         scr_pt_clr(xo,23+yo,BRIGHT_BLACK,BLACK,
-                "Base: A. Press [q] to open menu.");
+                "Base: A. High score: %d. Last score: %d.",
+                g_settings->penguin_hs, g_settings->penguin_last);
     } else if(base < 11) {
         scr_pt_clr(xo,23+yo,BRIGHT_BLACK,BLACK,
-                "Base: %d. Press [q] to open menu.", base);
+                "Base: %d. High score: %d. Last score: %d.", 
+                base, g_settings->penguin_hs, g_settings->penguin_last);
     } else {
         switch(base) {
             case 11: ch = 'J'; break;
@@ -180,6 +182,8 @@ void penguin_draw(void) {
             default: ch = '?'; break;
         }
         scr_pt_clr(xo,23+yo,BRIGHT_BLACK,BLACK,
-                "Base: %c. Press [q] to open menu.",ch);
+                "Base: %c. High score: %d. Last score: %d.",
+                ch, g_settings->penguin_hs, g_settings->penguin_last);
     }
+    g_penguin->flags &= ~GFL_DRAW;
 }

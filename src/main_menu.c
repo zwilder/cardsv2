@@ -23,24 +23,9 @@ void main_menu(void) {
     int xo = (g_screenW / 2) - (SCREEN_WIDTH / 2);
     int yo = (g_screenH / 2) - (SCREEN_HEIGHT / 2);
     char ch = '\0';
-    /*
-    SList *menu = create_slist(" ");
-    slist_push(&menu, " ");
-    slist_push(&menu, "khoq");
-    slist_push(&menu, "Klondike");
-    slist_push(&menu, "High scores");
-    slist_push(&menu, "Card color settings");
-    slist_push(&menu, "Quit");
-    */
-
     while(ch != 'q') {
         scr_clear(); // Clear everything off the terminal screen
         fill_screen_blank(g_screenbuf); // Fill the screenbuf with blank characters (transparent)
-        /*
-        pt_card_title((SCREEN_WIDTH / 2)-12+xo, 
-                (SCREEN_HEIGHT / 2)-6+yo, 
-                "Cards!");
-        */
         pt_card_title((SCREEN_WIDTH/2)-12+xo,1+yo,"Cards!");
         scr_pt_clr((SCREEN_WIDTH / 2)-9+xo,(SCREEN_HEIGHT - 1)+yo,
                 BRIGHT_BLACK,BLACK, "\u00A9 Zach Wilder 2024");
@@ -49,11 +34,10 @@ void main_menu(void) {
                 "[k] - Klondike        [p] - Penguin");
         draw_str((SCREEN_WIDTH/2)-20,9,
                 "[f] - Freecell        [c] - Cribbage");
-        draw_str((SCREEN_WIDTH/2)-20,10,
-                "[h] - High Scores     [o] - Card Settings");
         draw_str((SCREEN_WIDTH/2)-20,11,
-                "[q] - Quit");
-        //ch = draw_menu_nobox(menu, WHITE, BLACK);
+                "[h] - High Scores     [o] - Card Settings");
+        draw_str((SCREEN_WIDTH/2)-20,12,
+                "[?] - Help            [q] - Quit");
         draw_screen(g_screenbuf);
         ch = kb_get_bl_char();
         switch(ch) {
@@ -61,13 +45,16 @@ void main_menu(void) {
                 if(!klondike_init()) ch = 'q';
                 break;
             case 'p':
-                penguin_init();
+                if(!penguin_init()) ch = 'q';
                 break;
             case 'h':
                 high_scores();
                 break;
             case 'o':
                 settings_menu();
+                break;
+            case '?':
+                //help_menu();
                 break;
             case 'q':
                 break;
