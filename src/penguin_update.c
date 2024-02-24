@@ -64,6 +64,8 @@ void penguin_update(void) {
             // Is cell empty?
             if(!g_penguin->toref->cards) {
                 move_last_card_to_deck(g_penguin->fromref,g_penguin->toref);
+                //If, at this point, fromref is a tableau and is now empty,
+                //award 5 points
             } else {
                 solitaire_msg(g_penguin, "Only one card in each cell.");
             }
@@ -71,12 +73,14 @@ void penguin_update(void) {
                 (g_penguin->toref->id <= PN_TAB_G)) {
             // Moving to a tableau
             penguin_tableau_move();
-            // Cards can be moved to tableau if the to card is same suite and
-            // exactly one rank higher
+            //If, at this point, fromref is a tableau and is now empty,
+            //award 5 points
         } else if ((g_penguin->toref->id >= PN_FND_H) &&
                 (g_penguin->toref->id <= PN_FND_S)) {
             // Moving to a foundation
             penguin_foundation_move();
+            //If, at this point, fromref is a tableau and is now empty,
+            //award 5 points
         } else {
             solitaire_msg(g_penguin, "What are you trying to do?");
         }
@@ -106,6 +110,7 @@ void penguin_update(void) {
             }
             g_penguin->fromref = NULL;
             g_penguin->toref = NULL;
+            g_penguin->score += 50;
         }
     }
 }

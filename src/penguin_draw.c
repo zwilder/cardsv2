@@ -87,8 +87,8 @@ void penguin_draw(void) {
     // Buttons should go underneath the tableaus, so I need to add the number of
     // the cards in the tableau + 3 to y
     for(i = PN_TAB_A; i < PN_CELL_A; i++) {
-        j = g_penguin->decks[i]->count + 2;
-        if(j < 4) j = 4;
+        j = g_penguin->decks[i]->count + 3;
+        if(j == 3) j = 4;
         pt_button_at(g_penguin->btns[i],
                 g_penguin->btns[i]->x + xo,
                 g_penguin->btns[i]->y + j + yo);
@@ -108,19 +108,18 @@ void penguin_draw(void) {
             // Print the tops of all cards, except the last    
             j = 0;
             cards = deck->cards;
-            y = j + yo;
             while(cards->next) {
-                // For some reason this breaks when there is two cards in the
-                // deck? Fixing this by adding y=j+yo right before we print the
-                // last card makes the buttons dissappear - so I have no idea
-                // what I'm doing wrong haha. TODO
                 y = j + yo;
                 pt_card_top(x,y,cards);
                 j++;
                 cards = cards->next;
             }
             // Print the last card
+            y = j + yo;
             pt_card(x,y,cards);
+        } else {
+            // print a space since there is no cards
+            pt_card_space(x,yo);
         }
     }
 
