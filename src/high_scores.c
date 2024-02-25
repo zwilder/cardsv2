@@ -33,17 +33,27 @@ void high_scores(void) {
     pt_card_title((SCREEN_WIDTH / 2)-22+xo, yo+1, "High Scores");
     
     // Draw the scores
+    // Klondike
     snprintf(strbuf,79,
             "Klondike High Score:   %d", g_settings->klondike_hs);
     draw_colorstr(4,8,strbuf, WHITE, BLACK);
     snprintf(strbuf,79,
-            "Penguin High Score:    0");
+            "Wins:   %d", g_settings->klondike_wins);
+    draw_colorstr((SCREEN_WIDTH / 2),8,strbuf, WHITE, BLACK);
+    // Penguin
+    snprintf(strbuf,79,
+            "Penguin High Score:    %d", g_settings->penguin_hs);
     draw_colorstr(4,9,strbuf, WHITE, BLACK);
+    snprintf(strbuf,79,
+            "Wins:   %d", g_settings->penguin_wins);
+    draw_colorstr((SCREEN_WIDTH / 2),9,strbuf, WHITE, BLACK);
+    // Freecell
     snprintf(strbuf,79,
             "Freecell High Score:   0");
     draw_colorstr(4,10,strbuf, WHITE, BLACK);
+    // Cribbage
     snprintf(strbuf,79,
-            "Cribbage Wins:         0"); // There is going to be a number here someday
+            "Cribbage Wins:         0");
     draw_colorstr(4,11,strbuf, WHITE, BLACK);
 
     // Prompt

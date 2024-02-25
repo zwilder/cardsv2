@@ -34,7 +34,7 @@
 10  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║  ║
  1  ╚══╝  ╚══╝  ╚══╝  ╚══╝  ╚══╝  ╚══╝  ╚══╝                 └  ┘ └  ┘ └  ┘ └  ┘
  2                                                           [1]  [2]  [3]  [4]
- 3
+ 3                                                                              
  4
  5
  6
@@ -83,44 +83,51 @@ void penguin_draw(void) {
     clear_screen(g_screenbuf);
     draw_screen(g_screenbuf);
 
-    // Draw Buttons
-    // Buttons should go underneath the tableaus, so I need to add the number of
-    // the cards in the tableau + 3 to y
-    for(i = PN_TAB_A; i < PN_CELL_A; i++) {
-        j = g_penguin->decks[i]->count + 3;
-        if(j == 3) j = 4;
-        pt_button_at(g_penguin->btns[i],
-                g_penguin->btns[i]->x + xo,
-                g_penguin->btns[i]->y + j + yo);
-    }
-    for(i = PN_CELL_A; i < PN_STOCK; i++) {
-        pt_button_at(g_penguin->btns[i],
-                g_penguin->btns[i]->x + xo,
-                g_penguin->btns[i]->y + yo);
-    }
-
-    // Draw Tableaus
-    for(i = 0; i < 7; i++) {
-        x = (6*i) + xo;
-        // Get the current deck
-        deck = g_penguin->decks[PN_TAB_A + i];
-        if(deck->cards) {
-            // Print the tops of all cards, except the last    
-            j = 0;
-            cards = deck->cards;
-            while(cards->next) {
-                y = j + yo;
-                pt_card_top(x,y,cards);
-                j++;
-                cards = cards->next;
-            }
-            // Print the last card
-            y = j + yo;
-            pt_card(x,y,cards);
-        } else {
-            // print a space since there is no cards
-            pt_card_space(x,yo);
+    // Check to see if the game has been won...
+    if(!check_flag(g_penguin->flags, GFL_WIN)) {
+        // If it hasn't
+        // Draw Buttons
+        // Buttons should go underneath the tableaus, so I need to add the number of
+        // the cards in the tableau + 3 to y
+        for(i = PN_TAB_A; i < PN_CELL_A; i++) {
+            j = g_penguin->decks[i]->count + 3;
+            if(j == 3) j = 4;
+            pt_button_at(g_penguin->btns[i],
+                    g_penguin->btns[i]->x + xo,
+                    g_penguin->btns[i]->y + j + yo);
         }
+        for(i = PN_CELL_A; i < PN_STOCK; i++) {
+            pt_button_at(g_penguin->btns[i],
+                    g_penguin->btns[i]->x + xo,
+                    g_penguin->btns[i]->y + yo);
+        }
+
+        // Draw Tableaus
+        for(i = 0; i < 7; i++) {
+            x = (6*i) + xo;
+            // Get the current deck
+            deck = g_penguin->decks[PN_TAB_A + i];
+            if(deck->cards) {
+                // Print the tops of all cards, except the last    
+                j = 0;
+                cards = deck->cards;
+                while(cards->next) {
+                    y = j + yo;
+                    pt_card_top(x,y,cards);
+                    j++;
+                    cards = cards->next;
+                }
+                // Print the last card
+                y = j + yo;
+                pt_card(x,y,cards);
+            } else {
+                // print a space since there is no cards
+                pt_card_space(x,yo);
+            }
+        }
+    } else {
+        // If the game has been won draw "You win!" banner
+        pt_card_title(19+xo,11+yo,"You win!");
     }
 
     // Draw cells

@@ -80,6 +80,7 @@ Card* remove_card_from_deck(Deck *deck, Card *card) {
     if(result == card) {
         deck->cards = deck->cards->next;
         result->next = NULL;
+        result->prev = NULL;
     } else {
         while(result != card && result) {
             prev = result;

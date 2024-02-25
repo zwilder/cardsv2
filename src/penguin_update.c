@@ -72,8 +72,6 @@ void penguin_update(void) {
             if(!g_penguin->toref->cards) {
                 move_last_card_to_deck(g_penguin->fromref,g_penguin->toref);
                 solitaire_msg(g_penguin, " ");
-                //If, at this point, fromref is a tableau and is now empty,
-                //award 5 points
             } else {
                 solitaire_msg(g_penguin, "Only one card in each cell.");
             }
@@ -81,14 +79,10 @@ void penguin_update(void) {
                 (g_penguin->toref->id <= PN_TAB_G)) {
             // Moving to a tableau
             penguin_tableau_move();
-            //If, at this point, fromref is a tableau and is now empty,
-            //award 5 points
         } else if ((g_penguin->toref->id >= PN_FND_H) &&
                 (g_penguin->toref->id <= PN_FND_S)) {
             // Moving to a foundation
             penguin_foundation_move();
-            //If, at this point, fromref is a tableau and is now empty,
-            //award 5 points
         } else {
             solitaire_msg(g_penguin, "What are you trying to do?");
         }
@@ -161,9 +155,10 @@ void penguin_tableau_move(void) {
     Card *fromcard = get_last_card(g_penguin->fromref);
     Card *tocard = get_last_card(g_penguin->toref);
     Card *seqcard = NULL;
+    int highcard = penguin_find_high_card();
     if(!tocard) {
         //If tocard is NULL, is fromcard one lower than the base card?
-        if(get_rank(fromcard->flags) == penguin_find_high_card()) {
+        if(get_rank(fromcard->flags) == highcard) {
             valid_move = true;
         }
     } else if (penguin_valid_move(tocard->flags,fromcard->flags)) {
@@ -191,7 +186,15 @@ void penguin_tableau_move(void) {
             seqcard = seqcard->prev; 
         }
         // if seqcard != from card then we want to test seqcard and tocard
-        if(penguin_valid_move(tocard->flags,seqcard->flags)) {
+        if(!tocard) {
+            //attempting to move a sequence to a blank spot
+            if(get_rank(seqcard->flags) == highcard) {
+                move_chain_card(seqcard, g_penguin->fromref, g_penguin->toref);
+                solitaire_msg(g_penguin, " ");
+            } else {
+                solitaire_msg(g_penguin, "Invalid move, high card is %d", highcard);
+            }
+        } else if(penguin_valid_move(tocard->flags,seqcard->flags)) {
             move_chain_card(seqcard, g_penguin->fromref, g_penguin->toref);
             solitaire_msg(g_penguin, " ");
         }
