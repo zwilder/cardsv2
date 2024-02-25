@@ -1,11 +1,23 @@
-# Cards! V2
+# Cards!
 
-![Title](Title.png)
+![Title](screenshots/Title.png)
 
-A second attempt at a deck of cards, and some games to play with them. The first
-attempt happened by accident while playing around with some terminal codes in an
-attempt to do away with NCurses. This attempt is more deliberate, and will
-(hopefully) at least include a playable version of Klondike (or Freecell, or
-Penguin... or maybe all three?). 
+A deck of cards simulator. I designed this with the goal of making the framework
+to add any game played with a deck of cards easy to implement. This should run
+in most any modern terminal simulator that supports 256 colors (xterm, GNOME
+terminal, etc). Nothing but standard C libraries are used (no NCurses
+required!), and the program can be built with "make optimized". 
 
-![Gameplay](Gameplay.png)
+The games included (and mostly completed) so far are:
+- Klondike
+![Klondike](screenshots/Klondike.png)
+- Penguin
+![Penguin](screenshots/Penguin.png)
+
+I'm planning on adding a couple "multiplayer" games (particularly Cribbage),
+where the computer plays the second player... Eventually.
+
+Additionally, the card colors are customizable in a settigns screen, where
+(using the VI keys, 'hjkl') the user can choose from any of the supported 256
+colors.
+![Color Picker](screenshots/ColorPicker.png)
