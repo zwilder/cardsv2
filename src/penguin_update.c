@@ -44,8 +44,15 @@ void penguin_update(void) {
         g_penguin->fromref = NULL;
         g_penguin->toref = NULL;
     } else if (1 == count) {
-        // If 1, set "from" reference
+        // If 1, set "from" reference IF there is a card in the "from" deck
         g_penguin->fromref = g_penguin->decks[id_a]; 
+        if(!g_penguin->fromref->cards) {
+            // No cards in "from", NULL reference deactivate button
+            g_penguin->btns[id_a]->selected = false;
+            g_penguin->fromref = NULL;
+            solitaire_msg(g_penguin, "No card at %c to move.", 
+                    g_penguin->btns[id_a]->ch);
+        }
     } else if (2 == count) {
         // If 2, set "to" reference
         if(g_penguin->fromref == g_penguin->decks[id_a]) {
@@ -64,6 +71,7 @@ void penguin_update(void) {
             // Is cell empty?
             if(!g_penguin->toref->cards) {
                 move_last_card_to_deck(g_penguin->fromref,g_penguin->toref);
+                solitaire_msg(g_penguin, " ");
                 //If, at this point, fromref is a tableau and is now empty,
                 //award 5 points
             } else {
@@ -152,25 +160,41 @@ void penguin_tableau_move(void) {
     bool valid_move = false;
     Card *fromcard = get_last_card(g_penguin->fromref);
     Card *tocard = get_last_card(g_penguin->toref);
+    Card *seqcard = NULL;
     if(!tocard) {
         //If tocard is NULL, is fromcard one lower than the base card?
         if(get_rank(fromcard->flags) == penguin_find_high_card()) {
             valid_move = true;
         }
-    } else if (false) {
-        // Check to see if last card is in sequence, if it is compare first card of
-        // sequence to tocard. 
     } else if (penguin_valid_move(tocard->flags,fromcard->flags)) {
-        // If it is not, check fromcard to tocard
+        // Check fromcard to tocard
         valid_move = true;
-    }
-
+    } 
     // Move the card if valid
     if(valid_move) {
         move_last_card_to_deck(g_penguin->fromref,g_penguin->toref);
         solitaire_msg(g_penguin, " ");
     } else {
         solitaire_msg(g_penguin, "Invalid move, try something else.");
+    }
+    
+    if(!valid_move) {
+        // Check to see if last card is in sequence, if it is compare first card of
+        // sequence to tocard. 
+        seqcard = fromcard;
+        while(seqcard->prev) {
+            //if seqcard->prev is one higher and same suit then...
+            //continue, if not break
+            if(!penguin_valid_move(seqcard->prev->flags, seqcard->flags)) {
+                break;
+            }
+            seqcard = seqcard->prev; 
+        }
+        // if seqcard != from card then we want to test seqcard and tocard
+        if(penguin_valid_move(tocard->flags,seqcard->flags)) {
+            move_chain_card(seqcard, g_penguin->fromref, g_penguin->toref);
+            solitaire_msg(g_penguin, " ");
+        }
     }
 }
 

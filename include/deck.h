@@ -83,6 +83,7 @@ void draw_cards(Deck *from, Deck *to, int n);
 void add_deck(Deck *from, Deck *to);
 void move_top_card_to_deck(Deck *from, Deck *to);
 void move_last_card_to_deck(Deck *from, Deck *to);
+void move_chain_card(Card *card, Deck *from, Deck *to);
 Card* get_last_card(Deck *deck);
 Card* get_card_at(Deck *deck, int n);
 

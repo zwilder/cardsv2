@@ -165,6 +165,44 @@ void move_last_card_to_deck(Deck *from, Deck *to) {
     add_card_to_deck(to, card);
 }
 
+void move_chain_card(Card *card, Deck *from, Deck *to) {
+    // Move a chain of cards, starting with "card" from "from" to "to"
+    if(!card || !from || !to) return;
+    Card *lasttocard = get_last_card(to);
+    if(!lasttocard) {
+        // Moving chain to empty deck
+        // Set that deck->cards = card
+        to->cards = card;
+        if(card->prev) {
+            // Other cards in "from"
+            card->prev->next = NULL;
+            card->prev = NULL;
+        } else {
+            // No other cards in "from"
+            from->cards = NULL;
+        }
+        // Make sure the count in both "to" and "from" is accurate.
+        to->count = count_cards(to->cards);
+        from->count = count_cards(from->cards);
+    } else {
+        // Moving chain to another card
+        // First, need to check and sever the chain from the "from" deck
+        if(card->prev) {
+            //Other cards in "from"
+            card->prev->next = NULL;
+        } else {
+            //No other cards in "from", need to NULL the from->cards
+            from->cards = NULL;
+        }
+        // Reattach chain to "to deck"
+        card->prev = lasttocard;
+        lasttocard->next = card;
+        // Make sure the count in both "to" and "from" is accurate.
+        to->count = count_cards(to->cards);
+        from->count = count_cards(from->cards);
+    }
+}
+
 Card* get_last_card(Deck *deck) {
     if(!deck) return NULL;
     if(!deck->cards) return NULL;
