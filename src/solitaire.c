@@ -130,11 +130,12 @@ void solitaire_pause(Solitaire *g) {
     // Create the slist for the menu
     SList *menu = create_slist("-Game Paused-");
     slist_push(&menu, "Press any other key to resume");
-    slist_push(&menu, "cnmq");
+    slist_push(&menu, "cnmq?");
     slist_push(&menu, "Change card color settings");
     slist_push(&menu, "Start new game");
     slist_push(&menu, "Quit to main menu");
     slist_push(&menu, "Quit game");
+    slist_push(&menu, "Help");
 
     // Show the menu
     scr_clear(); // Clear everything off the terminal screen
@@ -156,6 +157,9 @@ void solitaire_pause(Solitaire *g) {
             break;
         case 'q':
             g->flags &= ~GFL_RUNNING;
+            break;
+        case '?':
+            help_menu();
             break;
         default: break;
     }

@@ -17,39 +17,25 @@
 * You should have received a copy of the GNU General Public License
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <cards.h>
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+void help_menu(void) {
+    int xo = (g_screenW / 2) - (SCREEN_WIDTH / 2);
+    int yo = (g_screenH / 2) - (SCREEN_HEIGHT / 2);
 
-/*****
- * Global settings structure
- *****/
-typedef struct Settings Settings;
+    // Clear the screen
+    scr_clear(); 
+    fill_screen_blank(g_screenbuf);
 
-struct Settings {
-    uint8_t redcolor;
-    uint8_t blackcolor;
-    uint8_t deckcolor;
-    uint8_t deckdesign;
-    uint8_t bgcolor;
-    uint8_t btncolor;
-    uint8_t btnselectcolor;
-    int klondike_hs;
-    int klondike_last;
-    int klondike_wins;
-    int penguin_hs;
-    int penguin_last;
-    int penguin_wins;
-};
+    // Draw the title
+    pt_card_title((SCREEN_WIDTH / 2)-12+xo, yo+1, "Help");
 
-extern Settings *g_settings;
+    // Print some help
+    scr_pt_clr(xo + 1, yo + 6, WHITE, BLACK, "[Under construction]");
+    
+    // Draw the screen
+    draw_screen(g_screenbuf);
 
-/*****
- * Settings functions
- *****/
-void init_settings(void);
-void close_settings(void);
-void settings_menu(void);
-void deck_design_menu(void);
-
-#endif //SETTINGS_H
+    // Wait for a keypress to return
+    kb_get_bl_char();
+}

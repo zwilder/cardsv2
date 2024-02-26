@@ -54,7 +54,7 @@ void main_menu(void) {
                 settings_menu();
                 break;
             case '?':
-                //help_menu();
+                help_menu();
                 break;
             case 'q':
                 break;

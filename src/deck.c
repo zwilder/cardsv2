@@ -580,12 +580,76 @@ void pt_card_back(int x, int y) {
     u2591u2591 u259bu259c u2597u259c u259au259e
     u2591u2591 u2599u259f u2599u2598 u259eu259a
     */
-    int fg = g_settings->deckcolor;
-    int bg = g_settings->bgcolor;
-    scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
-    scr_pt_clr(x,y+1,fg,bg,"\u2551\u2597\u259c\u2551");
-    scr_pt_clr(x,y+2,fg,bg,"\u2551\u2599\u2598\u2551");
-    scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
+    int bg = g_settings->deckcolor;
+    int fg = g_settings->bgcolor;
+    switch(g_settings->deckdesign) {
+        case 0:
+            /*╔══╗
+             *║▚▞║
+             *║▞▚║ 
+             *╚══╝
+             */
+            scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
+            scr_pt_clr(x,y+1,fg,bg,"\u2551\u259a\u259e\u2551");
+            scr_pt_clr(x,y+2,fg,bg,"\u2551\u259e\u259a\u2551");
+            scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
+            break;
+        case 1:
+            /*╔══╗
+             *║░░║
+             *║░░║ 
+             *╚══╝
+             */
+            scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
+            scr_pt_clr(x,y+1,fg,bg,"\u2551\u2591\u2591\u2551");
+            scr_pt_clr(x,y+2,fg,bg,"\u2551\u2591\u2591\u2551");
+            scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
+            break;
+        case 2:
+            /*╔══╗
+             *║▛▜║
+             *║▙▟║ 
+             *╚══╝
+             */
+            scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
+            scr_pt_clr(x,y+1,fg,bg,"\u2551\u259b\u259c\u2551");
+            scr_pt_clr(x,y+2,fg,bg,"\u2551\u2599\u259f\u2551");
+            scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
+            break;
+        case 3:
+            /*╔══╗
+             *║▗▜║
+             *║▙▘║ 
+             *╚══╝
+             */
+            scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
+            scr_pt_clr(x,y+1,fg,bg,"\u2551\u2597\u259c\u2551");
+            scr_pt_clr(x,y+2,fg,bg,"\u2551\u2599\u2598\u2551");
+            scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
+            break;
+        case 4:
+            /*╔══╗
+             *║▗▜║
+             *║▙▟║ 
+             *╚══╝
+             */
+            scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
+            scr_pt_clr(x,y+1,fg,bg,"\u2551\u2597\u259c\u2551");
+            scr_pt_clr(x,y+2,fg,bg,"\u2551\u2599\u259f\u2551");
+            scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
+            break;
+        default:
+            /*╔══╗
+             *║  ║
+             *║  ║ 
+             *╚══╝
+             */
+            scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
+            scr_pt_clr(x,y+1,fg,bg,"\u2551  \u2551");
+            scr_pt_clr(x,y+2,fg,bg,"\u2551  \u2551");
+            scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
+            break;
+    }
 }
 
 void pt_card_space(int x, int y) {

@@ -51,6 +51,7 @@ void save_settings(void) {
         fwrite(&(g_settings->penguin_hs),sizeof(int),1,f);
         fwrite(&(g_settings->penguin_last),sizeof(int),1,f);
         fwrite(&(g_settings->penguin_wins),sizeof(int),1,f);
+        fwrite(&(g_settings->deckdesign),sizeof(uint8_t),1,f);
     }
 
     fclose(f);
@@ -62,6 +63,8 @@ bool load_settings(void) {
     int bytesread = 0;
 
     if(f) {
+        // These are in order of implementation, because otherwise I'd have to
+        // remember to remove the .cards.bin file every time I add something new
         bytesread += fread(&(g_settings->klondike_hs), sizeof(int),1,f);
         bytesread += fread(&(g_settings->redcolor), sizeof(uint8_t),1,f);
         bytesread += fread(&(g_settings->blackcolor), sizeof(uint8_t),1,f);
@@ -74,6 +77,7 @@ bool load_settings(void) {
         bytesread += fread(&(g_settings->penguin_hs), sizeof(int),1,f);
         bytesread += fread(&(g_settings->penguin_last), sizeof(int),1,f);
         bytesread += fread(&(g_settings->penguin_wins), sizeof(int),1,f);
+        bytesread += fread(&(g_settings->deckdesign), sizeof(uint8_t),1,f);
         success = true;
         fclose(f);
     } else {
@@ -81,6 +85,7 @@ bool load_settings(void) {
         g_settings->redcolor = BRIGHT_MAGENTA;
         g_settings->blackcolor = BRIGHT_CYAN;
         g_settings->deckcolor = BRIGHT_BLACK;
+        g_settings->deckdesign = 0;
         g_settings->bgcolor = BLACK;
         g_settings->btnselectcolor = CYAN;
         g_settings->btncolor = WHITE;
