@@ -142,6 +142,21 @@ void penguin_foundation_move(void) {
     }
 
     if(valid_move) {
+        /*
+        // Find highest card in sequence above the valid move
+        // TODO: doesn't work.
+        seqcard = fromcard;
+        while(seqcard->prev) {
+            if(!penguin_valid_move(seqcard->prev->flags, seqcard->flags)) {
+                break;
+            }
+            add_card_to_deck(g_penguin->toref, 
+                    remove_card_from_deck(g_penguin->fromref,seqcard));
+            seqcard = seqcard->prev;
+            seqcount += 1; // Keep track of how many in sequence for points
+        }
+        */
+         
         move_last_card_to_deck(g_penguin->fromref,g_penguin->toref);
         g_penguin->score += 15;
         solitaire_msg(g_penguin, " ");
@@ -167,6 +182,10 @@ void penguin_tableau_move(void) {
     } 
     // Move the card if valid
     if(valid_move) {
+        if((g_penguin->fromref->id >= PN_TAB_A) &&
+                (g_penguin->fromref->id <= PN_TAB_G)) {
+            g_penguin->score += 5;
+        }
         move_last_card_to_deck(g_penguin->fromref,g_penguin->toref);
         solitaire_msg(g_penguin, " ");
     } else {
@@ -195,6 +214,10 @@ void penguin_tableau_move(void) {
                 solitaire_msg(g_penguin, "Invalid move, high card is %d", highcard);
             }
         } else if(penguin_valid_move(tocard->flags,seqcard->flags)) {
+            if((g_penguin->fromref->id >= PN_TAB_A) &&
+                    (g_penguin->fromref->id <= PN_TAB_G)) {
+                g_penguin->score += 5;
+            }
             move_chain_card(seqcard, g_penguin->fromref, g_penguin->toref);
             solitaire_msg(g_penguin, " ");
         }

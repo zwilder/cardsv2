@@ -29,11 +29,12 @@ void main_menu(void) {
         pt_card_title((SCREEN_WIDTH/2)-12+xo,1+yo,"Cards!");
         scr_pt_clr((SCREEN_WIDTH / 2)-9+xo,(SCREEN_HEIGHT - 1)+yo,
                 BRIGHT_BLACK,BLACK, "\u00A9 Zach Wilder 2024");
-        // 40-20+66 = 86
         draw_str((SCREEN_WIDTH/2)-20,8,
                 "[k] - Klondike        [p] - Penguin");
+        /*
         draw_str((SCREEN_WIDTH/2)-20,9,
                 "[f] - Freecell        [c] - Cribbage");
+        */
         draw_str((SCREEN_WIDTH/2)-20,11,
                 "[h] - High Scores     [o] - Card Settings");
         draw_str((SCREEN_WIDTH/2)-20,12,
@@ -62,5 +63,4 @@ void main_menu(void) {
         }
     }
     clear_screen(g_screenbuf);
-    //destroy_slist(&menu);
 }
