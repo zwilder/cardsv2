@@ -72,6 +72,10 @@ void penguin_update(void) {
             if(!g_penguin->toref->cards) {
                 move_last_card_to_deck(g_penguin->fromref,g_penguin->toref);
                 solitaire_msg(g_penguin, " ");
+            } else if((g_penguin->fromref->id >= PN_CELL_A) &&
+                    (g_penguin->fromref->id <= PN_CELL_G)) {
+                // Moving from a cell to an occupied cell, swap the cards.
+                penguin_cell_swap();
             } else {
                 solitaire_msg(g_penguin, "Only one card in each cell.");
             }
@@ -121,7 +125,8 @@ void penguin_foundation_move(void) {
     bool valid_move = false;
     Card *fromcard = get_last_card(g_penguin->fromref);
     Card *tocard = get_last_card(g_penguin->toref);
-    int base = 0, i = 0;
+    Card *seqcard = NULL;
+    int base = 0, i = 0, seqcount = 0;
     //Moving card from somwhere to a foundation
     //Is the foundation empty? Check to see if card is the beak.
     if(!g_penguin->toref->cards) {
@@ -142,24 +147,25 @@ void penguin_foundation_move(void) {
     }
 
     if(valid_move) {
-        /*
         // Find highest card in sequence above the valid move
-        // TODO: doesn't work.
         seqcard = fromcard;
         while(seqcard->prev) {
             if(!penguin_valid_move(seqcard->prev->flags, seqcard->flags)) {
                 break;
             }
-            add_card_to_deck(g_penguin->toref, 
-                    remove_card_from_deck(g_penguin->fromref,seqcard));
             seqcard = seqcard->prev;
             seqcount += 1; // Keep track of how many in sequence for points
         }
-        */
+        // Move one to seqcount cards "from" to "to"
+        for(i = seqcount; i >= 0; i--) {
+            move_last_card_to_deck(g_penguin->fromref,g_penguin->toref);
+        }
+
+        // Give points, 15 for each card, moved to the foundation
+        g_penguin->score += 15 + (15*seqcount);
+        solitaire_msg(g_penguin, "Moved %d cards for %d points!", seqcount+1, 
+                (15 + (15*seqcount)));
          
-        move_last_card_to_deck(g_penguin->fromref,g_penguin->toref);
-        g_penguin->score += 15;
-        solitaire_msg(g_penguin, " ");
     } else {
         solitaire_msg(g_penguin, "Invalid move, try something else.");
     }
@@ -222,6 +228,20 @@ void penguin_tableau_move(void) {
             solitaire_msg(g_penguin, " ");
         }
     }
+}
+
+void penguin_cell_swap(void) {
+    if(!g_penguin->fromref || !g_penguin->toref) return;
+    Deck *from = g_penguin->fromref;
+    Deck *to = g_penguin->toref;
+    Card *tmp = from->cards;
+    if((from->id >= PN_CELL_A) && (from->id <= PN_CELL_G) &&
+           (to->id >= PN_CELL_A) && (to->id <= PN_CELL_G)) {
+        // Swap the cards
+        from->cards = to->cards;
+        to->cards = tmp;
+        solitaire_msg(g_penguin, " ");
+    } 
 }
 
 bool penguin_asc_sequence(int a, int b) {

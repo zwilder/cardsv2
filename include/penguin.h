@@ -60,6 +60,7 @@ void penguin_events(void);
 void penguin_update(void);
 void penguin_tableau_move(void);
 void penguin_foundation_move(void);
+void penguin_cell_swap(void);
 bool penguin_asc_sequence(int a, int b);
 bool penguin_valid_move(int a, int b);
 int penguin_find_base(void);
