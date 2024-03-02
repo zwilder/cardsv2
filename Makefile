@@ -1,28 +1,35 @@
+PROJ_NAME = Cards
+SRC_DIR = ./src
+OBJ_DIR = ./objs
+INC_DIR = ./include
 CC = gcc
-
-CFLAGS = -lm -I./include/
-
+CFLAGS = -I$(INC_DIR)/ 
+LDFLAGS = -lm
 OFLAGS = -O2
-
 GFLAGS = -g -Wall
+DEPS = $(OBJECTS:.o=.d)
 
-SOURCES = ./src/*.c
+ifeq (,$(wildcard $(OBJ_DIR)))
+	_ := $(shell mkdir -p $(OBJ_DIR))
+endif
 
-all: Cards
+SOURCES = $(wildcard $(SRC_DIR)/*.c)
+OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SOURCES))
 
-Cards: ctags
-	$(CC) $(SOURCES) $(CFLAGS) $(GFLAGS) -o Cards 
+.PHONY: all clean dev
 
-run:
-	./Cards
+all: $(PROJ_NAME)
+
+$(PROJ_NAME): $(OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(OFLAGS)
+
+$(OBJECTS): $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(GFLAGS) -MMD -MP -c $< -o $@
 
 clean:
-	rm Cards
+	rm $(OBJECTS) $(DEPS) $(PROJ_NAME)
 
-fresh: clean Cards
+-include $(DEPS)
 
-optimized:
-	$(CC) $(SOURCES) $(CFLAGS) $(OFLAGS) -o Cards
-
-ctags: 
+dev: $(PROJ_NAME)
 	ctags -R *

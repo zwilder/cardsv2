@@ -21,3 +21,5 @@ Additionally, the card colors are customizable in a settigns screen, where
 (using the VI keys, 'hjkl') the user can choose from any of the supported 256
 colors.
 ![Color Picker](screenshots/ColorPicker.png)
+
+![Klondike-alt](screenshots/Klondike-alt.png)
