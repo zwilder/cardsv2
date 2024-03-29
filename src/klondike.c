@@ -53,6 +53,7 @@ bool klondike_init(void) {
     for(i = 0; i < 4; i++) {
         g_klondike->btns[KL_FND_H + i]->x = 61 + (5*i);
         g_klondike->btns[KL_FND_H + i]->active = true;
+        g_klondike->btns[KL_FND_H + i]->ch = '1' + i;
     }
 
     // Put 52 cards in the stock, and shuffle it
@@ -149,20 +150,16 @@ void klondike_events(void) {
         case 'h': toggle_button(g_klondike->btns[KL_TAB_H]);
                   redraw = true;
                   break;
-        case 'I':
-        case 'i': toggle_button(g_klondike->btns[KL_FND_H]);
+        case '1': toggle_button(g_klondike->btns[KL_FND_H]);
                   redraw = true;
                   break;
-        case 'J':
-        case 'j': toggle_button(g_klondike->btns[KL_FND_D]);
+        case '2': toggle_button(g_klondike->btns[KL_FND_D]);
                   redraw = true;
                   break;
-        case 'K':
-        case 'k': toggle_button(g_klondike->btns[KL_FND_C]);
+        case '3': toggle_button(g_klondike->btns[KL_FND_C]);
                   redraw = true;
                   break;
-        case 'L':
-        case 'l': toggle_button(g_klondike->btns[KL_FND_S]);
+        case '4': toggle_button(g_klondike->btns[KL_FND_S]);
                   redraw = true;
                   break;
         case 'M':
@@ -171,7 +168,6 @@ void klondike_events(void) {
                   break;
         case 27: 
         case 'q':
-                  //klondike_pause(); 
                   solitaire_pause(g_klondike);
                   redraw = true; 
                   break;

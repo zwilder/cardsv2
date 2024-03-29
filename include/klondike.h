@@ -47,6 +47,7 @@ void klondike_loop(void);
 void klondike_events(void);
 void klondike_pause(void);
 void klondike_update(void);
+void klondike_fnd_move(void);
 void klondike_check_sequence(void);
 bool klondike_valid_move(int a, int b);
 void klondike_draw(void);
