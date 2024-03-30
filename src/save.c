@@ -19,6 +19,9 @@
 */
 
 #include <cards.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /*
 struct Settings {
@@ -36,7 +39,15 @@ struct Settings {
 */
 
 void save_settings(void) {
-    FILE *f = fopen(".cards.bin","wb+");
+    struct stat st = {0};
+    char *pathstr = malloc(180 * sizeof(char));
+    snprintf(pathstr, 180, "%s/.zwsl", getenv("HOME"));
+    if(stat(pathstr, &st) == -1) {
+        mkdir(pathstr, 0700);
+    }
+    snprintf(pathstr, 180, "%s/.zwsl/cards.bin", getenv("HOME"));
+    //FILE *f = fopen(".cards.bin","wb+");
+    FILE *f = fopen(pathstr,"wb+");
 
     if(f) {
         fwrite(&(g_settings->klondike_hs),sizeof(int),1,f);
@@ -55,11 +66,15 @@ void save_settings(void) {
     }
 
     fclose(f);
+    free(pathstr);
 }
 
 bool load_settings(void) {
     bool success = false;
-    FILE *f = fopen(".cards.bin","rb+");
+    char *pathstr = malloc(180 * sizeof(char));
+    snprintf(pathstr, 180, "%s/.zwsl/cards.bin", getenv("HOME"));
+    //FILE *f = fopen(".cards.bin","rb+");
+    FILE *f = fopen(pathstr,"rb+");
     int bytesread = 0;
 
     if(f) {
@@ -96,5 +111,6 @@ bool load_settings(void) {
         g_settings->penguin_wins = 0;
     }
 
+    free(pathstr);
     return success;
 }
