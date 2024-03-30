@@ -68,12 +68,12 @@ void settings_menu(void) {
     SList *menu = create_slist("-Color settings-");
     slist_push(&menu, "Press [q] to return");
     slist_push(&menu, "abcdehq");
-    slist_push(&menu, "Change red color");
-    slist_push(&menu, "Change black color");
-    slist_push(&menu, "Change deck color");
-    slist_push(&menu, "Change deck back design");
-    slist_push(&menu, "Change card background color");
-    slist_push(&menu, "Return settings to default");
+    slist_push(&menu, "- Change red color");
+    slist_push(&menu, "- Change black color");
+    slist_push(&menu, "- Change card back color");
+    slist_push(&menu, "- Change card back design");
+    slist_push(&menu, "- Change card face background color");
+    slist_push(&menu, "- Return settings to default");
     while(ch != 'q') {
         scr_clear(); // Clear everything off the terminal screen
         pt_card_title((SCREEN_WIDTH / 2)-16+xo, yo+1, "Settings");
@@ -90,14 +90,14 @@ void settings_menu(void) {
                 break;
             case 'c':
                 g_settings->deckcolor = color_picker_menu(g_settings->deckcolor,
-                        "Choose a new deck color");
+                        "Choose a new card back color");
                 break;
             case 'd':
                 deck_design_menu();
                 break;
             case 'e':
                 g_settings->bgcolor = color_picker_menu(g_settings->bgcolor,
-                        "Choose a new card background color");
+                        "Choose a new card face background color");
                 break;
                 /*
             case 'f':
@@ -110,10 +110,20 @@ void settings_menu(void) {
                 break;
                 */
             case 'h':
+                g_settings->redcolor = RED;
+                g_settings->blackcolor = BRIGHT_BLACK;
+                g_settings->deckcolor = BLUE;
+                g_settings->deckdesign = 0;
+                g_settings->bgcolor = WHITE;
+                g_settings->btnselectcolor = CYAN;
+                g_settings->btncolor = WHITE;
+                break;
+            case 'z':
+                // Hidden color setting - easter egg
                 g_settings->redcolor = BRIGHT_MAGENTA;
                 g_settings->blackcolor = BRIGHT_CYAN;
                 g_settings->deckcolor = BRIGHT_BLACK;
-                g_settings->deckdesign = 0;
+                g_settings->deckdesign = 5;
                 g_settings->bgcolor = BLACK;
                 g_settings->btnselectcolor = CYAN;
                 g_settings->btncolor = WHITE;

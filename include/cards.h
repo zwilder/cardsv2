@@ -54,6 +54,8 @@
 void main_menu(void); // main_menu.c
 void high_scores(void); // high_scores.c
 void help_menu(void); // help.c
+void help_penguin(void); // help.c
+void help_klondike(void); // help.c
 long current_ms(void); // solitaire.c
 
 #endif //CARDS_H
