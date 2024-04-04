@@ -22,6 +22,26 @@
 
 #include <stdbool.h>
 
+typedef enum {
+    GFL_NONE        = 0,
+    GFL_DRAW        = 1 << 1,
+    GFL_RESTART     = 1 << 2,
+    GFL_WIN         = 1 << 3,
+    GFL_RUNNING     = 1 << 4,
+    GFL_QTOMAIN     = 1 << 5,
+    /*
+     * It didn't make sense to me to add another whole set of flags for
+     * Cribbage, with the same game flags above... so I added them here. 
+     */
+    GFL_CRIBCUT     = 1 << 6,
+    GFL_CRIBDISC    = 1 << 7,
+    GFL_CRIBSHOW    = 1 << 8,
+    GFL_PCRIB       = 1 << 9,
+    GFL_CCRIB       = 1 << 10,
+    GFL_PTURN       = 1 << 11,
+    GFL_CTURN       = 1 << 12,
+} GameFlags;
+
 bool check_flag(int mask, int flag);
 void toggle_flag(int *mask, int flag);
 void remove_flag(int *mask, int flag);

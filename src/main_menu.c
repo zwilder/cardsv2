@@ -31,10 +31,10 @@ void main_menu(void) {
                 BRIGHT_BLACK,BLACK, "\u00A9 Zach Wilder 2024");
         draw_str((SCREEN_WIDTH/2)-20,8,
                 "[k] - Klondike        [p] - Penguin");
-        /*
+        
         draw_str((SCREEN_WIDTH/2)-20,9,
-                "[f] - Freecell        [c] - Cribbage");
-        */
+                "[c] - Cribbage");
+        
         draw_str((SCREEN_WIDTH/2)-20,11,
                 "[h] - High Scores     [o] - Card Settings");
         draw_str((SCREEN_WIDTH/2)-20,12,

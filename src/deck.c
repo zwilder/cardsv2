@@ -291,7 +291,7 @@ bool card_alt_color(int a, int b) {
     return (card_black(a) != card_black(b));
 }
 
-bool card_same_suit(int a, int b) {
+bool card_same_suite(int a, int b) {
     return (get_suite(a) == get_suite(b));
 }
 

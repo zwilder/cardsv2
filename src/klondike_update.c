@@ -231,7 +231,7 @@ void klondike_fnd_move(void) {
         if(g_klondike->decks[i]->cards) {
             //This foundation has a card, see if the from card can be moved there
             cflags_a = get_last_card(g_klondike->decks[i])->flags;
-            if(card_same_suit(cflags_a,cflags_b) &&
+            if(card_same_suite(cflags_a,cflags_b) &&
                     card_in_asc_sequence(cflags_b,cflags_a)) {
                 g_klondike->toref = g_klondike->decks[i];
                 valid_move = true;

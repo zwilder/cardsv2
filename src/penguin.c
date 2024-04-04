@@ -29,6 +29,7 @@ bool penguin_init(void) {
     bool ret_to_main = false;
     int i = 0, j = 0;
 
+    if(g_penguin) penguin_cleanup();
     // Allocate memory for decks/buttons
     g_penguin = create_solitaire(PN_NUM_DECKS);
 

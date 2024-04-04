@@ -257,7 +257,7 @@ bool penguin_asc_sequence(int a, int b) {
 }
 
 bool penguin_valid_move(int a, int b) {
-    if(card_same_suit(a,b) && penguin_asc_sequence(a,b)) {
+    if(card_same_suite(a,b) && penguin_asc_sequence(a,b)) {
         return true;
     }
     return false;

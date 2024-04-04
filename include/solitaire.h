@@ -20,15 +20,6 @@
 #ifndef SOLITAIRE_H
 #define SOLITAIRE_H
 
-typedef enum {
-    GFL_NONE        = 0,
-    GFL_DRAW        = 1 << 1,
-    GFL_RESTART     = 1 << 2,
-    GFL_WIN         = 1 << 3,
-    GFL_RUNNING     = 1 << 4,
-    GFL_QTOMAIN     = 1 << 5
-} GameFlags;
-
 typedef struct {
     void (*events)(void);
     void (*update)(void);
@@ -39,7 +30,7 @@ typedef struct {
     Deck *fromref; // A reference to where a move originates
     Deck *toref; // A reference to where the move is going
     char *msg; // String pointer for messages
-    uint8_t flags; // Bitflags
+    uint8_t flags; // GameFlags defined in flags.h
     int score; // Current game score
 } Solitaire;
 

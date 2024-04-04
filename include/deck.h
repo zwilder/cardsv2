@@ -98,7 +98,7 @@ bool card_clubs(int card);
 bool card_black(int card);
 bool card_red(int card);
 bool card_alt_color(int a, int b);
-bool card_same_suit(int a, int b);
+bool card_same_suite(int a, int b);
 bool card_in_asc_sequence(int a, int b);
 char get_suite(int card);
 int get_rank(int card);
