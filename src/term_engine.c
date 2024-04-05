@@ -1,6 +1,6 @@
 /*
 * Terminal Engine 
-* Copyright (C) Zach Wilder 2022-2023
+* Copyright (C) Zach Wilder 2022-2024
 * 
 * This file is a part of Terminal Engine
 *
@@ -163,6 +163,109 @@ void scr_set_style(int style) {
     if((style & ST_NONE) == ST_NONE) {
         printf("\x1b[0m");
     }
+}
+
+/******************
+ * Box Drawing
+ ******************/
+void scr_draw_hline_clr(int x, int y, int w, uint8_t fg, uint8_t bg) {
+    /* From x,y to x+w,y, draw a line of ─ characters (u2500) */
+    int i = 0;
+    for(i = x; i < (x+w); i++) {
+        scr_pt_clr(i,y,fg,bg, "\u2500");
+    }
+}
+
+void scr_draw_hline(int x, int y, int w) {
+    /* From x,y to x+w,y, draw a line of ─ characters (u2500) */
+    scr_draw_hline_clr(x,y,w,WHITE,BLACK);
+}
+
+void scr_draw_vline_clr(int x, int y, int h, uint8_t fg, uint8_t bg) {
+    /* From x,y, to x,y+h, draw a line of │ characters (u2502) */
+    int i = 0;
+    for(i = y; i < (y+h); i++) {
+        scr_pt_clr(x,i,fg,bg, "\u2502");
+    }
+}
+
+void scr_draw_vline(int x, int y, int h) {
+    scr_draw_vline_clr(x,y,h,WHITE,BLACK);
+}
+
+void scr_draw_dbl_hline_clr(int x, int y, int w, uint8_t fg, uint8_t bg) {
+    /* From x,y to x+w,y, draw a line of ═ characters (u2550) */
+    int i = 0;
+    for(i = x; i < (x+w); i++) {
+        scr_pt_clr(i,y,fg,bg, "\u2550");
+    }
+}
+
+void scr_draw_dbl_hline(int x, int y, int w) {
+    scr_draw_dbl_hline_clr(x,y,w,WHITE,BLACK);
+}
+
+void scr_draw_dbl_vline_clr(int x, int y, int h, uint8_t fg, uint8_t bg) {
+    /* From x,y, to x,y+h, draw a line of ║ characters (u2551) */
+    int i = 0;
+    for(i = y; i < (y+h); i++) {
+        scr_pt_clr(x,i,fg,bg, "\u2551");
+    }
+}
+
+void scr_draw_dbl_vline(int x, int y, int h) {
+    scr_draw_dbl_vline_clr(x,y,h,WHITE,BLACK);
+}
+
+void scr_draw_box_clr(int x, int y, int w, int h, uint8_t fg, uint8_t bg) {
+    /* Draw a single line box, starting with the sides and then fixing the
+     * corners */
+    scr_draw_hline_clr(x,y,w,fg,bg);
+    scr_draw_hline_clr(x,y+h,w,fg,bg);
+    scr_draw_vline_clr(x,y,h,fg,bg);
+    scr_draw_vline_clr(x+w,y,h,fg,bg);
+    scr_pt_clr(x,y,fg,bg, "\u250C"); // Top left
+    scr_pt_clr(x+w,y,fg,bg, "\u2510"); // Top right
+    scr_pt_clr(x,y+h,fg,bg, "\u2514"); // Btm left
+    scr_pt_clr(x+w,y+h,fg,bg, "\u2518"); // Btm right 
+}
+
+void scr_draw_box(int x, int y, int w, int h) {
+    scr_draw_box_clr(x,y,w,h,WHITE,BLACK);
+}
+
+void scr_draw_rnd_box_clr(int x, int y, int w, int h, uint8_t fg, uint8_t bg) {
+    /* Draw a single line box, starting with the sides and then fixing the
+     * corners */
+    scr_draw_hline_clr(x,y,w,fg,bg);
+    scr_draw_hline_clr(x,y+h,w,fg,bg);
+    scr_draw_vline_clr(x,y,h,fg,bg);
+    scr_draw_vline_clr(x+w,y,h,fg,bg);
+    scr_pt_clr(x,y,fg,bg, "\u256D"); // Top left
+    scr_pt_clr(x+w,y,fg,bg, "\u256E"); // Top right
+    scr_pt_clr(x,y+h,fg,bg, "\u2570"); // Btm left
+    scr_pt_clr(x+w,y+h,fg,bg, "\u256F"); // Btm right 
+}
+
+void scr_draw_rnd_box(int x, int y, int w, int h) {
+    scr_draw_rnd_box_clr(x,y,w,h, WHITE,BLACK);
+}
+
+void scr_draw_dbl_box_clr(int x, int y, int w, int h, uint8_t fg, uint8_t bg) {
+    /* Draw a double line box, starting with the sides and then fixing the
+     * corners */
+    scr_draw_dbl_hline_clr(x,y,w,fg,bg);
+    scr_draw_dbl_hline_clr(x,y+h,w,fg,bg);
+    scr_draw_dbl_vline_clr(x,y,h,fg,bg);
+    scr_draw_dbl_vline_clr(x+w,y,h,fg,bg);
+    scr_pt_clr(x,y,fg,bg, "\u2554"); // Top left
+    scr_pt_clr(x+w,y,fg,bg, "\u2557"); // Top right
+    scr_pt_clr(x,y+h,fg,bg, "\u255A"); // Btm left
+    scr_pt_clr(x+w,y+h,fg,bg, "\u255D"); // Btm right 
+}
+
+void scr_draw_dbl_box(int x, int y, int w, int h) {
+    scr_draw_dbl_box_clr(x,y,w,h,WHITE,BLACK);
 }
 
 /*******************

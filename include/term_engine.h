@@ -118,6 +118,24 @@ void scr_set_clr(uint8_t fg, uint8_t bg);
 void scr_set_curs(int x, int y);
 void scr_set_style(int style);
 
+/******************
+ * Box Drawing
+ ******************/
+void scr_draw_hline_clr(int x, int y, int w, uint8_t fg, uint8_t bg);
+void scr_draw_hline(int x, int y, int w);
+void scr_draw_vline_clr(int x, int y, int h, uint8_t fg, uint8_t bg);
+void scr_draw_vline(int x, int y, int h);
+void scr_draw_dbl_hline_clr(int x, int y, int w, uint8_t fg, uint8_t bg);
+void scr_draw_dbl_hline(int x, int y, int w);
+void scr_draw_dbl_vline_clr(int x, int y, int h, uint8_t fg, uint8_t bg);
+void scr_draw_dbl_vline(int x, int y, int h);
+void scr_draw_box_clr(int x, int y, int w, int h, uint8_t fg, uint8_t bg);
+void scr_draw_box(int x, int y, int w, int h);
+void scr_draw_rnd_box_clr(int x, int y, int w, int h, uint8_t fg, uint8_t bg);
+void scr_draw_rnd_box(int x, int y, int w, int h);
+void scr_draw_dbl_box_clr(int x, int y, int w, int h, uint8_t fg, uint8_t bg);
+void scr_draw_dbl_box(int x, int y, int w, int h);
+
 /*******************
  * Input functions
  *******************/
