@@ -22,11 +22,10 @@
 
 typedef enum {
     CR_PLAYER           = 0,
-    CR_PLAYER_CRIB,
     CR_PLAYER_BOARD,
     CR_CPU,
-    CR_CPU_CRIB,
     CR_CPU_BOARD,
+    CR_CRIB,
     CR_STOCK,
     CR_NUM_DECKS
 } CribbageDecks;
@@ -40,6 +39,8 @@ typedef struct {
 typedef struct {
     Deck **decks;
     uint8_t flags; // GameFlags defined in flags.h
+    bool pcrib; // Player crib
+    bool pturn; // CPU crib
     uint8_t pegP1; // Peg locations Player/Computer
     uint8_t pegP2;
     uint8_t pegC1;
@@ -47,6 +48,7 @@ typedef struct {
     uint8_t pScore; // Player score
     uint8_t cScore; // Computer score
     Button **btns;
+    char *msg; 
 } Cribbage;
 
 /*****
@@ -55,6 +57,7 @@ typedef struct {
 bool cribbage_init(void);
 void cribbage_cleanup(void);
 void cribbage_deal(void);
+void cribbage_msg(char *fstr, ...);
 void cribbage_loop(void);
 void cribbage_events(void);
 void cribbage_update(void);

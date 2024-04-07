@@ -48,6 +48,9 @@ void main_menu(void) {
             case 'p':
                 if(!penguin_init()) ch = 'q';
                 break;
+            case 'c':
+                if(!cribbage_init()) ch = 'q';
+                break;
             case 'h':
                 high_scores();
                 break;

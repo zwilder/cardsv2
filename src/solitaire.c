@@ -101,7 +101,7 @@ void solitaire_loop(Solitaire *g) {
      * would make the display change.*/
     long prev = current_ms();
     long lag = 0, current = 0, elapsed = 0;
-    long msperframe = 16; // 16ms = ~60fps, 33ms = ~30fps
+    long msperframe = 33; // 16ms = ~60fps, 33ms = ~30fps
     g->flags |= GFL_RUNNING;
     while(check_flag(g->flags, GFL_RUNNING)) {
         current = current_ms();

@@ -35,11 +35,8 @@ typedef enum {
      */
     GFL_CRIBCUT     = 1 << 6,
     GFL_CRIBDISC    = 1 << 7,
-    GFL_CRIBSHOW    = 1 << 8,
-    GFL_PCRIB       = 1 << 9,
-    GFL_CCRIB       = 1 << 10,
-    GFL_PTURN       = 1 << 11,
-    GFL_CTURN       = 1 << 12,
+    GFL_CRIBPLAY    = 1 << 8,
+    GFL_CRIBSHOW    = 1 << 9
 } GameFlags;
 
 bool check_flag(int mask, int flag);
