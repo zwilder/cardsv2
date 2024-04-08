@@ -102,8 +102,10 @@ bool card_same_suite(int a, int b);
 bool card_in_asc_sequence(int a, int b);
 char get_suite(int card);
 int get_rank(int card);
+char get_rank_ch(int card);
 int get_rank_flag(int card);
 int get_suite_flag(int card);
+char* get_card_str(Card *card);
 void shuffle_deck(Deck *deck);
 
 /*****

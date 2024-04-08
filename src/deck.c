@@ -348,6 +348,39 @@ int get_rank(int card) {
     return result;
 }
 
+char get_rank_ch(int card) {
+    char result = '\0';
+    if(check_flag(card, CD_A)) {
+        result = 'A';
+    } else if (check_flag(card,CD_2)) {
+        result = '2';
+    } else if (check_flag(card,CD_2)) {
+        result = '2';
+    } else if (check_flag(card,CD_3)) {
+        result = '3';
+    } else if (check_flag(card,CD_4)) {
+        result = '4';
+    } else if (check_flag(card,CD_5)) {
+        result = '5';
+    } else if (check_flag(card,CD_6)) {
+        result = '6';
+    } else if (check_flag(card,CD_7)) {
+        result = '7';
+    } else if (check_flag(card,CD_8)) {
+        result = '8';
+    } else if (check_flag(card,CD_9)) {
+        result = '9';
+    } else if (check_flag(card,CD_10)) {
+        result = 'T';
+    } else if (check_flag(card,CD_J)) {
+        result = 'J';
+    } else if (check_flag(card,CD_Q)) {
+        result = 'Q';
+    } else if (check_flag(card,CD_K)) {
+        result = 'K';
+    }
+    return result;
+}
 int get_rank_flag(int card) {
     // Just need to return the flag & ~(suites)
     return (card & ~(CD_H | CD_D | CD_C | CD_S));
@@ -359,6 +392,45 @@ int get_suite_flag(int card) {
             ~(CD_A | CD_2 | CD_3 | CD_4 | CD_5 | CD_6 | 
               CD_7 | CD_8 | CD_9 | CD_10 | CD_J | CD_Q | CD_K));
 }
+
+char* get_card_str(Card *card) {
+    // Given a card, return a string contain the suite/rank
+    /*
+     * ♠ u2660, ♤ u2664
+     * ♥ u2665, ♡ u2661
+     * ♦ u2666, ♢ u2662
+     * ♣ u2663, ♧ u2667
+     */
+    char *result = malloc(9 * sizeof(char));
+    
+    char suite = get_suite(card->flags);
+    char rank = get_rank_ch(card->flags);
+
+    if(rank == 'T') {
+        if(suite == 's') {
+            snprintf(result,9,"%s10", "\u2660");
+        } else if(suite == 'h') {
+            snprintf(result,9,"%s10", "\u2665");
+        } else if(suite == 'd') {
+            snprintf(result,9,"%s10", "\u2666");
+        } else if(suite == 'c') {
+            snprintf(result,9,"%s10", "\u2663");
+        }
+    } else {
+        if(suite == 's') {
+            snprintf(result,9,"%s%c", "\u2660",rank);
+        } else if(suite == 'h') {
+            snprintf(result,9,"%s%c", "\u2665",rank);
+        } else if(suite == 'd') {
+            snprintf(result,9,"%s%c", "\u2666",rank);
+        } else if(suite == 'c') {
+            snprintf(result,9,"%s%c", "\u2663",rank);
+        }
+    }
+
+    return result;
+}
+
 void shuffle_deck(Deck *deck) {
     int rounds = 500; // Seems about right for a truly random shuffle
     int i,j,n;

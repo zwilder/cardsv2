@@ -38,7 +38,7 @@ typedef struct {
 
 typedef struct {
     Deck **decks;
-    uint8_t flags; // GameFlags defined in flags.h
+    int flags; // GameFlags defined in flags.h
     bool pcrib; // Player crib
     bool pturn; // CPU crib
     uint8_t pegP1; // Peg locations Player/Computer
@@ -47,6 +47,7 @@ typedef struct {
     uint8_t pegC2;
     uint8_t pScore; // Player score
     uint8_t cScore; // Computer score
+    uint8_t count; // Value on table
     Button **btns;
     char *msg; 
 } Cribbage;

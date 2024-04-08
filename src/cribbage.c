@@ -19,6 +19,7 @@
 */
 
 #include <cards.h>
+#include <ctype.h>
 
 Cribbage *g_cribbage = NULL;
 
@@ -52,6 +53,7 @@ bool cribbage_init(void) {
     g_cribbage->pegC2 = 0;
     g_cribbage->pScore = 0;
     g_cribbage->cScore = 0;
+    g_cribbage->count = 0;
     g_cribbage->msg = NULL;
 
     // Put 52 cards in the stock, and shuffle it
@@ -234,15 +236,198 @@ void cribbage_events(void) {
 /*****
  * Update functions (will be moved to cribbage_update.c, eventually)
  *****/
-void cribbage_update_discard(void) {
+char cribbage_prompt(char *fstr, ...) {
+    // Draw a prompt at the bottom of the screen, and wait for the user to
+    // return a keypress
+    char result = '\0';
+    if(!fstr) return result;
 
+    // Draw a blank line to "erase" the bottom of the screen
+    char *prompt = malloc(SCREEN_WIDTH * sizeof(char));
+    memset(prompt, ' ', SCREEN_WIDTH - 2);
+    prompt[SCREEN_WIDTH - 1] = '\0';
+    scr_pt_clr(0,23,WHITE,BLACK,prompt); 
+
+    // Format the prompt
+    va_list args;
+    va_start(args,fstr);
+    vsnprintf(prompt,SCREEN_WIDTH,fstr,args);
+    va_end(args);
+    // Print the prompt
+    scr_pt_clr(0,23,WHITE,BLACK,prompt);
+
+    // Show the blinking cursor
+    // (Doesn't work)
+    // Should have a show/hide in term_engine TODO
+    //printf("\x1b[?25h\x1b[1 q"); 
+
+    // Get a char from the user
+    result = kb_get_bl_char();
+
+    // Hide the cursor
+    //printf("\x1b[?25l\x1b[0 q");
+
+    // Change result to upper case
+    if(result) {
+        result = toupper(result);
+    }
+
+    free(prompt);
+    return result;
+}
+
+void cribbage_cpu_to_crib(void) {
+    // Have the computer choose two cards to add to the crib.
+    // The computer player is an idiot right now, and just chooses two random
+    // cards from their hand. Eventually, it will analyze it's hand and choose
+    // appropriate discards for it's skill level. 
+    int i = mt_rand(0,5);
+    Deck *crib = g_cribbage->decks[CR_CRIB];
+    Deck *cpuhand = g_cribbage->decks[CR_CPU];
+    add_card_to_deck(crib, 
+            remove_card_from_deck(cpuhand,
+                get_card_at(cpuhand,i)));
+    i = mt_rand(0,4);
+    add_card_to_deck(crib, 
+            remove_card_from_deck(cpuhand,
+                get_card_at(cpuhand,i)));
+}
+
+void cribbage_update_discard(void) {
+    int i = 0, count = 0;
+    int id_a = 0, id_b = 0;
+    char *astr = NULL, *bstr = NULL;
+    Card *acard = NULL, *bcard = NULL;
+    char ch = '\0';
+    // Count how many buttons are selected
+    count = 0;
+    for(i = 0; i < 6; i++) {
+        if(g_cribbage->btns[i]->selected) {
+            count++;
+            (id_a ? (id_b = i) : (id_a = i));
+        }
+    }
+
+    // If 2, prompt the user for confirmation that these two are what they want
+    // to add to the crib
+    if(2 == count) {
+        acard = get_card_at(g_cribbage->decks[CR_PLAYER], id_a);
+        bcard = get_card_at(g_cribbage->decks[CR_PLAYER], id_b);
+        astr = get_card_str(acard);
+        bstr = get_card_str(bcard);
+        // If user confirms, add the two cards to the crib and change state to
+        // GFL_CRIBPLAY
+        // If user declines, deselect all buttons
+        ch = cribbage_prompt("Add the %s and %s to the crib? [y/n]", astr, bstr);
+        if('Y' == ch)
+        {
+            // Move cards to crib, change state
+            remove_card_from_deck(g_cribbage->decks[CR_PLAYER],acard);
+            add_card_to_deck(g_cribbage->decks[CR_CRIB],acard);
+            remove_card_from_deck(g_cribbage->decks[CR_PLAYER],bcard);
+            add_card_to_deck(g_cribbage->decks[CR_CRIB],bcard);
+
+            // TODO CPU needs to add two cards to the crib here
+            cribbage_cpu_to_crib();
+
+            g_cribbage->flags &= ~GFL_CRIBDISC;
+            g_cribbage->flags |= GFL_CRIBPLAY | GFL_DRAW;
+            cribbage_msg("Choose a card to play");
+            for(i = 0; i < 6; i++) {
+                g_cribbage->btns[i]->selected = false;
+                // Deactivate last two buttons, not needed now
+                if(i > 3) {
+                    g_cribbage->btns[i]->active = false;
+                }
+            }
+        } else {
+            for(i = 0; i < 6; i++) {
+                g_cribbage->btns[i]->selected = false;
+            }
+        }
+    }
+    if(astr) free(astr);
+    if(bstr) free(bstr);
+}
+
+void cribbage_cpu_play(void) {
+    // Have the cpu play a card from it's hand on to the table.
+    // The cpu player is currently an idiot, so it just chooses a random, valid,
+    // card and places it on the table. Eventually, it will choose a card
+    // "intelligently" 
+    Deck *board = g_cribbage->decks[CR_CPU_BOARD];
+    Deck *cpuhand = g_cribbage->decks[CR_CPU];
+    int numcards = count_cards(cpuhand->cards);
+    int i = mt_rand(0,numcards);
+    add_card_to_deck(board, 
+            remove_card_from_deck(cpuhand,
+                get_card_at(cpuhand,i)));
+}
+
+void cribbage_update_count(void) {
+    // Count the value of cards on the table, adding points to the person who
+    // played the last card if applicable, and resetting the count to 0 if both
+    // players are "go"
+    Deck *playerboard = g_cribbage->decks[CR_PLAYER_BOARD];
+    Deck *cpuboard = g_cribbage->decks[CR_CPU_BOARD];
+    int newcount = 0;
+    Card *tmp = playerboard->cards;
+    while(tmp) {
+        newcount += cribbage_card_value(tmp->flags);
+        tmp = tmp->next;
+    }
+    tmp = cpuboard->cards;
+    while(tmp) {
+        newcount += cribbage_card_value(tmp->flags);
+        tmp = tmp->next;
+    }
+
+    g_cribbage->count = newcount;
 }
 
 void cribbage_update_play(void) {
-
+    // Alternate turns playing cards, scoring points and increasing the count
+    int i = 0, id = 0, count = 0;
+    bool selected = false;
+    Card *pcard = NULL;
+    // Check to see if it's the player's turn,
+    if(g_cribbage->pturn) {
+        //Check if a button is selected
+        count = 0;
+        for(i = 0; i < 6; i++) {
+            if(g_cribbage->btns[i]->active) {
+                count += 1;
+            }
+            if(g_cribbage->btns[i]->selected) {
+                selected = true;
+                id = i;
+            }
+        }
+        if(selected) {
+            // get the card that was selected, place it on the board.
+            pcard = get_card_at(g_cribbage->decks[CR_PLAYER], id);
+            // End player turn
+            if(pcard) {
+                remove_card_from_deck(g_cribbage->decks[CR_PLAYER],pcard);
+                add_card_to_deck(g_cribbage->decks[CR_PLAYER_BOARD],pcard);
+                cribbage_update_count();
+                g_cribbage->btns[count-1]->active = false;
+                g_cribbage->pturn = false;
+            }
+            for(i = 0; i < 6; i++) {
+                g_cribbage->btns[i]->selected = false;
+            }
+        }
+    } else {
+        // Have the computer play a card
+        cribbage_cpu_play();
+        cribbage_update_count();
+        g_cribbage->pturn = true;
+    }
 }
 
 void cribbage_update_show(void) {
+    // Score hands
 
 }
 
@@ -455,7 +640,7 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
 
     // Draw count
     //i = cribbage_get_count();
-    i = 0;
+    i = g_cribbage->count;
     scr_pt_clr(37+xo,12+yo,WHITE,BLACK,"Count: %d",i);
 
     // Draw Board
