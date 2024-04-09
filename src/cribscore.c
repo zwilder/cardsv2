@@ -126,18 +126,50 @@ CribScore* score_cribbage_hand(Card *hand, Card *flop) {
 }
 
 CribScore* count_runs(Card *hand, Card *flop) {
+    // TODO: Function didn't count a double run of four with the cards as
+    // follows:
+    // - Hand: 4S 3D 2D 2C
+    // - Cut: 5C
+    // Hand should have scored 10 points and was scored as "A run of 4 for 4,
+    // pair for 2 - 6 points!". 
+    // POSSIBLY fixed by adding line 197 (and gratuitous comments) 
+    //   A-2-3-4-5-6-7-8-9-T-J-Q-K
+    // H|0 0 0 0 0 0 0 0 0 0 0 0 0
+    // S|0 0 0 1 0 0 0 0 0 0 0 0 0
+    // D|0 1 1 0 0 0 0 0 0 0 0 0 0
+    // C|0 1 0 0 1 0 0 0 0 0 0 0 0
+    //
+    // T|0 2 1 1 1 0 0 0 0 0 0 0 0
+
+    // Trying to figure out what I did here when I wrote this...
     if(!hand) return 0;
     if(!flop) return 0;
     if(count_cards(hand) != 4) return 0;
     CribScore *result = NULL;
-    uint8_t matrix[13][5] = {{ 0 }};
+    uint8_t matrix[13][5] = {{ 0 }}; // 13 cards in each of the 4 suites, and 1 to total the matrix
+    //x,y are positions in the matrix
+    //cur = current
+    //prev = prev
+    //r = run
+    //m = multiplier
+    //br = best run
+    //bm = best multiplier
     int x,y,cur,prev,r,m,br,bm;
-    int cards[5];
+    int cards[5]; //Shortcut to hold the card flags (smart)
     cards[0] = hand->flags;
     cards[1] = hand->next->flags;
     cards[2] = hand->next->next->flags;
     cards[3] = hand->next->next->next->flags;
     cards[4] = flop->flags;
+    // The following creates the matrix and sums the total at the bottom
+    // For example, a hand of AS 2C 3D 2D, with cut of KH would generate a
+    // matrix like:
+    //   A-2-3-4-5-6-7-8-9-T-J-Q-K
+    // H|0 0 0 0 0 0 0 0 0 0 0 0 1
+    // S|1 1 0 0 0 0 0 0 0 0 0 0 0
+    // D|0 1 1 0 0 0 0 0 0 0 0 0 0
+    // C|0 0 0 0 0 0 0 0 0 0 0 0 0
+    // T|1 2 1 0 0 0 0 0 0 0 0 0 1
     for(x = 0; x < 13; x++) {
         for(y = 0; y < 5; ++y) {
             if(get_rank(cards[y]) == (x+1)) {
@@ -149,28 +181,44 @@ CribScore* count_runs(Card *hand, Card *flop) {
         }
         matrix[x][4] = matrix[x][0] + matrix[x][1] + matrix[x][2] + matrix[x][3];
     }
+    // The smallest "run" of cards is a single card
     br = bm = r = m = 1;
     cur = 0;
-    prev = matrix[0][4];
+    prev = matrix[0][4]; // Start at 1, so the previous is 0
+    // This looks at JUST the T(otal) column, matrix[x][4]
     for(x = 1; x < 13; x++) {
         cur = matrix[x][4];
         if(cur && prev) {
+            // If the previous cell and current cell have a number, increase the
+            // run count. If the current cell is more than 1, change the
+            // multiplier to the current cell
             r++;
-            if(cur > 1) m = cur;
+            if(cur > 1) m = cur; // Not sure if this should actually be "> m"
+            if(prev > m) m = prev; //New 2024
         } else {
+            // Either this cell or the previous cell doesn't have a number, so
+            // there is a break in our run
             if(r > br) {
+                // Check to see if the current run (r) is better than our best
+                // run (br). Update the best run/multiplier if so.
                 br = r;
                 bm = m;
             }
+            //Reset the run counter and multiplier
             r = 1;
             m = 1;
         }
         prev = cur;
     }
+
+    // Final check to see if the current run is better than the best run,
+    // and it updates it if so.
     if(r > br) {
         br = r;
         bm = m;
     }
+
+    // Cribbage needs to have cards in a run of 3 or more.
     if(br >= 3) {
         if(bm == 1) {
             result = create_cribscore(1, br, "a run of %d for %d", br,br);
