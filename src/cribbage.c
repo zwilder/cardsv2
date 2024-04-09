@@ -55,6 +55,7 @@ bool cribbage_init(void) {
     g_cribbage->cScore = 0;
     g_cribbage->count = 0;
     g_cribbage->msg = NULL;
+    g_cribbage->flags = GFL_NONE;
 
     // Put 52 cards in the stock, and shuffle it
     fill_deck(g_cribbage->decks[CR_STOCK]);
@@ -118,7 +119,7 @@ void cribbage_deal(void) {
     Deck *stock = g_cribbage->decks[CR_STOCK];
     Deck *playerhand = g_cribbage->decks[CR_PLAYER];
     Deck *cpuhand = g_cribbage->decks[CR_CPU];
-    g_cribbage->pcrib = false; // May eventually have a "cut the deck" see who goes first thing
+    g_cribbage->pcrib = true; // May eventually have a "cut the deck" see who goes first thing
     g_cribbage->pturn = false;
 
     // Give 6 cards to the player, 6 cards to the cpu
@@ -245,7 +246,7 @@ char cribbage_prompt(char *fstr, ...) {
     // Draw a blank line to "erase" the bottom of the screen
     char *prompt = malloc(SCREEN_WIDTH * sizeof(char));
     memset(prompt, ' ', SCREEN_WIDTH - 2);
-    prompt[SCREEN_WIDTH - 1] = '\0';
+    prompt[SCREEN_WIDTH - 2] = '\0';
     scr_pt_clr(0,23,WHITE,BLACK,prompt); 
 
     // Format the prompt
@@ -359,6 +360,7 @@ void cribbage_cpu_play(void) {
     Deck *cpuhand = g_cribbage->decks[CR_CPU];
     int numcards = count_cards(cpuhand->cards);
     int i = mt_rand(0,numcards);
+    i = 0;
     add_card_to_deck(board, 
             remove_card_from_deck(cpuhand,
                 get_card_at(cpuhand,i)));
@@ -390,6 +392,17 @@ void cribbage_update_play(void) {
     int i = 0, id = 0, count = 0;
     bool selected = false;
     Card *pcard = NULL;
+    // Check to see if both player and cpu hands are empty
+    if((count_cards(g_cribbage->decks[CR_PLAYER]->cards) == 0) &&
+            (count_cards(g_cribbage->decks[CR_CPU]->cards) == 0)) {
+        cribbage_prompt("Press any key to continue...");
+        g_cribbage->flags &= ~GFL_CRIBPLAY;
+        g_cribbage->flags |= GFL_CRIBSHOW | GFL_DRAW;
+        //Move cards from the board back to the hand
+        add_deck(g_cribbage->decks[CR_PLAYER_BOARD], g_cribbage->decks[CR_PLAYER]);
+        add_deck(g_cribbage->decks[CR_CPU_BOARD], g_cribbage->decks[CR_CPU]);
+        return;
+    }
     // Check to see if it's the player's turn,
     if(g_cribbage->pturn) {
         //Check if a button is selected
@@ -417,12 +430,14 @@ void cribbage_update_play(void) {
             for(i = 0; i < 6; i++) {
                 g_cribbage->btns[i]->selected = false;
             }
+            g_cribbage->flags |= GFL_DRAW;
         }
     } else {
         // Have the computer play a card
         cribbage_cpu_play();
         cribbage_update_count();
         g_cribbage->pturn = true;
+        g_cribbage->flags |= GFL_DRAW;
     }
 }
 
@@ -581,67 +596,130 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
     int x = 0, y = 0, i = 0;
     Deck *deck = NULL;
     Card *cards = NULL;
+    CribScore *score = NULL;
     uint8_t board_fg = WHITE; // Might be a settings option in the future?
     uint8_t board_bg = BRIGHT_BLACK;
 
     // Clear screen
     scr_clear();
 
-    // Draw crib
-    y = (g_cribbage->pcrib ? 14 : 1);
-    deck = g_cribbage->decks[CR_CRIB];
-    cards = deck->cards;
-    i = 4;
-    while(cards){
-        pt_card_back(i+xo,y);
-        i -= 1;
-        cards=cards->next;
+    if(check_flag(g_cribbage->flags, GFL_CRIBSHOW)) {
+        // Draw crib
+        y = (g_cribbage->pcrib ? 14 : 0);
+        deck = g_cribbage->decks[CR_CRIB];
+        cards = deck->cards;
+        x = 1;
+        while(cards) {
+            pt_card(x+xo,y+yo,cards);
+            x += 4;
+            cards = cards->next;
+        }
+        scr_pt_clr(6+xo, y+yo+4, WHITE, BLACK, "Crib");
+
+        // Draw player hand
+        deck = g_cribbage->decks[CR_PLAYER];
+        cards = deck->cards;
+        x = 54;
+        y = 14;
+        while(cards) {
+            pt_card(x+xo,y+yo,cards);
+            x += 4;
+            cards = cards->next;
+        }
+        scr_pt_clr(4+54+xo, y+yo+4, WHITE, BLACK, "Your hand");
+
+        // Draw cpu hand
+        deck = g_cribbage->decks[CR_CPU];
+        cards = deck->cards;
+        x = 54;
+        y = 0;
+        while(cards) {
+            pt_card(x+xo,y+yo,cards);
+            x += 4;
+            cards = cards->next;
+        }
+        scr_pt_clr(4+54+xo, y+yo+4, WHITE, BLACK, "CPU hand");
+
+        // Draw CPU points
+        deck = g_cribbage->decks[CR_CPU];
+        cards = deck->cards;
+        score = score_cribbage_hand(cards, g_cribbage->decks[CR_STOCK]->cards);
+        scr_pt_clr(xo,yo+21,WHITE,BLACK,"CPU hand: %s", score->msg);
+        destroy_cribscore(score);
+        // Draw crib points
+        deck = g_cribbage->decks[CR_CRIB];
+        cards = deck->cards;
+        score = score_cribbage_hand(cards, g_cribbage->decks[CR_STOCK]->cards);
+        scr_pt_clr(xo,yo+22,WHITE,BLACK,"%s: %s", 
+                (g_cribbage->pcrib ? "Your crib" : "CPU's Crib"),score->msg);
+        destroy_cribscore(score);
+        // Draw player points
+        deck = g_cribbage->decks[CR_PLAYER];
+        cards = deck->cards;
+        score = score_cribbage_hand(cards, g_cribbage->decks[CR_STOCK]->cards);
+        scr_pt_clr(xo,yo+23,WHITE,BLACK,"Your hand: %s",score->msg);
+        destroy_cribscore(score);
+    } else {
+        // Draw crib
+        y = (g_cribbage->pcrib ? 14 : 0);
+        deck = g_cribbage->decks[CR_CRIB];
+        cards = deck->cards;
+        i = 4;
+        while(cards){
+            pt_card_back(i+xo,y+yo);
+            i -= 1;
+            cards=cards->next;
+        }
+
+        // Draw player hand
+        deck = g_cribbage->decks[CR_PLAYER];
+        cards = deck->cards;
+        x = 54;
+        y = 14;
+        i = 0;
+        while(cards) {
+            pt_card(x+xo,y+yo,cards);
+            pt_button_at(g_cribbage->btns[i],x+xo,y+yo+4);
+            x += 4;
+            i += 1;
+            cards = cards->next;
+        }
+
+        // Draw player table cards
+        deck = g_cribbage->decks[CR_PLAYER_BOARD];
+        cards = deck->cards;
+        x = 20;
+        y = 13;
+        while(cards) {
+            pt_card(x,y,cards);
+            x += 4;
+            cards = cards->next;
+        }
+
+        // Draw cpu table cards
+        deck = g_cribbage->decks[CR_CPU_BOARD];
+        cards = deck->cards;
+        x = 20;
+        y = 0;
+        while(cards) {
+            pt_card(x,y,cards);
+            x += 4;
+            cards = cards->next;
+        }
+
+        // Draw count
+        i = g_cribbage->count;
+        scr_pt_clr(37+xo,12+yo,WHITE,BLACK,"Count: %d",i);
+
+        //Draw message/prompt
+        if(g_cribbage->msg) {
+            scr_pt_clr(xo,22+yo,WHITE,BLACK,"%s",g_cribbage->msg);
+        }
     }
 
     // Draw cut
     pt_card_back(14+xo,6+yo);
     pt_card(14+xo,7+yo,g_cribbage->decks[CR_STOCK]->cards);
-
-    // Draw player hand
-    deck = g_cribbage->decks[CR_PLAYER];
-    cards = deck->cards;
-    x = 54;
-    y = 14;
-    i = 0;
-    while(cards) {
-        pt_card(x,y,cards);
-        pt_button_at(g_cribbage->btns[i],x,y+4);
-        x += 4;
-        i += 1;
-        cards = cards->next;
-    }
-
-    // Draw player table cards
-    deck = g_cribbage->decks[CR_PLAYER_BOARD];
-    cards = deck->cards;
-    x = 20;
-    y = 13;
-    while(cards) {
-        pt_card(x,y,cards);
-        x += 4;
-        cards = cards->next;
-    }
-
-    // Draw cpu table cards
-    deck = g_cribbage->decks[CR_CPU_BOARD];
-    cards = deck->cards;
-    x = 20;
-    y = 1;
-    while(cards) {
-        pt_card(x,y,cards);
-        x += 4;
-        cards = cards->next;
-    }
-
-    // Draw count
-    //i = cribbage_get_count();
-    i = g_cribbage->count;
-    scr_pt_clr(37+xo,12+yo,WHITE,BLACK,"Count: %d",i);
 
     // Draw Board
     scr_draw_box_clr(20+xo,5+yo,40,6,board_fg,board_bg);
@@ -649,12 +727,6 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
             " . ..... ..... ..... ..... ..... ..... ");
     scr_pt_clr(21+xo,7+yo,board_fg,board_bg,
             " . ..... ..... ..... ..... ..... ..... ");
- /*
- * ♠ u2660, ♤ u2664
- * ♥ u2665, ♡ u2661
- * ♦ u2666, ♢ u2662
- * ♣ u2663, ♧ u2667
- */
     scr_pt_clr(21+xo,8+yo,board_fg,board_bg,
             "     \u2664        \u2661        \u2662        \u2667      ");
     scr_pt_clr(21+xo,9+yo,board_fg,board_bg,
@@ -678,10 +750,6 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
     scr_pt_clr(62+xo,6+yo,WHITE,BLACK,"%d",g_cribbage->cScore);
     scr_pt_clr(62+xo,10+yo,WHITE,BLACK,"%d",g_cribbage->pScore);
 
-    //Draw message/prompt
-    if(g_cribbage->msg) {
-        scr_pt_clr(xo,22+yo,WHITE,BLACK,"%s",g_cribbage->msg);
-    }
     
     // Turn off draw flag
     g_cribbage->flags &= ~GFL_DRAW;

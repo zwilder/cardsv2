@@ -18,6 +18,7 @@
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <ctype.h>
 #include <cards.h>
 
 /*
@@ -32,6 +33,11 @@
  *  - get_value() replaced with get_rank()
  *  - Checking if two cards have the same suite by calling "get_card_ch(A) ==
  *    get_card_ch(B)" replaced with the much more gooder "card_same_suite(A,B)"
+ *  - score_cribbage_hand returns a CribScore with the message and point value
+ *    instead of printing directly on the screen. 
+ *  - count_15s now prints the number of fifteens as a word and not a number
+ *  - count_15s fixed to include all combinations of cards (I missed a couple in
+ *    the brute force counting originally).
  */
 
 int cribbage_card_value(int card) {
@@ -56,12 +62,16 @@ CribScore* create_cribscore(int qty, int pts, char *msg,...) {
 
 void destroy_cribscore(CribScore *score) {
     if(!score) return;
-    if(score->msg) free(score->msg);
+    if(score->msg) {
+        free(score->msg);
+        score->msg = NULL;
+    }
     free(score);
+    score = NULL;
 }
 
-int score_cribbage_hand(Card *hand, Card *flop) {
-    char *buf = malloc(500 * sizeof(char));
+CribScore* score_cribbage_hand(Card *hand, Card *flop) {
+    char *buf = malloc(80 * sizeof(char));
     buf[0] = '\0'; 
     int score = 0;
     CribScore *fifteens = count_15s(hand, flop);
@@ -69,6 +79,7 @@ int score_cribbage_hand(Card *hand, Card *flop) {
     CribScore *pairs = count_pairs(hand,flop);
     CribScore *flush = count_flush(hand,flop);
     CribScore *nobs = count_nobs(hand,flop);
+    CribScore *result = NULL;
     if(fifteens) {
         score += fifteens->pts;
         strcat(buf, fifteens->msg);
@@ -97,7 +108,13 @@ int score_cribbage_hand(Card *hand, Card *flop) {
         strcat(buf, nobs->msg);
     }
     if(score) {
-        scr_pt(0, g_screenH - 3, "%s - %d points!", buf, score);
+        //scr_pt(0, g_screenH - 3, "%s - %d points!", buf, score);
+        //snprintf(msg,80,"%s - %d points.",buf,score);
+        buf[0] = toupper(buf[0]);
+        result = create_cribscore(0,score,"%s - %d points!",buf,score);
+    } else {
+        //snprintf(msg,80,"No points.");
+        result = create_cribscore(0,0,"No points!");
     }
     destroy_cribscore(fifteens);
     destroy_cribscore(runs);
@@ -105,7 +122,7 @@ int score_cribbage_hand(Card *hand, Card *flop) {
     destroy_cribscore(flush);
     destroy_cribscore(nobs);
     free(buf);
-    return score;
+    return result;
 }
 
 CribScore* count_runs(Card *hand, Card *flop) {
@@ -263,12 +280,14 @@ CribScore* count_15s(Card *hand, Card *flop) {
     if(!flop) return 0;
     if(count_cards(hand) != 4) return 0;
     CribScore *result = NULL;
+    char *num = malloc(80*sizeof(char));
     int i = 0;
     int A = cribbage_card_value(hand->flags);
     int B = cribbage_card_value(hand->next->flags);
     int C = cribbage_card_value(hand->next->next->flags);
     int D = cribbage_card_value(hand->next->next->next->flags);
     int E = cribbage_card_value(flop->flags);
+    // Two cards
     if(A+B == 15) i++;
     if(A+C == 15) i++;
     if(A+D == 15) i++;
@@ -279,24 +298,60 @@ CribScore* count_15s(Card *hand, Card *flop) {
     if(C+D == 15) i++;
     if(C+E == 15) i++;
     if(D+E == 15) i++;
+    // Three cards
     if(A+B+C == 15) i++;
     if(A+B+D == 15) i++;
     if(A+B+E == 15) i++;
+    if(A+C+D == 15) i++;
     if(A+C+E == 15) i++;
     if(A+D+E == 15) i++;
     if(B+C+D == 15) i++;
     if(B+C+E == 15) i++;
+    if(B+D+E == 15) i++;
     if(C+D+E == 15) i++;
+    // Four cards
     if(A+B+C+D == 15) i++;
     if(A+B+C+E == 15) i++;
+    if(A+B+D+E == 15) i++;
     if(A+C+D+E == 15) i++;
     if(B+C+D+E == 15) i++;
+    // Five cards
     if(A+B+C+D+E == 15) i++;
     
+    // Highest possible number of 15s in a single hand is eight
+    switch(i) {
+        case(1):
+            snprintf(num,80,"one");
+            break;
+        case(2):
+            snprintf(num,80,"two");
+            break;
+        case(3):
+            snprintf(num,80,"three");
+            break;
+        case(4):
+            snprintf(num,80,"four");
+            break;
+        case(5):
+            snprintf(num,80,"five");
+            break;
+        case(6):
+            snprintf(num,80,"six");
+            break;
+        case(7):
+            snprintf(num,80,"seven");
+            break;
+        case(8):
+            snprintf(num,80,"eight");
+            break;
+        default:
+            break;
+    }
     if(i == 1) {
         result = create_cribscore(1, 2, "15 for 2");
     } else if (i) {
-        result = create_cribscore(i, i*2, "%d 15s for %d", i, i*2);
+        result = create_cribscore(i, i*2, "%s 15s for %d", num, i*2);
     }
+    free(num);
     return result;
 }
