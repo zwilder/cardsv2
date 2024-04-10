@@ -253,7 +253,7 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
         x = 20;
         y = 13;
         while(cards) {
-            pt_card(x,y,cards);
+            pt_card(x+xo,y+yo,cards);
             x += 4;
             cards = cards->next;
         }
@@ -264,7 +264,7 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
         x = 20;
         y = 0;
         while(cards) {
-            pt_card(x,y,cards);
+            pt_card(x+xo,y+yo,cards);
             x += 4;
             cards = cards->next;
         }
@@ -290,7 +290,7 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
     scr_pt_clr(21+xo,7+yo,board_fg,board_bg,
             " . ..... ..... ..... ..... ..... ..... ");
     scr_pt_clr(21+xo,8+yo,board_fg,board_bg,
-            "     \u2664        \u2661        \u2662        \u2667      ");
+            "        \u2664     \u2661           \u2662     \u2667      ");
     scr_pt_clr(21+xo,9+yo,board_fg,board_bg,
             " . ..... ..... ..... ..... ..... ..... ");
     scr_pt_clr(21+xo,10+yo,board_fg,board_bg,

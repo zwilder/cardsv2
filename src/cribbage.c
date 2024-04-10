@@ -182,13 +182,15 @@ char cribbage_prompt(char *fstr, ...) {
     // Draw a prompt at the bottom of the screen, and wait for the user to
     // return a keypress
     char result = '\0';
+    int xo = (g_screenW / 2) - (SCREEN_WIDTH / 2); // Standard screen size is 80x24, defined in glyph.c
+    int yo = (g_screenH / 2) - (SCREEN_HEIGHT / 2);
     if(!fstr) return result;
 
     // Draw a blank line to "erase" the bottom of the screen
     char *prompt = malloc(SCREEN_WIDTH * sizeof(char));
     memset(prompt, ' ', SCREEN_WIDTH - 2);
     prompt[SCREEN_WIDTH - 2] = '\0';
-    scr_pt_clr(0,23,WHITE,BLACK,prompt); 
+    scr_pt_clr(0+xo,23+yo,WHITE,BLACK,prompt); 
 
     // Format the prompt
     va_list args;
@@ -196,7 +198,7 @@ char cribbage_prompt(char *fstr, ...) {
     vsnprintf(prompt,SCREEN_WIDTH,fstr,args);
     va_end(args);
     // Print the prompt
-    scr_pt_clr(0,23,WHITE,BLACK,prompt);
+    scr_pt_clr(xo,23+yo,WHITE,BLACK,prompt);
 
     // Show the blinking cursor
     // (Doesn't work)

@@ -126,41 +126,27 @@ CribScore* score_cribbage_hand(Card *hand, Card *flop) {
 }
 
 CribScore* count_runs(Card *hand, Card *flop) {
-    // TODO: Function didn't count a double run of four with the cards as
-    // follows:
-    // - Hand: 4S 3D 2D 2C
-    // - Cut: 5C
-    // Hand should have scored 10 points and was scored as "A run of 4 for 4,
-    // pair for 2 - 6 points!". 
-    // POSSIBLY fixed by adding line 197 (and gratuitous comments) 
-    //   A-2-3-4-5-6-7-8-9-T-J-Q-K
-    // H|0 0 0 0 0 0 0 0 0 0 0 0 0
-    // S|0 0 0 1 0 0 0 0 0 0 0 0 0
-    // D|0 1 1 0 0 0 0 0 0 0 0 0 0
-    // C|0 1 0 0 1 0 0 0 0 0 0 0 0
-    //
-    // T|0 2 1 1 1 0 0 0 0 0 0 0 0
-
-    // Trying to figure out what I did here when I wrote this...
-    if(!hand) return 0;
-    if(!flop) return 0;
-    if(count_cards(hand) != 4) return 0;
+    if(!hand) return NULL;
+    if(!flop) return NULL;
+    if(count_cards(hand) != 4) return NULL;
     CribScore *result = NULL;
-    uint8_t matrix[13][5] = {{ 0 }}; // 13 cards in each of the 4 suites, and 1 to total the matrix
-    //x,y are positions in the matrix
-    //cur = current
-    //prev = prev
-    //r = run
-    //m = multiplier
-    //br = best run
-    //bm = best multiplier
-    int x,y,cur,prev,r,m,br,bm;
+    uint8_t matrix[13] = { 0 }; // 13 cards (x) in each of the 4 suites (y), and 1 to total the matrix (y)
+    int x,y,cur,prev,r,m,br,bm; // r/br: run/best run. m/bm: multiplier/best multiplier
     int cards[5]; //Shortcut to hold the card flags (smart)
     cards[0] = hand->flags;
     cards[1] = hand->next->flags;
     cards[2] = hand->next->next->flags;
     cards[3] = hand->next->next->next->flags;
     cards[4] = flop->flags;
+    /*
+    //Original 2022 matrix code, leaving it here for ... well so I remember what
+    //I did. Note that matrix above needs to be initialized as 
+    // matrix[13][5] == {{ 0 }}
+    //for this to work. I **think** theoretically I could use the matrix to
+    //check for other point scoring hands as well... a flush would be a 4/5 in
+    //a single total column, for instance. A straight flush (like in a poker
+    //hand) could be figured with the full matrix too, and a royal flush would
+    //be an easy skip from there.
     // The following creates the matrix and sums the total at the bottom
     // For example, a hand of AS 2C 3D 2D, with cut of KH would generate a
     // matrix like:
@@ -171,8 +157,16 @@ CribScore* count_runs(Card *hand, Card *flop) {
     // C|0 0 0 0 0 0 0 0 0 0 0 0 0
     // T|1 2 1 0 0 0 0 0 0 0 0 0 1
     for(x = 0; x < 13; x++) {
-        for(y = 0; y < 5; ++y) {
+        for(y = 0; y < 5; y++) {
             if(get_rank(cards[y]) == (x+1)) {
+                // This includes suite for some reason, really the only column
+                // that matters is the total column, and that could be found by
+                // using a 1 dimensional array of 13 elements and then:
+                // for(x = 0; x < 13; x++) {
+                //  for(y = 0; y < 5; y++) {
+                //   if(get_rank(cards[y]) == (x+1)) matrix[x] += 1
+                //  }
+                // }
                 if((cards[y] & CD_H) == CD_H) matrix[x][0] += 1;
                 if((cards[y] & CD_C) == CD_C) matrix[x][1] += 1;
                 if((cards[y] & CD_D) == CD_D) matrix[x][2] += 1;
@@ -181,20 +175,33 @@ CribScore* count_runs(Card *hand, Card *flop) {
         }
         matrix[x][4] = matrix[x][0] + matrix[x][1] + matrix[x][2] + matrix[x][3];
     }
+    */
+    // This just makes the total column of that matrix, which is all that really
+    // matters for cribbage runs.
+    for(x = 0; x < 13; x++) {
+        for(y = 0; y < 5; y++) {
+            if(get_rank(cards[y]) == (x+1)) {
+                matrix[x] += 1;
+            }
+        }
+    }
     // The smallest "run" of cards is a single card
     br = bm = r = m = 1;
     cur = 0;
-    prev = matrix[0][4]; // Start at 1, so the previous is 0
-    // This looks at JUST the T(otal) column, matrix[x][4]
+    prev = matrix[0]; // Start at 1, so the previous is 0
     for(x = 1; x < 13; x++) {
-        cur = matrix[x][4];
+        cur = matrix[x];
+        if(prev > 1) {
+            if(m == 1) {
+                m = prev;
+            } else {
+                m = 4; // Quadruple run of 3
+            }
+        }
         if(cur && prev) {
             // If the previous cell and current cell have a number, increase the
-            // run count. If the current cell is more than 1, change the
-            // multiplier to the current cell
+            // run count. 
             r++;
-            if(cur > 1) m = cur; // Not sure if this should actually be "> m"
-            if(prev > m) m = prev; //New 2024
         } else {
             // Either this cell or the previous cell doesn't have a number, so
             // there is a break in our run
@@ -212,7 +219,7 @@ CribScore* count_runs(Card *hand, Card *flop) {
     }
 
     // Final check to see if the current run is better than the best run,
-    // and it updates it if so.
+    // and update if so.
     if(r > br) {
         br = r;
         bm = m;
@@ -220,14 +227,23 @@ CribScore* count_runs(Card *hand, Card *flop) {
 
     // Cribbage needs to have cards in a run of 3 or more.
     if(br >= 3) {
-        if(bm == 1) {
-            result = create_cribscore(1, br, "a run of %d for %d", br,br);
-        } else if(bm == 2) {
-            result = create_cribscore(bm, br*bm, 
-                    "a double run of %d for %d", br,br*bm);
-        } else if(bm == 3) {
-            result = create_cribscore(bm, br*bm, 
-                    "a triple run of %d for %d", br,br*bm);
+        switch(bm) {
+            case 1:
+                result = create_cribscore(1, br, "a run of %d for %d", br,br);
+                break;
+            case 2:
+                result = create_cribscore(bm, br*bm, 
+                        "a double run of %d for %d", br,br*bm);
+                break;
+            case 3:
+                result = create_cribscore(bm, br*bm, 
+                        "a triple run of %d for %d", br,br*bm);
+                break;
+            case 4:
+                result = create_cribscore(bm, br*bm,
+                        "a quadruple run of %d for %d",br,br*bm);
+                break;
+            default: break;
         }
     }
     return result;
@@ -290,6 +306,10 @@ CribScore* count_nobs(Card *hand, Card *flop) {
 }
 
 CribScore* count_pairs(Card *hand, Card *flop) {
+    //TODO: This failed with the following:
+    // -Hand: 9C AD AC AH
+    // -Cut: 9D
+    // Scored as "No Points!" (clearly wrong)
     if(!hand) return 0;
     if(!flop) return 0;
     if(count_cards(hand) != 4) return 0;
