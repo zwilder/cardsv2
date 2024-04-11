@@ -18,6 +18,13 @@
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+ * TODO: I got a segfault attempting to move an empty column to a column with a
+ * King... wasn't playing in GDB so I don't have any more info. Needs to be
+ * investigated. (Annoyingly, It was the VERY last card before winning the
+ * game). Possibly fixed. (added a check to make sure g_klondike->fromref->cards
+ * isn't NULL in check_sequence).
+ */
 #include <cards.h>
 
 void klondike_update(void) {
@@ -147,6 +154,7 @@ void klondike_check_sequence(void) {
 
     // The first visible card in a tableau is the highest in sequence
     card = g_klondike->fromref->cards;
+    if(!card) return; // Can't move nothin' from nothin'
     while(card) {
         if(check_flag(card->flags, CD_UP)) break;
         card = card->next;
