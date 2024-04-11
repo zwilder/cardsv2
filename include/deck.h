@@ -109,6 +109,14 @@ char* get_card_str(Card *card);
 void shuffle_deck(Deck *deck);
 
 /*****
+ * Card/Deck sorting
+ *****/
+void merge_sort_deck(Deck *deck);
+void merge_sort_cards(Card **headref);
+void merge_sort_cards_bysuite(Card **headref, bool bysuite);
+void merge_sort_deck_bysuite(Deck *deck, bool bysuite);
+
+/*****
  * Deck drawing
  *****/
 void pt_card_simple(int x, int y, Card *card);

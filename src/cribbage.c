@@ -128,6 +128,8 @@ void cribbage_deal(void) {
         draw_card(stock,cpuhand);
     }
         
+    //merge_sort_cards(&(playerhand->cards), false);
+    merge_sort_deck(playerhand);
     cribbage_msg("Choose two cards to add to %s crib:", 
             (g_cribbage->pcrib ? "your" : "the computer\'s"));
     g_cribbage->flags |= GFL_DRAW | GFL_CRIBDISC;

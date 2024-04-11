@@ -116,8 +116,27 @@ void cribbage_update_count(void) {
     // Count the value of cards on the table, adding points to the person who
     // played the last card if applicable, and resetting the count to 0 if both
     // players are "go"
+    /*
+     * This function needs to check which card was just played to the board
+     * (last card in CPU_BOARD if !pturn, in PLAYER_BOARD if pturn), and compare
+     * it to the card last played to the board (last card in CPU_BOARD if pturn,
+     * last card in PLAYER_BOARD if !pturn). If it's an invalid move (makes
+     * count exceed 31) return false. If it's a valid move, check to see if it
+     * makes count 15 or 31 grant points. Check for runs, check for pairs/three
+     * of a kind/four of a kind, grant points. If it's 31, reset count to 0 -
+     * remember last card in that series so stop looking when we reach it when
+     * analyzing cards (maybe this needs to be a Card* in Cribbage?)
+     *
+     * Idea: What if I used card flags? Turn cards "inactive" when both players
+     * are a go, use one deck for the "board" (with a flag CD_PLAYER/CD_CPU on
+     * each card to show who it belonged to/where it needs to be drawn), last
+     * card played would always be the head of the deck->cards list (in a shared
+     * deck)... I think that solves ALL the problems and would require the least
+     * amount of "new" code to implement.
+     */
     Deck *playerboard = g_cribbage->decks[CR_PLAYER_BOARD];
     Deck *cpuboard = g_cribbage->decks[CR_CPU_BOARD];
+    
     int newcount = 0;
     Card *tmp = playerboard->cards;
     while(tmp) {
@@ -133,24 +152,49 @@ void cribbage_update_count(void) {
     g_cribbage->count = newcount;
 }
 
+bool cribbage_check_go(Deck *deck) {
+    Card *cards = NULL;
+    int count = g_cribbage->count;
+    cards = deck->cards;
+    while(cards) {
+        if((cribbage_card_value(cards->flags) + count) < 31) {
+             return false;
+        }
+        cards = cards->next;
+    }
+    return true;
+}
 void cribbage_update_play(void) {
     // Alternate turns playing cards, scoring points and increasing the count
     int i = 0, id = 0, count = 0;
     bool selected = false;
     Card *pcard = NULL;
+    Deck *pdeck = g_cribbage->decks[CR_PLAYER];
+    Deck *cdeck = g_cribbage->decks[CR_CPU];
+
+    // Check to see if both players have a go
+    if(cribbage_check_go(cdeck) && cribbage_check_go(pdeck)) {
+        //reset count to 0, last person who played a card gets a point (2 if
+        //count is 31), and set g_cribbage->lastcard to last card played.
+    }
+
     // Check to see if both player and cpu hands are empty
     if((count_cards(g_cribbage->decks[CR_PLAYER]->cards) == 0) &&
             (count_cards(g_cribbage->decks[CR_CPU]->cards) == 0)) {
-        cribbage_prompt("Press any key to continue...");
         g_cribbage->flags &= ~GFL_CRIBPLAY;
         g_cribbage->flags |= GFL_CRIBSHOW | GFL_DRAW;
         //Move cards from the board back to the hand
+        //(This will move to cribbage_update_show())
+        cribbage_prompt("Press any key to continue...");
         add_deck(g_cribbage->decks[CR_PLAYER_BOARD], g_cribbage->decks[CR_PLAYER]);
         add_deck(g_cribbage->decks[CR_CPU_BOARD], g_cribbage->decks[CR_CPU]);
         return;
     }
     // Check to see if it's the player's turn,
     if(g_cribbage->pturn) {
+        //Check if player has a go
+        //TODO
+
         //Check if a button is selected
         count = 0;
         for(i = 0; i < 6; i++) {
@@ -180,6 +224,7 @@ void cribbage_update_play(void) {
         }
     } else {
         // Have the computer play a card
+        // Check first if CPU has a go TODO
         cribbage_cpu_play();
         cribbage_update_count();
         g_cribbage->pturn = true;

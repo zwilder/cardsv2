@@ -281,7 +281,9 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
 
     // Draw cut
     pt_card_back(14+xo,6+yo);
-    pt_card(14+xo,7+yo,g_cribbage->decks[CR_STOCK]->cards);
+    if(!check_flag(g_cribbage->flags, GFL_CRIBDISC)) {
+        pt_card(14+xo,7+yo,g_cribbage->decks[CR_STOCK]->cards);
+    }
 
     // Draw Board
     scr_draw_box_clr(20+xo,5+yo,40,6,board_fg,board_bg);

@@ -448,6 +448,79 @@ void shuffle_deck(Deck *deck) {
         add_card_to_deck(deck, remove_card_from_deck(deck,tmp));
     }
 }
+
+/*****
+ * Card/Deck sorting
+ *****/
+Card* sorted_merge(Card *a, Card *b, bool bysuite) {
+    Card *result = NULL;
+    if(!a) {
+        return b;
+    } else if(!b) {
+        return a;
+    }
+    int aval = get_rank(a->flags);
+    int bval = get_rank(b->flags);
+    if(bysuite) {
+        if((a->flags & CD_H) == CD_H) aval += 13;
+        if((a->flags & CD_S) == CD_S) aval += 26;
+        if((a->flags & CD_D) == CD_D) aval += 39;
+
+        if((b->flags & CD_H) == CD_H) bval += 13;
+        if((b->flags & CD_S) == CD_S) bval += 26;
+        if((b->flags & CD_D) == CD_D) bval += 39;
+    }
+    if(aval <= bval) {
+        result = a;
+        result->next = sorted_merge(a->next, b, bysuite);
+    } else {
+        result = b;
+        result->next = sorted_merge(a, b->next, bysuite);
+    }
+    return result;
+}
+
+void ft_bk_splt(Card *source, Card **frontref, Card **backref) {
+    Card *fast = NULL;
+    Card *slow = NULL;
+    slow = source;
+    fast = source->next;
+    while(fast) {
+        fast = fast->next;
+        if(fast) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+    }
+    *frontref = source;
+    *backref = slow->next;
+    slow->next = NULL;
+}
+
+void merge_sort_deck(Deck *deck) {
+    merge_sort_cards_bysuite(&(deck->cards),false);
+}
+
+void merge_sort_cards(Card **headref) {
+    merge_sort_cards_bysuite(headref,false);
+}
+
+void merge_sort_deck_bysuite(Deck *deck, bool bysuite) {
+    merge_sort_cards_bysuite(&(deck->cards), bysuite);
+}
+
+void merge_sort_cards_bysuite(Card **headref, bool bysuite) {
+    Card *head = *headref;
+    Card *a = NULL;
+    Card *b = NULL;
+
+    if(!head || !head->next) return;
+    ft_bk_splt(head, &a, &b);
+    merge_sort_cards_bysuite(&a,bysuite);
+    merge_sort_cards_bysuite(&b,bysuite);
+    *headref = sorted_merge(a,b,bysuite);
+}
+
 /*****
  * Deck drawing
  *****/

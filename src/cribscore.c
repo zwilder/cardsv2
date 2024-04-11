@@ -306,10 +306,6 @@ CribScore* count_nobs(Card *hand, Card *flop) {
 }
 
 CribScore* count_pairs(Card *hand, Card *flop) {
-    //TODO: This failed with the following:
-    // -Hand: 9C AD AC AH
-    // -Cut: 9D
-    // Scored as "No Points!" (clearly wrong)
     if(!hand) return 0;
     if(!flop) return 0;
     if(count_cards(hand) != 4) return 0;
@@ -338,6 +334,8 @@ CribScore* count_pairs(Card *hand, Card *flop) {
         result = create_cribscore(3, 6, "a pair royale for 6");
     } else if(i == 6) {
         result = create_cribscore(6, 12, "a double pair royale for 12");
+    } else if (i) {
+        result = create_cribscore(i,i*2,"%d pairs for %d", i, i*2);
     }
     return result;
 }
