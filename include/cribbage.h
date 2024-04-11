@@ -38,7 +38,7 @@ typedef struct {
 
 typedef struct {
     Deck **decks;
-    int flags; // GameFlags defined in flags.h
+    uint32_t flags; // GameFlags defined in flags.h
     bool pcrib; // Player crib
     bool pturn; // CPU crib
     uint8_t pegP1; // Peg locations Player/Computer

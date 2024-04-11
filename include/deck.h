@@ -46,7 +46,7 @@ typedef enum {
 } CardFlags;
 
 struct Card {
-    int flags;
+    uint32_t flags;
     Card *next;
     Card *prev;
 };

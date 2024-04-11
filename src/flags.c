@@ -20,19 +20,19 @@
 
 #include <flags.h>
 
-bool check_flag(int mask, int flag) {
+bool check_flag(uint32_t mask, uint32_t flag) {
     /* Is flag on? */
     return((mask & flag) == flag);
 }
-void toggle_flag(int *mask, int flag) {
+void toggle_flag(uint32_t *mask, uint32_t flag) {
     /* Toggles flag on/off */
     *mask ^= flag;
 }
-void remove_flag(int *mask, int flag) {
+void remove_flag(uint32_t *mask, uint32_t flag) {
     /* Turns off flag */
     *mask &= ~flag;
 }
-void engage_flag(int *mask, int flag) {
+void engage_flag(uint32_t *mask, uint32_t flag) {
     /* Turns on flag */
     *mask |= flag;
 }

@@ -30,7 +30,7 @@ typedef struct {
     Deck *fromref; // A reference to where a move originates
     Deck *toref; // A reference to where the move is going
     char *msg; // String pointer for messages
-    uint8_t flags; // GameFlags defined in flags.h
+    uint32_t flags; // GameFlags defined in flags.h
     int score; // Current game score
 } Solitaire;
 

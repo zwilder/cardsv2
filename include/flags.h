@@ -21,6 +21,7 @@
 #define FLAGS_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef enum {
     GFL_NONE        = 0,
@@ -39,9 +40,9 @@ typedef enum {
     GFL_CRIBSHOW    = 1 << 9
 } GameFlags;
 
-bool check_flag(int mask, int flag);
-void toggle_flag(int *mask, int flag);
-void remove_flag(int *mask, int flag);
-void engage_flag(int *mask, int flag);
+bool check_flag(uint32_t mask, uint32_t flag);
+void toggle_flag(uint32_t *mask, uint32_t flag);
+void remove_flag(uint32_t *mask, uint32_t flag);
+void engage_flag(uint32_t *mask, uint32_t flag);
 
 #endif //FLAGS_H
