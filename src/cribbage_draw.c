@@ -158,6 +158,7 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
     int x = 0, y = 0, i = 0;
     Deck *deck = NULL;
     Card *cards = NULL;
+    SList *msgs = g_cribbage->msglist;
     CribScore *score = NULL;
     uint8_t board_fg = WHITE; // Might be a settings option in the future?
     uint8_t board_bg = BRIGHT_BLACK;
@@ -247,25 +248,14 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
             cards = cards->next;
         }
 
-        // Draw player table cards
-        deck = g_cribbage->decks[CR_PLAYER_BOARD];
+        // Draw table cards
+        deck = g_cribbage->decks[CR_BOARD];
         cards = deck->cards;
         x = 20;
-        y = 13;
         while(cards) {
-            pt_card(x+xo,y+yo,cards);
+            y = (check_flag(cards->flags,CD_CPU) ? 0 : 13);
             x += 4;
-            cards = cards->next;
-        }
-
-        // Draw cpu table cards
-        deck = g_cribbage->decks[CR_CPU_BOARD];
-        cards = deck->cards;
-        x = 20;
-        y = 0;
-        while(cards) {
             pt_card(x+xo,y+yo,cards);
-            x += 4;
             cards = cards->next;
         }
 
@@ -275,7 +265,22 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
 
         //Draw message/prompt
         if(g_cribbage->msg) {
-            scr_pt_clr(xo,22+yo,WHITE,BLACK,"%s",g_cribbage->msg);
+            scr_pt_clr(xo,19+g_cribbage->msgpos+yo,WHITE,BLACK,"%s",g_cribbage->msg);
+        }
+        // This would be cool if it worked...
+        // Basically, it SHOULD print a "scrolling" list of messages, ideally
+        // with the "older" (anything other than the last) in BRIGHT_BLACK, so
+        // that the newest message stands out and it looks like a "scrolling"
+        // terminal
+        i = 0;
+        while(msgs) {
+            if(msgs->next) {
+                scr_pt_clr(xo,19+i+yo,WHITE,BLACK,"%s",msgs->data);
+            } else {
+                scr_pt_clr(xo,19+i+yo,BRIGHT_WHITE,BLACK,"%s",msgs->data);
+            }
+            i += 1;
+            msgs = msgs->next;
         }
     }
 
@@ -299,16 +304,14 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
             " . ..... ..... ..... ..... ..... ..... ");
 
     //Draw CPU pegs
-    // TODO: This should go off of pegC1, pegC2 not cScore
-    cribbage_draw_peg(22,58,6,g_cribbage->cScore,BRIGHT_RED);
-    //cribbage_draw_peg(22,58,6,g_cribbage->pegC1,BRIGHT_RED);
-    //cribbage_draw_peg(22,58,6,g_cribbage->pegC2,RED);
+    //cribbage_draw_peg(22,58,6,g_cribbage->cScore,BRIGHT_RED);
+    cribbage_draw_peg(22,58,6,g_cribbage->pegC2,BRIGHT_RED);
+    cribbage_draw_peg(22,58,6,g_cribbage->pegC1,BRIGHT_RED);
 
     //Draw player pegs 
-    // TODO: This should go off of pegP1, pegP2 not cScore
-    cribbage_draw_peg(22,58,9,g_cribbage->pScore,BRIGHT_GREEN);
-    //cribbage_draw_peg(22,58,6,g_cribbage->pegP1,BRIGHT_GREEN);
-    //cribbage_draw_peg(22,58,6,g_cribbage->pegP2,GREEN);
+    //cribbage_draw_peg(22,58,9,g_cribbage->pScore,BRIGHT_GREEN);
+    cribbage_draw_peg(22,58,9,g_cribbage->pegP2,BRIGHT_GREEN);
+    cribbage_draw_peg(22,58,9,g_cribbage->pegP1,BRIGHT_GREEN);
 
     //Draw scores
     scr_pt_clr(62+xo,6+yo,WHITE,BLACK,"%d",g_cribbage->cScore);

@@ -1,6 +1,6 @@
 /*
 * Toolbox
-* Copyright (C) Zach Wilder 2022-2023
+* Copyright (C) Zach Wilder 2022-2024
 * 
 * This file is a part of Toolbox
 *
@@ -28,16 +28,31 @@
  * length of the string. Portable outside of this project. 
  *******/
 
-SList* create_slist(char *s) {
+SList* create_slist(char *s, ...) {
     /* Create a SList node, calculate the length of string s (don't forget the
      * \0 at the end!), store both the string and the length, and return the
      * node.
      */
     SList *node = malloc(sizeof(SList));
-    node->data = malloc(sizeof(char) * (strlen(s) + 1));
-    strcpy(node->data, s);
-    node->length = strlen(s);
+    int i = 0;
+    va_list args;
+    va_start(args,s);
+    i = vsnprintf(NULL,0,s,args); // Get size without writing
+    va_end(args);
+    i += 1; // +1 for '\0'
+    node->data = malloc(sizeof(char) * i);
+    if(!node->data) {
+        // If for some reason malloc fails, free the node
+        free(node);
+        va_end(args);
+        return NULL;
+    }
+    va_start(args,s);
+    vsnprintf(node->data,i,s,args);
+    node->length = strlen(node->data);
     node->next = NULL;
+
+    va_end(args);
     return node;
 }
 
@@ -83,10 +98,31 @@ void destroy_slist(SList **head) {
     }
 }
 
-void slist_push(SList **head, char *s) {
+void slist_push(SList **head, char *s,...) {
     /* Push a new node onto the SList, containing string s */
-    SList *newNode = create_slist(s);
-    SList *tmp;
+    if(!s) return;
+    SList *newNode = malloc(sizeof(SList));
+    SList *tmp = NULL;
+    int i = 0;
+
+    va_list args;
+    va_start(args,s);
+    i = vsnprintf(NULL,0,s,args); // Get size without writing
+    va_end(args);
+    i += 1; // +1 for '\0'
+    newNode->data = malloc(sizeof(char) * i);
+    if(!newNode->data) {
+        // If for some reason malloc fails, free the node
+        free(newNode);
+        va_end(args);
+        return;
+    }
+    va_start(args, s);
+    vsnprintf(newNode->data,i,s,args);
+    va_end(args);
+    newNode->length = strlen(newNode->data);
+    newNode->next = NULL;
+
     if(!(*head)) {
         *head = newNode;
         return;
@@ -123,6 +159,14 @@ void slist_push_node(SList **head, SList *s) {
         tmp = tmp->next;
     }
     tmp->next = s;
+}
+
+SList* slist_pop_node(SList **head) {
+    if(!(*head)) return NULL;
+    SList *result = *head;
+    *head = (*head)->next;
+    result->next = NULL;
+    return result;
 }
 
 int slist_count(SList *node) {

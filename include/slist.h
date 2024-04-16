@@ -1,6 +1,6 @@
 /*
 * Toolbox
-* Copyright (C) Zach Wilder 2022-2023
+* Copyright (C) Zach Wilder 2022-2024
 * 
 * This file is a part of Toolbox
 *
@@ -35,13 +35,14 @@ typedef struct SList SList;
 /*******************
  * slist.c functions
  *******************/
-SList* create_slist(char *s);
+SList* create_slist(char *s, ...);
 SList* create_slist_blank(int strsize);
 void destroy_slist(SList **head);
 
 void slist_push_blank(SList **head, int strsize);
-void slist_push(SList **head, char *s);
+void slist_push(SList **head, char *s, ...);
 void slist_push_node(SList **head, SList *s);
+SList* slist_pop_node(SList **head);
 int slist_count(SList *node);
 int slist_count_chars(SList *node, bool incSpace); 
 char* slist_get_string(SList *node);

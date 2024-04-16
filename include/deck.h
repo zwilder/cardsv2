@@ -42,7 +42,9 @@ typedef enum {
     CD_S        = 1 << 15,
     CD_C        = 1 << 16,
     CD_D        = 1 << 17,
-    CD_UP       = 1 << 18
+    CD_UP       = 1 << 18,
+    CD_PLAYER   = 1 << 19,
+    CD_CPU      = 1 << 20
 } CardFlags;
 
 struct Card {

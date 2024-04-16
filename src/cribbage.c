@@ -55,6 +55,14 @@ bool cribbage_init(void) {
     g_cribbage->cScore = 0;
     g_cribbage->count = 0;
     g_cribbage->msg = NULL;
+    g_cribbage->msglist = NULL;
+
+    //g_cribbage->msglist = create_slist("First message. %d",1001);
+    //slist_push(&(g_cribbage->msglist), "Second message. %d",2);
+    //slist_push(&(g_cribbage->msglist), "Third message. %d",3);
+    //slist_push(&(g_cribbage->msglist), "Fourth message. %d",4);
+
+    g_cribbage->msgpos = 0;
     g_cribbage->flags = GFL_NONE;
 
     // Put 52 cards in the stock, and shuffle it
@@ -62,6 +70,9 @@ bool cribbage_init(void) {
     shuffle_deck(g_cribbage->decks[CR_STOCK]);
 
     // Deal the cards, draw the cards, enter the loop
+    // cut deck to see who goes first here maybe?
+    g_cribbage->pcrib = true; 
+    g_cribbage->pturn = false;
     cribbage_deal();
     cribbage_draw();
     cribbage_loop();
@@ -108,31 +119,14 @@ void cribbage_cleanup(void) {
         g_cribbage->msg = NULL;
     }
 
+    if(g_cribbage->msglist) {
+        destroy_slist(&g_cribbage->msglist);
+    }
+
     if(g_cribbage) {
         free(g_cribbage);
         g_cribbage = NULL;
     }
-}
-
-void cribbage_deal(void) {
-    int i = 0;
-    Deck *stock = g_cribbage->decks[CR_STOCK];
-    Deck *playerhand = g_cribbage->decks[CR_PLAYER];
-    Deck *cpuhand = g_cribbage->decks[CR_CPU];
-    g_cribbage->pcrib = true; // May eventually have a "cut the deck" see who goes first thing
-    g_cribbage->pturn = false;
-
-    // Give 6 cards to the player, 6 cards to the cpu
-    for(i = 0; i < 6; i++) {
-        draw_card(stock,playerhand);
-        draw_card(stock,cpuhand);
-    }
-        
-    //merge_sort_cards(&(playerhand->cards), false);
-    merge_sort_deck(playerhand);
-    cribbage_msg("Choose two cards to add to %s crib:", 
-            (g_cribbage->pcrib ? "your" : "the computer\'s"));
-    g_cribbage->flags |= GFL_DRAW | GFL_CRIBDISC;
 }
 
 void cribbage_loop(void) {
@@ -163,10 +157,19 @@ void cribbage_loop(void) {
         while(lag >= msperframe) {
             lag -= msperframe;
         }
+        if(check_flag(g_cribbage->flags,GFL_PAUSE)) {
+            // In case I need to pause the loop? Might be a good idea or a
+            // terrible idea. A better implementation would just loop, skipping
+            // the regular update/events and then end when the user enters a
+            // keypress. Update: No shocker here, it doesn't work well
+            //cribbage_prompt("Press any key to continue...");
+            g_cribbage->flags &= ~GFL_PAUSE;
+        }
     }
 }
 
 void cribbage_msg(char *fstr, ...) {
+    /*
     if(g_cribbage->msg) {
         free(g_cribbage->msg);
         g_cribbage->msg = NULL;
@@ -178,6 +181,33 @@ void cribbage_msg(char *fstr, ...) {
     g_cribbage->msg = malloc(sizeof(char) * i);
     vsnprintf(g_cribbage->msg,i,fstr,args);
     va_end(args);
+    */
+    // Cribbage should maintain an SList of messages, and then print all of them
+    // in order on the screen
+    
+    if(!fstr) return;
+    SList *tmp = NULL;
+    char *msg = NULL;
+    va_list args;
+    va_start(args, fstr);
+    int i = vsnprintf(NULL, 0, fstr, args);
+    va_end(args);
+    i += 1;
+    msg = malloc(sizeof(char) * i);
+    if(!msg) return;
+    va_start(args,fstr);
+    vsnprintf(msg, i, fstr, args);
+    va_end(args);
+
+    g_cribbage->msgpos += 1;
+    if(g_cribbage->msgpos > 4) {
+        tmp = slist_pop_node(&g_cribbage->msglist);
+        destroy_slist(&tmp);
+        slist_push(&g_cribbage->msglist,"%s",msg);
+    } else {
+        slist_push(&g_cribbage->msglist,"%s",msg);
+    }
+    free(msg);
 }
 
 char cribbage_prompt(char *fstr, ...) {

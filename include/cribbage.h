@@ -22,11 +22,10 @@
 
 typedef enum {
     CR_PLAYER           = 0,
-    CR_PLAYER_BOARD,
     CR_CPU,
-    CR_CPU_BOARD,
     CR_CRIB,
     CR_STOCK,
+    CR_BOARD,
     CR_NUM_DECKS
 } CribbageDecks;
 
@@ -50,6 +49,8 @@ typedef struct {
     uint8_t count; // Value on table
     Button **btns;
     char *msg; 
+    SList *msglist;
+    uint8_t msgpos;
 } Cribbage;
 
 extern Cribbage *g_cribbage;
@@ -58,7 +59,6 @@ extern Cribbage *g_cribbage;
  *****/
 bool cribbage_init(void);
 void cribbage_cleanup(void);
-void cribbage_deal(void);
 void cribbage_msg(char *fstr, ...);
 char cribbage_prompt(char *fstr, ...);
 void cribbage_loop(void);
@@ -72,6 +72,7 @@ void cribbage_events(void);
  * cribbage_update.c
  *****/
 void cribbage_update(void);
+void cribbage_deal(void);
 
 /*****
  * cribbage_draw.c
