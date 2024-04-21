@@ -132,6 +132,18 @@ void fill_deck(Deck *deck) {
     }
 }
 
+Card* search_cards(Card *cards, int cflags) {
+    if(!cards) return NULL;
+    Card *result = cards;
+    while(result) {
+        if(check_flag(result->flags,cflags)) {
+            break;
+        }
+        result = result->next;
+    }
+    return result;
+}
+
 Card* search_deck(Deck *deck, int cflags) {
     if(!deck) return NULL;
     if(!deck->cards) return NULL;
@@ -295,6 +307,10 @@ bool card_same_suite(int a, int b) {
     return (get_suite(a) == get_suite(b));
 }
 
+bool card_same_rank(int a, int b) {
+    return(get_rank(a) == get_rank(b));
+}
+
 bool card_in_asc_sequence(int a, int b) {
     // Is the value of card 'a' exactly one higher than card 'b'?
     return (get_rank(a) == get_rank(b) + 1);
@@ -391,6 +407,27 @@ int get_suite_flag(int card) {
     return (card & 
             ~(CD_A | CD_2 | CD_3 | CD_4 | CD_5 | CD_6 | 
               CD_7 | CD_8 | CD_9 | CD_10 | CD_J | CD_Q | CD_K));
+}
+
+uint32_t rank_to_cflag(int rank) {
+    uint32_t result = CD_NONE;
+    switch(rank) {
+        case 1: result = CD_A; break;
+        case 2: result = CD_2; break;
+        case 3: result = CD_3; break;
+        case 4: result = CD_4; break;
+        case 5: result = CD_5; break;
+        case 6: result = CD_6; break;
+        case 7: result = CD_7; break;
+        case 8: result = CD_8; break;
+        case 9: result = CD_9; break;
+        case 10: result = CD_10; break;
+        case 11: result = CD_J; break;
+        case 12: result = CD_Q; break;
+        case 13: result = CD_K; break;
+        default: result = CD_NONE; break;
+    }
+    return result;
 }
 
 char* get_card_str(Card *card) {

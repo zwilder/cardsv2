@@ -86,6 +86,7 @@ int cribbage_card_value(int card);
 CribScore* create_cribscore(int qty, int pts, char *msg,...);
 void destroy_cribscore(CribScore *score);
 CribScore* score_cribbage_hand(Card *hand, Card *flop);
+CribScore* score_cribbage_play(Deck *deck);
 CribScore* count_runs(Card *hand, Card *flop);
 CribScore* count_flush(Card *hand, Card *flop);
 CribScore* count_15s(Card *hand, Card *flop);

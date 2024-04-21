@@ -17,6 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <ctype.h>
 #include <cards.h>
 
 bool cribbage_check_go(Deck *deck);
@@ -208,13 +209,49 @@ void cribbage_update_count(void) {
      */
     Deck *board = g_cribbage->decks[CR_BOARD];
     Card *card = get_last_card(board);
+    int score = 0;
+    char *msg = malloc(80*sizeof(char));
+    CribScore *boardscore = NULL;
+    msg[0] = '\0';
     // Last card will never break 31 because both players are checked for valid
     // cards before this function is called. Theoretically. I should probably
     // add some error checking here.
+    // Update count
     g_cribbage->count += cribbage_card_value(card->flags);
-    cribbage_msg("%s: %d",
+    // Check 15/31
+    if(15 == g_cribbage->count) {
+        score += 2;
+        snprintf(msg,80,"15 for %d!", score);
+    } else if (31 == g_cribbage->count) {
+        score += 2;
+        snprintf(msg,80,"31 for 2!");
+    }
+    // Check boardscore (runs and pairs)
+    boardscore = score_cribbage_play(board);
+    if(boardscore) {
+        score += boardscore->pts;
+    }
+    // Add points
+    cribbage_add_points(score,g_cribbage->pturn);
+    // Format and send cribbage msg
+    if(boardscore) {
+        // Runs, pairs, and/or 15/31.
+        boardscore->msg[0] = toupper(boardscore->msg[0]);
+        cribbage_msg("%s: %d. %s %s",
+            (g_cribbage->pturn ? "You" : "CPU"),
+            g_cribbage->count, boardscore->msg, msg);
+    } else if (score) {
+        // 15/31
+        cribbage_msg("%s: %s",
+            (g_cribbage->pturn ? "You" : "CPU"),
+            msg);
+    } else {
+        // Nada
+        cribbage_msg("%s: %d",
             (g_cribbage->pturn ? "You" : "CPU"),
             g_cribbage->count);
+    }
+    free(msg);
 }
 
 bool cribbage_check_go(Deck *deck) {
@@ -272,6 +309,9 @@ void cribbage_update_play(void) {
             }
             pcard = g_cribbage->decks[CR_BOARD]->cards;
         }
+        merge_sort_deck(g_cribbage->decks[CR_PLAYER]);
+        merge_sort_deck(g_cribbage->decks[CR_CPU]);
+        merge_sort_deck(g_cribbage->decks[CR_CRIB]);
         return;
     }
 
@@ -280,6 +320,7 @@ void cribbage_update_play(void) {
         //Check if player has a go
         if(cribbage_check_go(pdeck)) {
             cribbage_msg("You: Go.");
+            //cribbage_prompt("You: Go. (Press any key)");
             g_cribbage->pturn = false;
             g_cribbage->flags |= GFL_DRAW;
             return;
@@ -324,6 +365,7 @@ void cribbage_update_play(void) {
         g_cribbage->flags |= GFL_DRAW;
         if(cribbage_check_go(cdeck)) {
             cribbage_msg("CPU: Go.");
+            //cribbage_prompt("CPU: Go. (Press any key)");
         } else {
             cribbage_cpu_play();
             cribbage_update_count();
@@ -332,25 +374,31 @@ void cribbage_update_play(void) {
     }
     // Check to see if both players have a go
     if(cribbage_check_go(cdeck) && cribbage_check_go(pdeck)) {
-        //reset count to 0, last person who played a card gets a point (2 if
-        //count is 31), and set g_cribbage->lastcard to last card played.
+        //reset count to 0, last person who played a card gets a point (31s are
+        //counted in update_count)        
         pcard = get_last_card(g_cribbage->decks[CR_BOARD]);
         player = check_flag(pcard->flags, CD_PLAYER);
         if(player && g_cribbage->pturn) {
             // Player's turn and last card played was player or
             // CPU's turn and last card played was CPU
             // This give's the other player an opportunity to say "go"
+            // TODO: This logic doesn't work out. Saying "go" is skipped most
+            // times, but not all times. Problem is likely that this function is
+            // chungus and does too many things.
+            g_cribbage->pturn = !g_cribbage->pturn;
         } else {
-            i = 1;
-            if(g_cribbage->count == 31) {
-                cribbage_msg("%s: 31 for 2!", (player ? "You" : "CPU"));
-                i = 2;
-            } else {
-                cribbage_msg("%s: last for 1.", (player ? "You" : "CPU"));
+            if(g_cribbage->count != 31) {
+                cribbage_msg("%s: Last for 1.", (player ? "You" : "CPU"));
+                cribbage_add_points(1,player);
             }
-            cribbage_add_points(i,player);
             g_cribbage->count = 0;
             g_cribbage->flags |= GFL_DRAW;
+        }
+        // Turn all cards in CR_BOARD inactive - CD_UP
+        pcard = g_cribbage->decks[CR_BOARD]->cards;
+        while(pcard) {
+            pcard->flags |= CD_UP;
+            pcard = pcard->next;
         }
     }
 
