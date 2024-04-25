@@ -43,6 +43,7 @@ void cribbage_deal(void) {
     
     // Switch who has the crib
     g_cribbage->pcrib = !g_cribbage->pcrib;
+    g_cribbage->pturn = !g_cribbage->pcrib;
 
     // Put all the cards back in the stock
     add_deck(playerhand,stock);
@@ -168,21 +169,52 @@ void cribbage_cpu_play(void) {
     Deck *board = g_cribbage->decks[CR_BOARD];
     Deck *cpuhand = g_cribbage->decks[CR_CPU];
     Card *card = NULL;
+    Card *choice = NULL;
     int numcards = count_cards(cpuhand->cards);
     int i = mt_rand(0,numcards-1); // -1 because 0 indexed
-    card = get_card_at(cpuhand,i);
+    int priority = 0;
+    //card = get_card_at(cpuhand,i);
     if(cribbage_check_go(cpuhand)) {
         // This should never happen.
         cribbage_msg("CPU: I uh, don't have any cards to play boss.");
         return;
     }
-    while((cribbage_card_value(card->flags) + g_cribbage->count) > 31) {
-        i = mt_rand(0,numcards-1);
-        card = get_card_at(cpuhand,i);
+    card = cpuhand->cards;
+    while(card) {
+        if((cribbage_card_value(card->flags) + g_cribbage->count) == 31) {
+            // Check to see if any of the CPU's cards can be played to make 31
+            if(priority < 5) {
+                priority = 5;
+                choice = card;
+            }
+        } else if ((cribbage_card_value(card->flags) 
+                    + g_cribbage->count) == 15) {
+            // Check to see if any of the CPU's cards can be played to make 15
+            if(priority < 4) {
+                priority = 4;
+                choice = card;
+            }
+        } else if(get_last_card(board)) {
+            // Check for pairs
+            if(get_rank(card->flags) == get_rank(get_last_card(board)->flags)) {
+                if(priority < 2) {
+                    priority = 2;
+                    choice = card;
+                }
+            }
+            // Check for runs
+            // Check for cards that make 10, 21, or 5 (and don't play those)
+        }
+        card = card->next;
     }
-    add_card_to_deck(board, 
-            remove_card_from_deck(cpuhand,
-                get_card_at(cpuhand,i)));
+    if(!choice) {
+        choice = get_card_at(cpuhand,i);
+        while((cribbage_card_value(choice->flags) + g_cribbage->count) > 31) {
+            i = mt_rand(0,numcards-1);
+            choice = get_card_at(cpuhand,i);
+        }
+    }
+    add_card_to_deck(board, remove_card_from_deck(cpuhand,choice));
 }
 
 void cribbage_update_count(void) {

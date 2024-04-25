@@ -71,8 +71,8 @@ bool cribbage_init(void) {
 
     // Deal the cards, draw the cards, enter the loop
     // cut deck to see who goes first here maybe?
-    g_cribbage->pcrib = true; 
-    g_cribbage->pturn = false;
+    g_cribbage->pcrib = false; 
+    g_cribbage->pturn = true;
     cribbage_deal();
     cribbage_draw();
     cribbage_loop();

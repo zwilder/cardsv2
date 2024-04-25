@@ -198,9 +198,16 @@ CribScore* score_cribbage_play(Deck *deck) {
         result = create_cribscore(1,score, "%s for %d!",buf,score);
     }
     // Check to see if this card and the card before it are in sequence, if so
-    // update the run counter (TODO: Since a run can be completed out of
-    // sequence - eg playing a 6 on a 7 5 creates a run of three. We need to try
-    // something else.)
+    // update the run counter 
+    // TODO: This still has quirks to work out. 
+    //  - '5 3 4 2' returned a run of four appropriately, then the next card '3'
+    //    didn't return any run (should have returned run of 3). 
+    //  - It doesn't check to make sure all cards in the run are connected to
+    //    all other cards.
+    //  - It doesn't count runs if the last card played completes the run
+    //    (possibly related to the first bullet)
+    //(TODO: note, test to see if this works when multiples of the same rank are
+    //on the board)
     if(card->prev && p == 0) {
         // Build matrix
         for(tmp = card; tmp; tmp = tmp->prev) {
@@ -246,8 +253,6 @@ CribScore* score_cribbage_play(Deck *deck) {
             for(x = rs; x <= re; x++) {
                 flags = rank_to_cflag(x + 1);
                 if(search_deck(deck,flags) == card->prev) {
-                    //(TODO: note, test to see if this works when multiples of
-                    //the same rank are on the board)
                     prevrun = true;
                 }
                 if(search_deck(deck,flags) == card) {

@@ -248,6 +248,19 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
             cards = cards->next;
         }
 
+        // Draw cpu hand (for testing purposes)
+        deck = g_cribbage->decks[CR_CPU];
+        cards = deck->cards;
+        x = 54;
+        y = 0;
+        i = 0;
+        while(cards) {
+            pt_card(x+xo,y+yo,cards);
+            x += 4;
+            i += 1;
+            cards = cards->next;
+        }
+
         // Draw table cards
         deck = g_cribbage->decks[CR_BOARD];
         cards = deck->cards;
