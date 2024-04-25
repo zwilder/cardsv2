@@ -173,7 +173,6 @@ void cribbage_cpu_play(void) {
     int numcards = count_cards(cpuhand->cards);
     int i = mt_rand(0,numcards-1); // -1 because 0 indexed
     int priority = 0;
-    //card = get_card_at(cpuhand,i);
     if(cribbage_check_go(cpuhand)) {
         // This should never happen.
         cribbage_msg("CPU: I uh, don't have any cards to play boss.");
@@ -221,24 +220,6 @@ void cribbage_update_count(void) {
     // Count the value of cards on the table, adding points to the person who
     // played the last card if applicable, and resetting the count to 0 if both
     // players are "go"
-    /*
-     * This function needs to check which card was just played to the board
-     * (last card in CPU_BOARD if !pturn, in PLAYER_BOARD if pturn), and compare
-     * it to the card last played to the board (last card in CPU_BOARD if pturn,
-     * last card in PLAYER_BOARD if !pturn). If it's an invalid move (makes
-     * count exceed 31) return false. If it's a valid move, check to see if it
-     * makes count 15 or 31 grant points. Check for runs, check for pairs/three
-     * of a kind/four of a kind, grant points. If it's 31, reset count to 0 -
-     * remember last card in that series so stop looking when we reach it when
-     * analyzing cards (maybe this needs to be a Card* in Cribbage?)
-     *
-     * Idea: What if I used card flags? Turn cards "inactive" (CD_UP) when both players
-     * are a go, use one deck for the "board" (with a flag CD_PLAYER/CD_CPU on
-     * each card to show who it belonged to/where it needs to be drawn), last
-     * card played would always be the head of the deck->cards list (in a shared
-     * deck)... I think that solves ALL the problems and would require the least
-     * amount of "new" code to implement.
-     */
     Deck *board = g_cribbage->decks[CR_BOARD];
     Card *card = get_last_card(board);
     int score = 0;

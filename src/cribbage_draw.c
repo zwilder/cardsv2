@@ -249,6 +249,7 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
         }
 
         // Draw cpu hand (for testing purposes)
+        /*
         deck = g_cribbage->decks[CR_CPU];
         cards = deck->cards;
         x = 54;
@@ -260,6 +261,7 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
             i += 1;
             cards = cards->next;
         }
+        */
 
         // Draw table cards
         deck = g_cribbage->decks[CR_BOARD];

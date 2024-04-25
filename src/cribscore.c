@@ -125,6 +125,16 @@ CribScore* score_cribbage_hand(Card *hand, Card *flop) {
     return result;
 }
 
+int count_consecutive(const bool seenRanks[], int lr, int hr, int max) {
+    // Assistance function for counting runs
+    int count = 0, i = 0;
+    for(i = lr; i <= hr; i++) {
+        if(!seenRanks[i]) break;
+        count++;
+    }
+    return count;
+}
+
 CribScore* score_cribbage_play(Deck *deck) {
     /*
      * Need to look through the ACTIVE cards in the deck for:
@@ -132,48 +142,31 @@ CribScore* score_cribbage_play(Deck *deck) {
      *  - Pairs
      * Unlike the other cribscore functions, the order of the cards matters - a
      * run only counts if it is in an unbroken sequence. 
-     * Note: Should never have both pairs and runs, because that doesn't make
-     * sense.
-     *
-     * What if we construct a matrix when score_cribbage_play is called - we
-     * need to ...
-     *   A-2-3-4-5-6-7-8-9-T-J-Q-K
-     * H|0 0 0 0 0 0 0 0 0 0 0 0 0
-     * S|0 0 0 0 0 0 0 0 0 0 0 0 0
-     * D|0 0 0 0 0 0 0 0 0 0 0 0 0
-     * C|0 0 0 0 0 0 0 0 0 0 0 0 0
-     * T|0 0 0 0 0 0 0 0 0 0 0 0 0
      */
     if(!deck) return NULL;
     CribScore *result = NULL;
     Card *card = get_last_card(deck);
     Card *tmp = NULL;
-    uint8_t matrix[13] = { 0 }; // For checking runs
-    int p = 0; // 'r'uns and 'p'airs counters
-    int x,cur,prev,r,br,rs,re; // r/br/rs/re: run/best run/run start/run end.
-    uint32_t flags = CD_NONE;
-    bool prevrun = false, currun = false;
+    int p = 0; // 'p'air counters
+    int cr = get_rank(card->flags); //current rank
+    int lr = cr; //lowest rank
+    int hr = cr; //highest rank
+    int ls = -1; //longest sequence
+    int seqlen = 0;
+    bool seenRanks[14] = {false}; // Ranks start at 1, not 0, so 14 for 13 ranks.
+    seenRanks[cr] = true;
     int score = 0;
     char *buf = malloc(80*sizeof(char));
     buf[0] = '\0';
-    // Look for pairs (ugly brute force)
+    // Look for pairs
     if(card->prev) {
-        if(card_same_rank(card->flags, card->prev->flags) &&
-                !check_flag(card->prev->flags,CD_UP)) {
-            p += 1;
-            if(card->prev->prev) {
-                if(card_same_rank(card->flags, card->prev->prev->flags) && 
-                        !check_flag(card->prev->flags,CD_UP)) {
-                    p += 1;
-                    if(card->prev->prev->prev) {
-                        if(card_same_rank(card->flags, 
-                                    card->prev->prev->prev->flags) && 
-                                    !check_flag(card->prev->flags,CD_UP)){
-                            p += 1;
-                        }
-                    }
-                }
-            }
+        tmp = card->prev;
+        while(tmp && card_same_rank(tmp->flags, card->flags) && !check_flag(tmp->flags, CD_UP)) {
+            // Loop backwards through cards, incrementing counter while there
+            // still is a backwards card AND it has the same rank as the current
+            // card AND its an active card
+            p += 1;    
+            tmp = tmp->prev;
         }
     }
 
@@ -197,72 +190,37 @@ CribScore* score_cribbage_play(Deck *deck) {
         }
         result = create_cribscore(1,score, "%s for %d!",buf,score);
     }
-    // Check to see if this card and the card before it are in sequence, if so
-    // update the run counter 
-    // TODO: This still has quirks to work out. 
-    //  - '5 3 4 2' returned a run of four appropriately, then the next card '3'
-    //    didn't return any run (should have returned run of 3). 
-    //  - It doesn't check to make sure all cards in the run are connected to
-    //    all other cards.
-    //  - It doesn't count runs if the last card played completes the run
-    //    (possibly related to the first bullet)
-    //(TODO: note, test to see if this works when multiples of the same rank are
-    //on the board)
-    if(card->prev && p == 0) {
-        // Build matrix
-        for(tmp = card; tmp; tmp = tmp->prev) {
-            // Loop backwards through cards, adding them to the matrix
-            if(!check_flag(tmp->flags, CD_UP)) {
-                x = get_rank(tmp->flags) - 1;
-                matrix[x] += 1;
-            } else {
-                // Stop when we hit an inactive card
-                break;
+    // Check for runs
+    // I'm using the same method that is used in BSD Cribbage here. Basically,
+    // it goes as follows:
+    // - Check to make sure theres enough cards on the table for a run
+    // - Loop backwards through the (active) cards, starting with the one before
+    //   the last card played.
+    // - Keep track of which ranks have been seen (in the boolean array
+    //   seenRanks), the highest rank seen (hr), and the lowest rank seen (lr)
+    // - Each loop, count the consecutive cards (using the helper function
+    //   count_consecutive). If the number of consecutive cards is higher than
+    //   the longest sequence seen, make that the longest sequence seen.
+    if(count_cards(deck->cards) > 2) {
+        tmp = card->prev;
+        while(tmp && !check_flag(tmp->flags, CD_UP)) {
+            if(seenRanks[get_rank(tmp->flags)]) break;
+            seenRanks[get_rank(tmp->flags)] = true;
+            if(get_rank(tmp->flags) < lr) {
+                lr = get_rank(tmp->flags);
             }
+            if(get_rank(tmp->flags) > hr) {
+                hr = get_rank(tmp->flags);
+            }
+            seqlen = count_consecutive(seenRanks, lr, hr, 14);
+            if(seqlen > ls) {
+                ls = seqlen;
+            }
+            tmp = tmp->prev;
         }
-        // Look for runs
-        br = r = 1;
-        cur = 0;
-        prev = matrix[0]; // Start at 1, so the previous is 0
-        for(x = 1; x < 13; x++) {
-            cur = matrix[x];
-            if(cur && prev) {
-                if(r == 1) {
-                    rs = x - 1;
-                }
-                r++;
-            } else {
-                if(r > br) {
-                    br = r;
-                    re = x - 1;
-                }
-                r = 1;
-            }
-            prev = cur;
-        }
-        if(r > br) {
-            br = r;
-            re = x - 1;
-        }
-        // Check to see if card is any of the cards in the run
-        // (if the run exists, br >= 3)
-        if(br >= 3) {
-            // Look at ranks between rs and re, find cards of those ranks, and
-            // see if card->prev == card
-            // Need card to be part of run AND card->prev to be part of run
-            for(x = rs; x <= re; x++) {
-                flags = rank_to_cflag(x + 1);
-                if(search_deck(deck,flags) == card->prev) {
-                    prevrun = true;
-                }
-                if(search_deck(deck,flags) == card) {
-                    currun = true;
-                }
-            }
-            if(prevrun && currun) {
-                if(result) destroy_cribscore(result);
-                result = create_cribscore(1,br, "run of %d for %d!",br,br);
-            }
+        if(ls > 2) {
+            if(result) destroy_cribscore(result);
+            result = create_cribscore(1,ls, "run of %d for %d!",ls,ls);
         }
     }
     free(buf);
