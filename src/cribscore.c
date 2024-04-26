@@ -23,21 +23,9 @@
 
 /*
  * Most of this file was written for the original Cards project - it worked well
- * there, and I see no reason (currently) to not reuse it.
- *
- * Modifications from the original project:
- *  - "Deck" linked list object is now "Card" linked list object
- *  - "->card" on Deck object replaced with "->flags" on Card object
- *  - count_deck() replaced with count_cards()
- *  - get_cribbage_card_value() replaced with cribbage_card_value()
- *  - get_value() replaced with get_rank()
- *  - Checking if two cards have the same suite by calling "get_card_ch(A) ==
- *    get_card_ch(B)" replaced with the much more gooder "card_same_suite(A,B)"
- *  - score_cribbage_hand returns a CribScore with the message and point value
- *    instead of printing directly on the screen. 
- *  - count_15s now prints the number of fifteens as a word and not a number
- *  - count_15s fixed to include all combinations of cards (I missed a couple in
- *    the brute force counting originally).
+ * there, and I see no reason (currently) to not reuse it. There are **many**
+ * modifications and improvements throughout the file from the original project,
+ * and everything appears to be in good working order now.
  */
 
 int cribbage_card_value(int card) {
@@ -125,16 +113,6 @@ CribScore* score_cribbage_hand(Card *hand, Card *flop) {
     return result;
 }
 
-int count_consecutive(const bool seenRanks[], int lr, int hr, int max) {
-    // Assistance function for counting runs
-    int count = 0, i = 0;
-    for(i = lr; i <= hr; i++) {
-        if(!seenRanks[i]) break;
-        count++;
-    }
-    return count;
-}
-
 CribScore* score_cribbage_play(Deck *deck) {
     /*
      * Need to look through the ACTIVE cards in the deck for:
@@ -147,6 +125,7 @@ CribScore* score_cribbage_play(Deck *deck) {
     CribScore *result = NULL;
     Card *card = get_last_card(deck);
     Card *tmp = NULL;
+    int i = 0, j = 0;
     int p = 0; // 'p'air counters
     int cr = get_rank(card->flags); //current rank
     int lr = cr; //lowest rank
@@ -163,7 +142,7 @@ CribScore* score_cribbage_play(Deck *deck) {
         tmp = card->prev;
         while(tmp && card_same_rank(tmp->flags, card->flags) && !check_flag(tmp->flags, CD_UP)) {
             // Loop backwards through cards, incrementing counter while there
-            // still is a backwards card AND it has the same rank as the current
+            // still is a previous card AND it has the same rank as the current
             // card AND its an active card
             p += 1;    
             tmp = tmp->prev;
@@ -191,36 +170,39 @@ CribScore* score_cribbage_play(Deck *deck) {
         result = create_cribscore(1,score, "%s for %d!",buf,score);
     }
     // Check for runs
-    // I'm using the same method that is used in BSD Cribbage here. Basically,
-    // it goes as follows:
-    // - Check to make sure theres enough cards on the table for a run
-    // - Loop backwards through the (active) cards, starting with the one before
-    //   the last card played.
-    // - Keep track of which ranks have been seen (in the boolean array
-    //   seenRanks), the highest rank seen (hr), and the lowest rank seen (lr)
-    // - Each loop, count the consecutive cards (using the helper function
-    //   count_consecutive). If the number of consecutive cards is higher than
-    //   the longest sequence seen, make that the longest sequence seen.
     if(count_cards(deck->cards) > 2) {
+        // Loop backwards through cards on table, starting before the last card
+        // played
         tmp = card->prev;
         while(tmp && !check_flag(tmp->flags, CD_UP)) {
-            if(seenRanks[get_rank(tmp->flags)]) break;
-            seenRanks[get_rank(tmp->flags)] = true;
-            if(get_rank(tmp->flags) < lr) {
-                lr = get_rank(tmp->flags);
+            j = get_rank(tmp->flags);
+            if(seenRanks[j]) break; // If we hit a pair, it's not a sequence
+            seenRanks[j] = true; // Flip the current rank to true
+            // Check to see if this is the lowest rank...
+            if(j < lr) {
+                lr = j;
             }
-            if(get_rank(tmp->flags) > hr) {
-                hr = get_rank(tmp->flags);
+            // Check to see if this is the highest rank
+            if(j > hr) {
+                hr = j;
             }
-            seqlen = count_consecutive(seenRanks, lr, hr, 14);
-            if(seqlen > ls) {
-                ls = seqlen;
+            // Starting at the lowest rank, going to highest, increment i
+            for(i = lr; i <= hr; i++) {
+                if(!seenRanks[i]) break; // break when we've seen rank i
+            }
+            // If i is greater than the highest rank, update the longest
+            // sequence. This only happens if everything from lowest to highest
+            // is in sequence.
+            if(i > hr) {
+                // longest = highest rank - lowest rank + 1 (for the last card
+                // played)
+                ls = hr - lr + 1;
             }
             tmp = tmp->prev;
         }
         if(ls > 2) {
             if(result) destroy_cribscore(result);
-            result = create_cribscore(1,ls, "run of %d for %d!",ls,ls);
+            result = create_cribscore(1,ls,"run of %d!", ls);
         }
     }
     free(buf);
