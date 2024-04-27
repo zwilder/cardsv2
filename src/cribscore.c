@@ -131,7 +131,6 @@ CribScore* score_cribbage_play(Deck *deck) {
     int lr = cr; //lowest rank
     int hr = cr; //highest rank
     int ls = -1; //longest sequence
-    int seqlen = 0;
     bool seenRanks[14] = {false}; // Ranks start at 1, not 0, so 14 for 13 ranks.
     seenRanks[cr] = true;
     int score = 0;

@@ -59,6 +59,7 @@ extern Cribbage *g_cribbage;
  *****/
 bool cribbage_init(void);
 void cribbage_cleanup(void);
+void cribbage_clear_msg(void);
 void cribbage_msg(char *fstr, ...);
 char cribbage_prompt(char *fstr, ...);
 void cribbage_loop(void);

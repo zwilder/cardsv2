@@ -159,7 +159,6 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
     Deck *deck = NULL;
     Card *cards = NULL;
     SList *msgs = g_cribbage->msglist;
-    CribScore *score = NULL;
     uint8_t board_fg = WHITE; // Might be a settings option in the future?
     uint8_t board_bg = BRIGHT_BLACK;
 
@@ -173,7 +172,11 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
         cards = deck->cards;
         x = 1;
         while(cards) {
-            pt_card(x+xo,y+yo,cards);
+            if(check_flag(cards->flags, CD_UP)) {
+                pt_card(x+xo,y+yo,cards);
+            } else {
+                pt_card_back(x+xo,y+yo);
+            }
             x += 4;
             cards = cards->next;
         }
@@ -185,7 +188,11 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
         x = 54;
         y = 14;
         while(cards) {
-            pt_card(x+xo,y+yo,cards);
+            if(check_flag(cards->flags, CD_UP)) {
+                pt_card(x+xo,y+yo,cards);
+            } else {
+                pt_card_back(x+xo,y+yo);
+            }
             x += 4;
             cards = cards->next;
         }
@@ -197,12 +204,31 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
         x = 54;
         y = 0;
         while(cards) {
-            pt_card(x+xo,y+yo,cards);
+            if(check_flag(cards->flags, CD_UP)) {
+                pt_card(x+xo,y+yo,cards);
+            } else {
+                pt_card_back(x+xo,y+yo);
+            }
             x += 4;
             cards = cards->next;
         }
         scr_pt_clr(4+54+xo, y+yo+4, WHITE, BLACK, "CPU hand");
 
+        //Draw message/prompt
+        if(g_cribbage->msg) {
+            scr_pt_clr(xo,19+g_cribbage->msgpos+yo,WHITE,BLACK,"%s",g_cribbage->msg);
+        }
+        i = 0;
+        while(msgs) {
+            if(msgs->next) {
+                scr_pt_clr(xo,19+i+yo,WHITE,BLACK,"%s",msgs->data);
+            } else {
+                scr_pt_clr(xo,19+i+yo,BRIGHT_WHITE,BLACK,"%s",msgs->data);
+            }
+            i += 1;
+            msgs = msgs->next;
+        }
+        /*
         // Draw CPU points
         deck = g_cribbage->decks[CR_CPU];
         cards = deck->cards;
@@ -222,6 +248,7 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
         score = score_cribbage_hand(cards, g_cribbage->decks[CR_STOCK]->cards);
         scr_pt_clr(xo,yo+23,WHITE,BLACK,"Your hand: %s",score->msg);
         destroy_cribscore(score);
+        */
     } else {
         // Draw crib
         y = (g_cribbage->pcrib ? 14 : 0);
@@ -282,11 +309,6 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
         if(g_cribbage->msg) {
             scr_pt_clr(xo,19+g_cribbage->msgpos+yo,WHITE,BLACK,"%s",g_cribbage->msg);
         }
-        // This would be cool if it worked...
-        // Basically, it SHOULD print a "scrolling" list of messages, ideally
-        // with the "older" (anything other than the last) in BRIGHT_BLACK, so
-        // that the newest message stands out and it looks like a "scrolling"
-        // terminal
         i = 0;
         while(msgs) {
             if(msgs->next) {

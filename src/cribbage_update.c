@@ -26,8 +26,10 @@ void cribbage_update_discard(void);
 void cribbage_cpu_play(void);
 void cribbage_update_count(void);
 bool cribbage_check_go(Deck *deck);
+void cribbage_check_win(void);
 void cribbage_add_points(int points, bool player);
 void cribbage_update_play(void);
+void cribbage_show_points(Card *hand, bool player, char *msg);
 void cribbage_update_show(void);
 
 /*****
@@ -281,6 +283,17 @@ bool cribbage_check_go(Deck *deck) {
     return true;
 }
 
+void cribbage_check_win(void) {
+    // Check if player has over 121
+    // TODO: Option for long/short game
+    if(g_cribbage->pScore >= 121) {
+
+    } else if (g_cribbage->cScore >= 121) {
+
+    }
+    // Check if CPU has over 121    
+}
+
 void cribbage_add_points(int points, bool player) {
     // Update score and peg locations
     uint8_t *peg1 = (player ? &(g_cribbage->pegP1) : &(g_cribbage->pegC1));
@@ -289,9 +302,9 @@ void cribbage_add_points(int points, bool player) {
 
     if(*peg1 > *peg2) {
         *peg2 = *peg1 + points;
-    } else {
+    } else if (*peg1 < *peg2){
         *peg1 = *peg2 + points;
-    }
+    } // Don't do anything if pegs are equal - because that removes one of them
     *score += points;
 }
 
@@ -307,24 +320,48 @@ void cribbage_update_play(void) {
     // Check to see if both player and cpu hands are empty
     if((count_cards(g_cribbage->decks[CR_PLAYER]->cards) == 0) &&
             (count_cards(g_cribbage->decks[CR_CPU]->cards) == 0)) {
-        g_cribbage->flags &= ~GFL_CRIBPLAY;
-        g_cribbage->flags |= GFL_CRIBSHOW | GFL_DRAW;
-        //Move cards from the board back to the hand
-        //(This will move to cribbage_update_show())
+        // Award point for last card
+        pcard = get_last_card(g_cribbage->decks[CR_BOARD]);
+        player = check_flag(pcard->flags, CD_PLAYER);
+        if(g_cribbage->count != 31) {
+            cribbage_msg("%s: Last for 1.", (player ? "You" : "CPU"));
+            cribbage_add_points(1,player);
+        }
+        // Change state
         cribbage_prompt("Press any key to continue...");
+        g_cribbage->flags &= ~GFL_CRIBPLAY;
+        g_cribbage->flags |= GFL_CRIBSHOW;
+        cribbage_clear_msg();
+        return;
+    } 
+    // Check to see if both players have a go
+    if(cribbage_check_go(cdeck) && cribbage_check_go(pdeck)) {
+        //reset count to 0, last person who played a card gets a point (31s are
+        //counted in update_count)        
+        pcard = get_last_card(g_cribbage->decks[CR_BOARD]);
+        player = check_flag(pcard->flags, CD_PLAYER);
+        if(player && g_cribbage->pturn) {
+            g_cribbage->pturn = !g_cribbage->pturn;
+        } else {
+            if(g_cribbage->count != 31) {
+                if(count_cards(g_cribbage->decks[CR_PLAYER]->cards)) {
+                    cribbage_msg("You: Go.");
+                }
+                if(count_cards(g_cribbage->decks[CR_CPU]->cards)) {
+                    cribbage_msg("CPU: Go.");
+                }
+                cribbage_msg("%s: Last for 1.", (player ? "You" : "CPU"));
+                cribbage_add_points(1,player);
+            }
+            g_cribbage->count = 0;
+            g_cribbage->flags |= GFL_DRAW;
+        }
+        // Turn all cards in CR_BOARD inactive - CD_UP
         pcard = g_cribbage->decks[CR_BOARD]->cards;
         while(pcard) {
-            remove_card_from_deck(g_cribbage->decks[CR_BOARD],pcard);
-            if(check_flag(pcard->flags, CD_PLAYER)) {
-                add_card_to_deck(g_cribbage->decks[CR_PLAYER],pcard);
-            } else {
-                add_card_to_deck(g_cribbage->decks[CR_CPU],pcard);
-            }
-            pcard = g_cribbage->decks[CR_BOARD]->cards;
+            pcard->flags |= CD_UP;
+            pcard = pcard->next;
         }
-        merge_sort_deck(g_cribbage->decks[CR_PLAYER]);
-        merge_sort_deck(g_cribbage->decks[CR_CPU]);
-        merge_sort_deck(g_cribbage->decks[CR_CRIB]);
         return;
     }
 
@@ -332,8 +369,8 @@ void cribbage_update_play(void) {
     if(g_cribbage->pturn) {
         //Check if player has a go
         if(cribbage_check_go(pdeck)) {
-            cribbage_msg("You: Go.");
-            //cribbage_prompt("You: Go. (Press any key)");
+            //cribbage_msg("You: Go.");
+            cribbage_prompt("You: Go. (Press any key)");
             g_cribbage->pturn = false;
             g_cribbage->flags |= GFL_DRAW;
             return;
@@ -385,41 +422,82 @@ void cribbage_update_play(void) {
         }
         g_cribbage->pturn = true;
     }
-    // Check to see if both players have a go
-    if(cribbage_check_go(cdeck) && cribbage_check_go(pdeck)) {
-        //reset count to 0, last person who played a card gets a point (31s are
-        //counted in update_count)        
-        pcard = get_last_card(g_cribbage->decks[CR_BOARD]);
-        player = check_flag(pcard->flags, CD_PLAYER);
-        if(player && g_cribbage->pturn) {
-            // Player's turn and last card played was player or
-            // CPU's turn and last card played was CPU
-            // This give's the other player an opportunity to say "go"
-            // TODO: This logic doesn't work out. Saying "go" is skipped most
-            // times, but not all times. Problem is likely that this function is
-            // chungus and does too many things.
-            g_cribbage->pturn = !g_cribbage->pturn;
-        } else {
-            if(g_cribbage->count != 31) {
-                cribbage_msg("%s: Last for 1.", (player ? "You" : "CPU"));
-                cribbage_add_points(1,player);
-            }
-            g_cribbage->count = 0;
-            g_cribbage->flags |= GFL_DRAW;
-        }
-        // Turn all cards in CR_BOARD inactive - CD_UP
-        pcard = g_cribbage->decks[CR_BOARD]->cards;
-        while(pcard) {
-            pcard->flags |= CD_UP;
-            pcard = pcard->next;
-        }
-    }
 
+    //Check win condition
+    cribbage_check_win();
+}
+
+void cribbage_show_points(Card *hand, bool player, char *msg) {
+    CribScore *score = score_cribbage_hand(hand, g_cribbage->decks[CR_STOCK]->cards);
+    cribbage_add_points(score->pts, player);
+    cribbage_msg("%s: %s", msg, score->msg);
+    cribbage_prompt("Press any key to continue...");
+    destroy_cribscore(score);
+}
+
+void cribbage_flip_cards(Card *cards) {
+    Card *tmp = cards;
+    while(tmp) {
+        tmp->flags |= CD_UP;
+        tmp = tmp->next;
+    }
 }
 
 void cribbage_update_show(void) {
     // Score hands
+    Card *pcard = NULL;
+    int i = 0;
 
+    pcard = g_cribbage->decks[CR_BOARD]->cards;
+    if(pcard) {
+        //Move cards from the board back to the hand
+        while(pcard) {
+            remove_card_from_deck(g_cribbage->decks[CR_BOARD],pcard);
+            pcard->flags &= ~CD_UP;
+            if(check_flag(pcard->flags, CD_PLAYER)) {
+                add_card_to_deck(g_cribbage->decks[CR_PLAYER],pcard);
+            } else {
+                add_card_to_deck(g_cribbage->decks[CR_CPU],pcard);
+            }
+            pcard = g_cribbage->decks[CR_BOARD]->cards;
+        }
+        merge_sort_deck(g_cribbage->decks[CR_PLAYER]);
+        merge_sort_deck(g_cribbage->decks[CR_CPU]);
+        merge_sort_deck(g_cribbage->decks[CR_CRIB]);
+
+        // Award points
+        if(g_cribbage->pcrib) {
+            //Computer
+            cribbage_flip_cards(g_cribbage->decks[CR_CPU]->cards);
+            cribbage_show_points(g_cribbage->decks[CR_CPU]->cards, false, "CPU hand");
+            //Player (TODO: make player state points first/instead)
+            cribbage_flip_cards(g_cribbage->decks[CR_PLAYER]->cards);
+            cribbage_show_points(g_cribbage->decks[CR_PLAYER]->cards, true, "Your hand");
+        } else {
+            //Player
+            cribbage_flip_cards(g_cribbage->decks[CR_PLAYER]->cards);
+            cribbage_show_points(g_cribbage->decks[CR_PLAYER]->cards, true, "Your hand");
+            //Computer
+            cribbage_flip_cards(g_cribbage->decks[CR_CPU]->cards);
+            cribbage_show_points(g_cribbage->decks[CR_CPU]->cards, false, "CPU hand");
+        }
+        //Crib
+        cribbage_flip_cards(g_cribbage->decks[CR_CRIB]->cards);
+        cribbage_show_points(g_cribbage->decks[CR_CRIB]->cards, g_cribbage->pcrib,
+                (g_cribbage->pcrib ? "Your crib" : "CPU's Crib"));
+
+        //Check win condition
+        cribbage_check_win();
+
+        // Move to next round
+        cribbage_clear_msg();
+        for(i = 0; i < 6; i++) {
+            g_cribbage->btns[i]->active = true;
+        }
+        g_cribbage->count = 0;
+        g_cribbage->flags &= ~GFL_CRIBSHOW;
+        cribbage_deal();
+    }
 }
 
 void cribbage_update(void) {

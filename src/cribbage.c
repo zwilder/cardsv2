@@ -167,6 +167,13 @@ void cribbage_loop(void) {
         }
     }
 }
+void cribbage_clear_msg(void) {
+    //Push 4 blank messages - might be ok to just destroy the message list?
+    //destroy_slist(&g_cribbage->msglist); // This is blinky?
+    cribbage_msg(" ");
+    cribbage_msg(" ");
+    cribbage_msg(" ");
+}
 
 void cribbage_msg(char *fstr, ...) {
     /*
@@ -217,6 +224,8 @@ char cribbage_prompt(char *fstr, ...) {
     int xo = (g_screenW / 2) - (SCREEN_WIDTH / 2); // Standard screen size is 80x24, defined in glyph.c
     int yo = (g_screenH / 2) - (SCREEN_HEIGHT / 2);
     if(!fstr) return result;
+    g_cribbage->flags |= GFL_DRAW;
+    cribbage_draw();
 
     // Draw a blank line to "erase" the bottom of the screen
     char *prompt = malloc(SCREEN_WIDTH * sizeof(char));
