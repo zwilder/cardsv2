@@ -284,14 +284,33 @@ bool cribbage_check_go(Deck *deck) {
 }
 
 void cribbage_check_win(void) {
-    // Check if player has over 121
     // TODO: Option for long/short game
-    if(g_cribbage->pScore >= 121) {
-
-    } else if (g_cribbage->cScore >= 121) {
-
+    char ch = '\0';
+    bool prompt = false;
+    if(g_cribbage->pScore >= 61) {
+        //TODO: Add flash
+        cribbage_msg("You win!");
+        prompt = true;
+    } else if (g_cribbage->cScore >= 61) {
+        cribbage_msg("You lose!");
+        prompt = true;
     }
-    // Check if CPU has over 121    
+    if (prompt) {
+        ch = cribbage_prompt("Another round? (y/n):");
+        if(ch == 'Y') {
+            // Start a new round
+            g_cribbage->flags &= ~GFL_CRIBDISC;
+            g_cribbage->flags &= ~GFL_CRIBPLAY;
+            g_cribbage->flags &= ~GFL_CRIBSHOW;
+            g_cribbage->count = 0;
+            g_cribbage->pScore = 0;
+            g_cribbage->cScore = 0;
+            cribbage_deal();
+        } else {
+            g_cribbage->flags &= ~GFL_RUNNING;
+            g_cribbage->flags |= GFL_QTOMAIN;
+        }
+    }
 }
 
 void cribbage_add_points(int points, bool player) {
@@ -300,11 +319,12 @@ void cribbage_add_points(int points, bool player) {
     uint8_t *peg2 = (player ? &(g_cribbage->pegP2) : &(g_cribbage->pegC2));
     uint8_t *score = (player ? &(g_cribbage->pScore) : &(g_cribbage->cScore));
 
+    // TODO: This is silly. Fix it.
     if(*peg1 > *peg2) {
         *peg2 = *peg1 + points;
-    } else if (*peg1 < *peg2){
+    } else {
         *peg1 = *peg2 + points;
-    } // Don't do anything if pegs are equal - because that removes one of them
+    } 
     *score += points;
 }
 
