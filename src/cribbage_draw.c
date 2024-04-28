@@ -24,8 +24,8 @@
  *****/
 
 int peg_xofs(int score) {
-    // This needs an adjustment for 121 point games, right now works fine for 61
-    // point games TODO
+    // TODO This needs an adjustment for 121 point games, right now works fine for 61
+    // point games 
     if(score > 30) {
         score -= 30;
     }
@@ -163,9 +163,31 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
     uint8_t board_bg = BRIGHT_BLACK;
 
     // Clear screen
-    scr_clear();
+    //scr_clear();
+    clear_screen(g_screenbuf);
+    draw_screen(g_screenbuf);
 
-    if(check_flag(g_cribbage->flags, GFL_CRIBSHOW)) {
+    if (check_flag(g_cribbage->flags, GFL_WIN)) {
+        //TODO: This needs to be adjusted for standard games
+        if(g_cribbage->pScore >= 61) {
+            pt_card_title((SCREEN_WIDTH/2)-16+xo,yo,"YOU WON!");
+        }
+        if(g_cribbage->msg) {
+            scr_pt_clr(xo,19+g_cribbage->msgpos+yo,WHITE,BLACK,"%s",g_cribbage->msg);
+        }
+
+        //Draw message/prompt
+        i = 0;
+        while(msgs) {
+            if(msgs->next) {
+                scr_pt_clr(xo,19+i+yo,WHITE,BLACK,"%s",msgs->data);
+            } else {
+                scr_pt_clr(xo,19+i+yo,BRIGHT_WHITE,BLACK,"%s",msgs->data);
+            }
+            i += 1;
+            msgs = msgs->next;
+        }
+    } else if (check_flag(g_cribbage->flags, GFL_CRIBSHOW)) {
         // Draw crib
         y = (g_cribbage->pcrib ? 14 : 0);
         deck = g_cribbage->decks[CR_CRIB];
@@ -214,6 +236,10 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
         }
         scr_pt_clr(4+54+xo, y+yo+4, WHITE, BLACK, "CPU hand");
 
+        // Draw count
+        i = g_cribbage->count;
+        scr_pt_clr(37+xo,12+yo,WHITE,BLACK,"Count: %d",i);
+
         //Draw message/prompt
         if(g_cribbage->msg) {
             scr_pt_clr(xo,19+g_cribbage->msgpos+yo,WHITE,BLACK,"%s",g_cribbage->msg);
@@ -228,27 +254,6 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
             i += 1;
             msgs = msgs->next;
         }
-        /*
-        // Draw CPU points
-        deck = g_cribbage->decks[CR_CPU];
-        cards = deck->cards;
-        score = score_cribbage_hand(cards, g_cribbage->decks[CR_STOCK]->cards);
-        scr_pt_clr(xo,yo+21,WHITE,BLACK,"CPU hand: %s", score->msg);
-        destroy_cribscore(score);
-        // Draw crib points
-        deck = g_cribbage->decks[CR_CRIB];
-        cards = deck->cards;
-        score = score_cribbage_hand(cards, g_cribbage->decks[CR_STOCK]->cards);
-        scr_pt_clr(xo,yo+22,WHITE,BLACK,"%s: %s", 
-                (g_cribbage->pcrib ? "Your crib" : "CPU's Crib"),score->msg);
-        destroy_cribscore(score);
-        // Draw player points
-        deck = g_cribbage->decks[CR_PLAYER];
-        cards = deck->cards;
-        score = score_cribbage_hand(cards, g_cribbage->decks[CR_STOCK]->cards);
-        scr_pt_clr(xo,yo+23,WHITE,BLACK,"Your hand: %s",score->msg);
-        destroy_cribscore(score);
-        */
     } else {
         // Draw crib
         y = (g_cribbage->pcrib ? 14 : 0);

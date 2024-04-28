@@ -315,6 +315,17 @@ char kb_get_bl_char(void) {
     return c;
 }
 
+char kb_get_bl_char_cursor(int x, int y) {
+    /* Get a char, block until input recieved, and show a blinky cursor at 
+     * (x,y) */
+    char c = '\0';
+    scr_set_style(ST_BLINK);
+    scr_pt(x,y,"█");
+    c = kb_get_bl_char();
+    scr_set_style(ST_NONE);
+    return c;
+}
+
 char* kb_get_str(int maxsz) {
     /*
      * 1	Blinking block

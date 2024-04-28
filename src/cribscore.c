@@ -99,7 +99,7 @@ CribScore* score_cribbage_hand(Card *hand, Card *flop) {
         //scr_pt(0, g_screenH - 3, "%s - %d points!", buf, score);
         //snprintf(msg,80,"%s - %d points.",buf,score);
         buf[0] = toupper(buf[0]);
-        result = create_cribscore(0,score,"%s - %d points!",buf,score);
+        result = create_cribscore(0,score,"%s",buf,score);
     } else {
         //snprintf(msg,80,"No points.");
         result = create_cribscore(0,0,"No points!");

@@ -18,13 +18,6 @@
 * along with Cards.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*
- * TODO: I got a segfault attempting to move an empty column to a column with a
- * King... wasn't playing in GDB so I don't have any more info. Needs to be
- * investigated. (Annoyingly, It was the VERY last card before winning the
- * game). Possibly fixed. (added a check to make sure g_klondike->fromref->cards
- * isn't NULL in check_sequence).
- */
 #include <cards.h>
 
 void klondike_update(void) {

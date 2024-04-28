@@ -247,7 +247,7 @@ char cribbage_prompt(char *fstr, ...) {
     //printf("\x1b[?25h\x1b[1 q"); 
 
     // Get a char from the user
-    result = kb_get_bl_char();
+    result = kb_get_bl_char_cursor(xo+strlen(fstr)+1,23+yo);
 
     // Hide the cursor
     //printf("\x1b[?25l\x1b[0 q");
