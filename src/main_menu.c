@@ -25,10 +25,8 @@ void main_menu(void) {
     char ch = '\0';
     while(ch != 'q') {
         scr_clear(); // Clear everything off the terminal screen
-        fill_screen_blank(g_screenbuf); // Fill the screenbuf with blank characters (transparent)
-        pt_card_title((SCREEN_WIDTH/2)-12+xo,1+yo,"Cards!");
-        scr_pt_clr((SCREEN_WIDTH / 2)-9+xo,(SCREEN_HEIGHT - 1)+yo,
-                BRIGHT_BLACK,BLACK, "\u00A9 Zach Wilder 2024");
+        // Screen buffer drawing
+        clear_screen(g_screenbuf);
         draw_str((SCREEN_WIDTH/2)-20,8,
                 "[k] - Klondike        [p] - Penguin");
         
@@ -40,6 +38,10 @@ void main_menu(void) {
         draw_str((SCREEN_WIDTH/2)-20,12,
                 "[?] - Help            [q] - Quit");
         draw_screen(g_screenbuf);
+        // Terminal drawing
+        pt_card_title((SCREEN_WIDTH/2)-12+xo,1+yo,"Cards!");
+        scr_pt_clr((SCREEN_WIDTH / 2)-9+xo,(SCREEN_HEIGHT - 1)+yo,
+                BRIGHT_BLACK,BLACK, "\u00A9 Zach Wilder 2024");
         ch = kb_get_bl_char();
         switch(ch) {
             case 'k':
@@ -65,5 +67,4 @@ void main_menu(void) {
             default: break;
         }
     }
-    clear_screen(g_screenbuf);
 }

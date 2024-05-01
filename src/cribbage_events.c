@@ -61,8 +61,12 @@ void cribbage_events(void) {
             break;
         case 'q':
         case 'Q':
-            g_cribbage->flags &= ~GFL_RUNNING;
-            g_cribbage->flags |= GFL_QTOMAIN;
+            if(cribbage_prompt("Really quit? (y/n)") == 'Y') {
+                g_cribbage->flags &= ~GFL_RUNNING;
+                g_cribbage->flags |= GFL_QTOMAIN;
+            } else {
+                redraw = true;
+            }
             break;
         default: break;
     }

@@ -41,6 +41,7 @@ void cribbage_deal(void) {
     Deck *stock = g_cribbage->decks[CR_STOCK];
     Deck *playerhand = g_cribbage->decks[CR_PLAYER];
     Deck *cpuhand = g_cribbage->decks[CR_CPU];
+    Deck *board = g_cribbage->decks[CR_BOARD];
     Deck *crib = g_cribbage->decks[CR_CRIB];
     Card *card = NULL;
     
@@ -49,6 +50,7 @@ void cribbage_deal(void) {
     g_cribbage->pturn = !g_cribbage->pcrib;
 
     // Put all the cards back in the stock
+    add_deck(board,stock);
     add_deck(playerhand,stock);
     add_deck(cpuhand,stock);
     add_deck(crib,stock);
@@ -322,15 +324,23 @@ void cribbage_add_points(int points, bool player) {
 }
 
 void cribbage_update_win(void) {
+    int i = 0;
     char ch = cribbage_prompt("Another round? (y/n):");
     if(ch == 'Y') {
         // Start a new round
         g_cribbage->flags &= ~GFL_CRIBDISC;
         g_cribbage->flags &= ~GFL_CRIBPLAY;
         g_cribbage->flags &= ~GFL_CRIBSHOW;
+        g_cribbage->flags &= ~GFL_WIN;
         g_cribbage->count = 0;
         g_cribbage->pScore = 0;
         g_cribbage->cScore = 0;
+        g_cribbage->pegC1 = g_cribbage->pegC2 = 0;
+        g_cribbage->pegP1 = g_cribbage->pegP2 = 0;
+        cribbage_clear_msg();
+        for(i = 0; i < 6; i++) {
+            g_cribbage->btns[i]->active = true;
+        }
         cribbage_deal();
     } else {
         g_cribbage->flags &= ~GFL_RUNNING;

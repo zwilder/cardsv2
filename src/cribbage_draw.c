@@ -356,8 +356,8 @@ U+259x	▐	░	▒	▓	▔	▕	▖	▗	▘	▙	▚	▛	▜	▝	▞	▟
     cribbage_draw_peg(22,58,9,g_cribbage->pegP1,BRIGHT_GREEN);
 
     //Draw scores
-    scr_pt_clr(62+xo,6+yo,WHITE,BLACK,"%d",g_cribbage->cScore);
-    scr_pt_clr(62+xo,10+yo,WHITE,BLACK,"%d",g_cribbage->pScore);
+    scr_pt_clr(62+xo,6+yo,WHITE,BLACK,"CPU's score: %d",g_cribbage->cScore);
+    scr_pt_clr(62+xo,10+yo,WHITE,BLACK,"Your score:  %d",g_cribbage->pScore);
 
     
     // Turn off draw flag
