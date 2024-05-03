@@ -20,7 +20,7 @@
 #include <cards.h>
 
 int main(int argc, char **argv) {
-    init_genrand(time(NULL)); // Seed the pnrg
+    init_genrand(time(NULL)); // Seed the prng
     term_init(); // Initialize the terminal
     init_screenbuf(); // Initialize the global screen buffer
     clear_screen(g_screenbuf); // Clear the screenbuf

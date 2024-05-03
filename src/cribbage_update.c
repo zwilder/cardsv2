@@ -34,7 +34,7 @@ void cribbage_show_points(Card *hand, bool player, char *msg);
 void cribbage_update_show(void);
 
 /*****
- * Cribbage update functions
+ * Cribbage update assistance functions
  *****/
 void cribbage_deal(void) {
     int i = 0;
@@ -108,63 +108,6 @@ void cribbage_cpu_to_crib(void) {
     add_card_to_deck(crib, 
             remove_card_from_deck(cpuhand,
                 get_card_at(cpuhand,i)));
-}
-
-void cribbage_update_discard(void) {
-    int i = 0, count = 0;
-    int id_a = 0, id_b = 0;
-    char *astr = NULL, *bstr = NULL;
-    Card *acard = NULL, *bcard = NULL;
-    char ch = '\0';
-    // Count how many buttons are selected
-    count = 0;
-    for(i = 0; i < 6; i++) {
-        if(g_cribbage->btns[i]->selected) {
-            count++;
-            (id_a ? (id_b = i) : (id_a = i));
-        }
-    }
-
-    // If 2, prompt the user for confirmation that these two are what they want
-    // to add to the crib
-    if(2 == count) {
-        acard = get_card_at(g_cribbage->decks[CR_PLAYER], id_a);
-        bcard = get_card_at(g_cribbage->decks[CR_PLAYER], id_b);
-        astr = get_card_str(acard);
-        bstr = get_card_str(bcard);
-        // If user confirms, add the two cards to the crib and change state to
-        // GFL_CRIBPLAY
-        // If user declines, deselect all buttons
-        ch = cribbage_prompt("Add the %s and %s to the crib? [y/n]", astr, bstr);
-        if('Y' == ch)
-        {
-            // Move cards to crib, change state
-            remove_card_from_deck(g_cribbage->decks[CR_PLAYER],acard);
-            add_card_to_deck(g_cribbage->decks[CR_CRIB],acard);
-            remove_card_from_deck(g_cribbage->decks[CR_PLAYER],bcard);
-            add_card_to_deck(g_cribbage->decks[CR_CRIB],bcard);
-
-            cribbage_cpu_to_crib();
-
-            g_cribbage->flags &= ~GFL_CRIBDISC;
-            g_cribbage->flags |= GFL_CRIBPLAY | GFL_DRAW;
-            cribbage_msg("Choose a card to play");
-            for(i = 0; i < 6; i++) {
-                g_cribbage->btns[i]->selected = false;
-                // Deactivate last two buttons, not needed now
-                if(i > 3) {
-                    g_cribbage->btns[i]->active = false;
-                }
-            }
-        } else {
-            for(i = 0; i < 6; i++) {
-                g_cribbage->btns[i]->selected = false;
-            }
-        }
-        g_cribbage->flags |= GFL_DRAW;
-    }
-    if(astr) free(astr);
-    if(bstr) free(bstr);
 }
 
 void cribbage_cpu_play(void) {
@@ -323,6 +266,38 @@ void cribbage_add_points(int points, bool player) {
     *score += points;
 }
 
+void cribbage_show_points(Card *hand, bool player, char *msg) {
+    CribScore *score = score_cribbage_hand(hand, g_cribbage->decks[CR_STOCK]->cards);
+    cribbage_add_points(score->pts, player);
+    cribbage_msg("%s: %s", msg, score->msg);
+    cribbage_prompt("Press any key to continue...");
+    destroy_cribscore(score);
+}
+
+void cribbage_flip_cards(Card *cards) {
+    Card *tmp = cards;
+    while(tmp) {
+        tmp->flags |= CD_UP;
+        tmp = tmp->next;
+    }
+}
+
+/*****
+ * Cribbage update functions
+ *****/
+void cribbage_update(void) {
+    // Calls the appropriate update routine for whichever state the game is in
+    if(check_flag(g_cribbage->flags, GFL_WIN)) {
+        cribbage_update_win();
+    } else if(check_flag(g_cribbage->flags, GFL_CRIBDISC)) {
+        cribbage_update_discard();
+    } else if (check_flag(g_cribbage->flags, GFL_CRIBPLAY)) {
+        cribbage_update_play();
+    } else if (check_flag(g_cribbage->flags, GFL_CRIBSHOW)) {
+        cribbage_update_show();
+    }
+}
+
 void cribbage_update_win(void) {
     int i = 0;
     char ch = cribbage_prompt("Another round? (y/n):");
@@ -346,6 +321,63 @@ void cribbage_update_win(void) {
         g_cribbage->flags &= ~GFL_RUNNING;
         g_cribbage->flags |= GFL_QTOMAIN;
     }
+}
+
+void cribbage_update_discard(void) {
+    int i = 0, count = 0;
+    int id_a = 0, id_b = 0;
+    char *astr = NULL, *bstr = NULL;
+    Card *acard = NULL, *bcard = NULL;
+    char ch = '\0';
+    // Count how many buttons are selected
+    count = 0;
+    for(i = 0; i < 6; i++) {
+        if(g_cribbage->btns[i]->selected) {
+            count++;
+            (id_a ? (id_b = i) : (id_a = i));
+        }
+    }
+
+    // If 2, prompt the user for confirmation that these two are what they want
+    // to add to the crib
+    if(2 == count) {
+        acard = get_card_at(g_cribbage->decks[CR_PLAYER], id_a);
+        bcard = get_card_at(g_cribbage->decks[CR_PLAYER], id_b);
+        astr = get_card_str(acard);
+        bstr = get_card_str(bcard);
+        // If user confirms, add the two cards to the crib and change state to
+        // GFL_CRIBPLAY
+        // If user declines, deselect all buttons
+        ch = cribbage_prompt("Add the %s and %s to the crib? [y/n]", astr, bstr);
+        if('Y' == ch)
+        {
+            // Move cards to crib, change state
+            remove_card_from_deck(g_cribbage->decks[CR_PLAYER],acard);
+            add_card_to_deck(g_cribbage->decks[CR_CRIB],acard);
+            remove_card_from_deck(g_cribbage->decks[CR_PLAYER],bcard);
+            add_card_to_deck(g_cribbage->decks[CR_CRIB],bcard);
+
+            cribbage_cpu_to_crib();
+
+            g_cribbage->flags &= ~GFL_CRIBDISC;
+            g_cribbage->flags |= GFL_CRIBPLAY | GFL_DRAW;
+            cribbage_msg("Choose a card to play");
+            for(i = 0; i < 6; i++) {
+                g_cribbage->btns[i]->selected = false;
+                // Deactivate last two buttons, not needed now
+                if(i > 3) {
+                    g_cribbage->btns[i]->active = false;
+                }
+            }
+        } else {
+            for(i = 0; i < 6; i++) {
+                g_cribbage->btns[i]->selected = false;
+            }
+        }
+        g_cribbage->flags |= GFL_DRAW;
+    }
+    if(astr) free(astr);
+    if(bstr) free(bstr);
 }
 
 void cribbage_update_play(void) {
@@ -394,6 +426,7 @@ void cribbage_update_play(void) {
                         g_cribbage->count);
                 cribbage_add_points(1,player);
             }
+            cribbage_prompt("Press any key to continue...");
             g_cribbage->count = 0;
             g_cribbage->flags |= GFL_DRAW;
         }
@@ -468,22 +501,6 @@ void cribbage_update_play(void) {
     cribbage_check_win();
 }
 
-void cribbage_show_points(Card *hand, bool player, char *msg) {
-    CribScore *score = score_cribbage_hand(hand, g_cribbage->decks[CR_STOCK]->cards);
-    cribbage_add_points(score->pts, player);
-    cribbage_msg("%s: %s", msg, score->msg);
-    cribbage_prompt("Press any key to continue...");
-    destroy_cribscore(score);
-}
-
-void cribbage_flip_cards(Card *cards) {
-    Card *tmp = cards;
-    while(tmp) {
-        tmp->flags |= CD_UP;
-        tmp = tmp->next;
-    }
-}
-
 void cribbage_update_show(void) {
     // Score hands
     Card *pcard = NULL;
@@ -548,19 +565,6 @@ void cribbage_update_show(void) {
             g_cribbage->flags &= ~GFL_CRIBSHOW;
             cribbage_deal();
         }
-    }
-}
-
-void cribbage_update(void) {
-    // Calls the appropriate update routine for whichever state the game is in
-    if(check_flag(g_cribbage->flags, GFL_WIN)) {
-        cribbage_update_win();
-    } else if(check_flag(g_cribbage->flags, GFL_CRIBDISC)) {
-        cribbage_update_discard();
-    } else if (check_flag(g_cribbage->flags, GFL_CRIBPLAY)) {
-        cribbage_update_play();
-    } else if (check_flag(g_cribbage->flags, GFL_CRIBSHOW)) {
-        cribbage_update_show();
     }
 }
 

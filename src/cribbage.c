@@ -56,12 +56,6 @@ bool cribbage_init(void) {
     g_cribbage->count = 0;
     g_cribbage->msg = NULL;
     g_cribbage->msglist = NULL;
-
-    //g_cribbage->msglist = create_slist("First message. %d",1001);
-    //slist_push(&(g_cribbage->msglist), "Second message. %d",2);
-    //slist_push(&(g_cribbage->msglist), "Third message. %d",3);
-    //slist_push(&(g_cribbage->msglist), "Fourth message. %d",4);
-
     g_cribbage->msgpos = 0;
     g_cribbage->flags = GFL_NONE;
 
@@ -176,19 +170,6 @@ void cribbage_clear_msg(void) {
 }
 
 void cribbage_msg(char *fstr, ...) {
-    /*
-    if(g_cribbage->msg) {
-        free(g_cribbage->msg);
-        g_cribbage->msg = NULL;
-    }
-    if(!fstr) return;
-    va_list args;
-    va_start(args,fstr);
-    int i = SCREEN_WIDTH - 1;
-    g_cribbage->msg = malloc(sizeof(char) * i);
-    vsnprintf(g_cribbage->msg,i,fstr,args);
-    va_end(args);
-    */
     // Cribbage should maintain an SList of messages, and then print all of them
     // in order on the screen
     
@@ -242,15 +223,8 @@ char cribbage_prompt(char *fstr, ...) {
     scr_pt_clr(xo,23+yo,WHITE,BLACK,prompt);
 
     // Show the blinking cursor
-    // (Doesn't work)
-    // Should have a show/hide in term_engine TODO
-    //printf("\x1b[?25h\x1b[1 q"); 
-
     // Get a char from the user
     result = kb_get_bl_char_cursor(xo+strlen(fstr)+1,23+yo);
-
-    // Hide the cursor
-    //printf("\x1b[?25l\x1b[0 q");
 
     // Change result to upper case
     if(result) {
