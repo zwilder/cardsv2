@@ -118,7 +118,10 @@ void cribbage_cpu_play(void) {
     // TODO: For some bizarre reason, during a test game the computer played a
     // card that brought the total to 33 before claiming a point for go. Not
     // sure how that happened and I haven't been able to duplicate it, but
-    // clearly a bug.
+    // clearly a bug. Update 10/4: After many (many) rounds, this bug happens
+    // when the computer has a matching card during the play. For instance if
+    // there is 25 on the table, and the last card played was a K... the
+    // computer will play a K for 2 points and 1 for last. (Obviously wrong)
     Deck *board = g_cribbage->decks[CR_BOARD];
     Deck *cpuhand = g_cribbage->decks[CR_CPU];
     Card *card = NULL;
@@ -126,6 +129,7 @@ void cribbage_cpu_play(void) {
     int numcards = count_cards(cpuhand->cards);
     int i = mt_rand(0,numcards-1); // -1 because 0 indexed
     int priority = 0;
+    int valuecheck = 0;
     if(cribbage_check_go(cpuhand)) {
         // This should never happen.
         cribbage_msg("CPU: I uh, don't have any cards to play boss.");
@@ -159,7 +163,11 @@ void cribbage_cpu_play(void) {
         }
         card = card->next;
     }
-    if(!choice) {
+    if(choice) {
+        // Made a card choice, lets make sure it's valid
+        valuecheck = cribbage_card_value(choice->flags) + g_cribbage->count;
+    }
+    if(!choice || (valuecheck > 31)) {
         choice = get_card_at(cpuhand,i);
         while((cribbage_card_value(choice->flags) + g_cribbage->count) > 31) {
             i = mt_rand(0,numcards-1);
