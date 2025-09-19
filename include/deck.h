@@ -126,7 +126,9 @@ void merge_sort_deck_bysuite(Deck *deck, bool bysuite);
  *****/
 void pt_card_simple(int x, int y, Card *card);
 void pt_card(int x, int y, Card *card);
+void pt_card_blink(int x, int y, Card *card);
 void pt_card_top(int x, int y, Card *card);
+void pt_card_top_blink(int x, int y, Card *card);
 void pt_card_suite(int x, int y, Card *card);
 void pt_card_rank(int x, int y, Card *card);
 void pt_card_left(int x, int y, Card *card);

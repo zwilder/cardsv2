@@ -69,5 +69,6 @@ int penguin_find_high_card(void);
  * penguin_draw.c
  *****/
 void penguin_draw(void); 
+bool penguin_find_next_card(Card *card);
 
 #endif //PENGUIN_H

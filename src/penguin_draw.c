@@ -113,13 +113,24 @@ void penguin_draw(void) {
                 cards = deck->cards;
                 while(cards->next) {
                     y = j + yo;
-                    pt_card_top(x,y,cards);
+                    // Idea: what if we set a toggle to a keypress 
+                    // to "highlight" the "next" card up from the 
+                    // foundation? Maybe have it blink?
+                    if(penguin_find_next_card(cards)) {
+                        pt_card_top_blink(x,y,cards);
+                    } else {
+                        pt_card_top(x,y,cards);
+                    }
                     j++;
                     cards = cards->next;
                 }
                 // Print the last card
                 y = j + yo;
-                pt_card(x,y,cards);
+                if(penguin_find_next_card(cards)) {
+                    pt_card_blink(x,y,cards);
+                } else {
+                    pt_card(x,y,cards);
+                }
             } else {
                 // print a space since there is no cards
                 pt_card_space(x,yo);
@@ -197,4 +208,32 @@ void penguin_draw(void) {
                 ch, g_settings->penguin_hs, g_settings->penguin_last);
     }
     g_penguin->flags &= ~GFL_DRAW;
+}
+
+bool penguin_find_next_card(Card *card) {
+    // Take the rank and suite of card and see if it is exactly 1 higher than
+    // the rank of the matching suite in the foundation
+    bool success = false;
+    Deck *fnd = NULL;
+    Card *fnd_top_card = NULL;
+    int i = 0;
+    int card_rank = 0, fnd_rank = 0;
+
+    if(!card) return success;
+    card_rank = get_rank(card->flags);
+    for(i = 0; i < 4; i++) {
+        fnd = g_penguin->decks[PN_FND_H + i];
+        fnd_top_card = get_last_card(fnd);
+        if(!fnd_top_card) continue;
+        if(card_same_suite(fnd_top_card->flags, card->flags)) {
+            // We want the rank exactly one higher than the fnd rank
+            fnd_rank = get_rank(fnd_top_card->flags) + 1;
+            if(fnd_rank > 13) fnd_rank = 1; // Next higher than K is A
+            if(fnd_rank == card_rank) {
+                success = true;
+                break;
+            }
+        }
+    }
+    return success;
 }

@@ -679,6 +679,57 @@ void pt_card(int x, int y, Card *card) {
     free(rankstr);
 }
 
+void pt_card_blink(int x, int y, Card *card) {
+    /* 
+     * Same as pt_card, but print the Suite/Rank blinking
+     * (Note: This could probably be done simpler instead of copying the code
+     * from the pt_card(...) function)
+     */
+    int cflags = card->flags;
+    int fg = (card_red(cflags) ? g_settings->redcolor : g_settings->blackcolor);
+    int bg = g_settings->bgcolor;
+    char *sstr = malloc(8 * sizeof(char));
+    char *rankstr = malloc(4 * sizeof(char));
+    int rank = get_rank(cflags);
+    if(13 == rank) {
+        snprintf(rankstr,4,"K");
+    } else if (12 == rank) {
+        snprintf(rankstr,4,"Q");
+    } else if (11 == rank) {
+        snprintf(rankstr,4,"J");
+    } else if (1 == rank) {
+        snprintf(rankstr,4,"A");
+    } else {
+        snprintf(rankstr,4,"%d",rank);
+    }
+    switch(get_suite(cflags)) {
+        case 'h': snprintf(sstr, 8, "\u2665"); break;
+        case 'd': snprintf(sstr, 8, "\u2666"); break;
+        case 'c': snprintf(sstr, 8, "\u2663"); break;
+        case 's': snprintf(sstr, 8, "\u2660"); break;
+        default: break;
+    }
+
+    scr_pt_clr(x,y,fg,bg,"\u2554\u2550\u2550\u2557");
+    scr_pt_clr(x,y+1,fg,bg,"\u2551  \u2551");
+    scr_set_style(ST_BLINK);
+    scr_pt_clr(x+1,y+1,fg,bg,"%s ",sstr);
+    scr_set_style(ST_NONE);
+    if(10 == rank) {
+        scr_pt_clr(x,y+2,fg,bg,"\u2551  \u2551");
+        scr_set_style(ST_BLINK);
+        scr_pt_clr(x+1,y+2,fg,bg,"%s",rankstr);
+        scr_set_style(ST_NONE);
+    } else {
+        scr_pt_clr(x,y+2,fg,bg,"\u2551  \u2551");
+        scr_set_style(ST_BLINK);
+        scr_pt_clr(x+2,y+2,fg,bg,"%s",rankstr);
+        scr_set_style(ST_NONE);
+    }
+    scr_pt_clr(x,y+3,fg,bg,"\u255A\u2550\u2550\u255D");
+    free(sstr);
+    free(rankstr);
+}
 void pt_card_top(int x, int y, Card *card) {
     /*
      * Prints the top of the card for vertical stacking like:
@@ -700,6 +751,22 @@ void pt_card_top(int x, int y, Card *card) {
     }
 }
 
+void pt_card_top_blink(int x, int y, Card *card) {
+    /* 
+     * Same as pt_card_top, but make the suite/rank blink
+     */
+    int rank = get_rank(card->flags);
+    int fg = (card_red(card->flags) ? g_settings->redcolor : g_settings->blackcolor);
+    int bg = g_settings->bgcolor;
+    scr_pt_clr(x,y,fg, bg, "\u2554");
+    scr_set_style(ST_BLINK);
+    pt_card_simple(x+1,y,card);
+    scr_set_style(ST_NONE);
+    if(10 != rank) {
+        scr_pt_clr(x+3,y,fg,bg, "\u2557");
+    }
+}
+    
 void pt_card_suite(int x, int y, Card *card) {
     int fg = (card_red(card->flags) ? g_settings->redcolor : g_settings->blackcolor);
     int bg = g_settings->bgcolor;
