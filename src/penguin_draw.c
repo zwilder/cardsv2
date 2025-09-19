@@ -148,7 +148,11 @@ void penguin_draw(void) {
         deck = g_penguin->decks[PN_CELL_A + i];
         if(deck->cards) {
             cards = deck->cards;
-            pt_card(x,y,cards);
+            if(penguin_find_next_card(cards)) {
+                pt_card_blink(x,y,cards);
+            } else {
+                pt_card(x,y,cards);
+            }
         } else {
             pt_card_space_ch(x,y,str[i]);
         }
@@ -211,8 +215,9 @@ void penguin_draw(void) {
 }
 
 bool penguin_find_next_card(Card *card) {
-    // Take the rank and suite of card and see if it is exactly 1 higher than
-    // the rank of the matching suite in the foundation
+    /* Take the rank and suite of card and see if it is exactly 1 higher than
+     * the rank of the matching suite in the foundation
+     */
     bool success = false;
     Deck *fnd = NULL;
     Card *fnd_top_card = NULL;
@@ -220,6 +225,8 @@ bool penguin_find_next_card(Card *card) {
     int card_rank = 0, fnd_rank = 0;
 
     if(!card) return success;
+    if(!(check_flag(g_penguin->flags, GFL_TARGET))) return success;
+
     card_rank = get_rank(card->flags);
     for(i = 0; i < 4; i++) {
         fnd = g_penguin->decks[PN_FND_H + i];

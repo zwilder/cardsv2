@@ -198,6 +198,10 @@ void penguin_events(void) {
         case '2': btn_id = PN_FND_D; break;
         case '3': btn_id = PN_FND_C; break;
         case '4': btn_id = PN_FND_S; break;
+        case 'T':
+        case 't':
+                  g_penguin->flags ^= GFL_TARGET;
+                  break;
         case 27:
         case 'q': solitaire_pause(g_penguin); break;
         default: redraw = false; break;

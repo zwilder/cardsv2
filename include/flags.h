@@ -38,7 +38,12 @@ typedef enum {
     GFL_CRIBDISC    = 1 << 7,
     GFL_CRIBPLAY    = 1 << 8,
     GFL_CRIBSHOW    = 1 << 9,
-    GFL_PAUSE       = 1 << 10
+    GFL_PAUSE       = 1 << 10,
+
+    /*
+     * Target is for 'next' cards, used in Penguin
+     */
+    GFL_TARGET      = 1 << 11
 } GameFlags;
 
 bool check_flag(uint32_t mask, uint32_t flag);
