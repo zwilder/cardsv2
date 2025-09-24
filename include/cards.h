@@ -1,6 +1,6 @@
 /*
 * Cards
-* Copyright (C) Zach Wilder 2024
+* Copyright (C) Zach Wilder 2024-2025
 * 
 * This file is a part of Cards
 *
@@ -37,6 +37,7 @@
 #include <deck.h>
 #include <button.h>
 #include <settings.h>
+#include <high_scores.h>
 #include <save.h>
 #include <draw.h> // Toolbox candidate
 #include <color_picker.h> // Toolbox candidate
@@ -53,7 +54,6 @@
  * Utility and Helper functions
  *****/
 void main_menu(void); // main_menu.c
-void high_scores(void); // high_scores.c
 void help_menu(void); // help.c
 void help_about(void); // help.c
 void help_penguin(void); // help.c

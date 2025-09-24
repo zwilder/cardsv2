@@ -110,6 +110,8 @@ void klondike_loop(void) {
     }
     if(g_klondike->score) {
         g_settings->klondike_last = g_klondike->score;
+        add_new_score_chrono(g_settings->klondike_scores,
+                g_klondike->score);
     }
     save_settings();
 }

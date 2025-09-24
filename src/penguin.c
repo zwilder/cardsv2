@@ -1,6 +1,6 @@
 /*
 * Cards
-* Copyright (C) Zach Wilder 2024
+* Copyright (C) Zach Wilder 2024-2025
 * 
 * This file is a part of Cards
 *
@@ -157,6 +157,8 @@ void penguin_loop(void) {
     }
     if(g_penguin->score) {
         g_settings->penguin_last = g_penguin->score;
+        add_new_score_chrono(g_settings->penguin_scores,
+                g_penguin->score);
     }
     save_settings();
 }

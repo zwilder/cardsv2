@@ -25,6 +25,7 @@
  * Global settings structure
  *****/
 typedef struct Settings Settings;
+typedef struct Highscore Highscore;
 
 struct Settings {
     uint8_t redcolor;
@@ -40,6 +41,8 @@ struct Settings {
     int penguin_hs;
     int penguin_last;
     int penguin_wins;
+    Highscore *klondike_scores;
+    Highscore *penguin_scores;
 };
 
 extern Settings *g_settings;

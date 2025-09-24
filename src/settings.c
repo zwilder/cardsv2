@@ -54,10 +54,23 @@ void init_settings(void) {
     g_settings->penguin_hs = 0;
     g_settings->penguin_last = 0;
     g_settings->penguin_wins = 0;
+    /*
+     * The high scores aren't created/initialized here because they are checked
+     * for during the data file loading in save.c. If the cards.bin file doesn't
+     * exist, THEN it creates the blank high scores. If it does exist, then it
+     * loads it and all is happy.
+     */
+    //g_settings->klondike_scores = create_highscores();
 }
 
 void close_settings(void) {
     if(!g_settings) return;
+    if(g_settings->klondike_scores) {
+        cleanup_high_scores(g_settings->klondike_scores);
+    }
+    if(g_settings->penguin_scores) {
+        cleanup_high_scores(g_settings->penguin_scores);
+    }
     free(g_settings);
 }
 

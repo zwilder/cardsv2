@@ -1,6 +1,6 @@
 /*
 * Cards
-* Copyright (C) Zach Wilder 2024
+* Copyright (C) Zach Wilder 2024-2025
 * 
 * This file is a part of Cards
 *
