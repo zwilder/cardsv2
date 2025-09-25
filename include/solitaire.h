@@ -40,5 +40,6 @@ void solitaire_msg(Solitaire *g, char *msg,...);
 long current_ms(void);
 void solitaire_loop(Solitaire *g);
 void solitaire_pause(Solitaire *g);
+char solitaire_prompt(char *fstr, ...);
 
 #endif // SOLITAIRE_H

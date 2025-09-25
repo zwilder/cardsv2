@@ -28,6 +28,14 @@ void klondike_update(void) {
     // Check win condition
     if(check_flag(g_klondike->flags, GFL_WIN)) {
         // None of the rest of update needs to run
+        g_klondike->flags |= GFL_DRAW;
+        g_klondike->draw();
+        if(solitaire_prompt("Another game? (y/n): ") == 'Y') {
+            g_klondike->flags |= GFL_RESTART;
+        } else {
+            g_klondike->flags |= GFL_QTOMAIN;
+            g_klondike->flags &= ~GFL_RUNNING;
+        }
         return;
     }
 

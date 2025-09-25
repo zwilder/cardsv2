@@ -19,6 +19,7 @@
 */
 #include <cards.h>
 #include <sys/time.h>
+#include <ctype.h>
 
 Solitaire* create_solitaire(uint8_t num_decks) {
     uint8_t i = 0;
@@ -167,4 +168,47 @@ void solitaire_pause(Solitaire *g) {
     // Cleanup
     clear_screen(g_screenbuf);
     destroy_slist(&menu);
+}
+
+char solitaire_prompt(char *fstr, ...) {
+    /*
+     * Draw a prompt at the bottom of the screen, and wait for the user to
+     * keypress, then return the char of that keypress (uppercase)
+     *
+     * Note: Need to make sure to turn on the GFL_DRAW flag, and call the
+     * solitaire's draw routine PRIOR to calling this. This seemed like a better
+     * solution than passing in a pointer to the solitaire game that was calling
+     * the function.
+     */
+    char result = '\0';
+    int xo = (g_screenW / 2) - (SCREEN_WIDTH / 2); // Standard screen size is 80x24, defined in glyph.c
+    int yo = (g_screenH / 2) - (SCREEN_HEIGHT / 2);
+    if(!fstr) return result;
+
+    // Draw a blank line to "erase" the bottom of the screen
+    char *prompt = malloc(SCREEN_WIDTH * sizeof(char));
+    memset(prompt, ' ', SCREEN_WIDTH - 2);
+    prompt[SCREEN_WIDTH - 2] = '\0';
+    scr_pt_clr(0+xo,23+yo,WHITE,BLACK,prompt); 
+
+    // Format the prompt
+    va_list args;
+    va_start(args,fstr);
+    vsnprintf(prompt,SCREEN_WIDTH,fstr,args);
+    va_end(args);
+
+    // Print the prompt
+    scr_pt_clr(xo,23+yo,WHITE,BLACK,prompt);
+
+    // Show the blinking cursor
+    // Get a char from the user
+    result = kb_get_bl_char_cursor(xo+strlen(fstr)+1,23+yo);
+
+    // Change result to upper case
+    if(result) {
+        result = toupper(result);
+    }
+
+    free(prompt);
+    return result;
 }

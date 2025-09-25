@@ -26,6 +26,15 @@ void penguin_update(void) {
     // Check win condition
     if(check_flag(g_penguin->flags, GFL_WIN)) {
         // None of the rest of update needs to run
+        // Maybe put a prompt here to start a new game?
+        g_penguin->flags |= GFL_DRAW;
+        g_penguin->draw();
+        if(solitaire_prompt("Another game? (y/n): ") == 'Y') {
+            g_penguin->flags |= GFL_RESTART;
+        } else {
+            g_penguin->flags |= GFL_QTOMAIN;
+            g_penguin->flags &= ~GFL_RUNNING;
+        }
         return;
     }
 
